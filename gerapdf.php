@@ -48,7 +48,7 @@ class PDF extends FPDF
         $this->SetFont('Helvetica','',10);
         $nb = 0;
         for($i=0;$i<count($data);$i++)
-            $nb = max($nb, $this->NbLines(40, $data[$i]));
+            $nb = max($nb, $this->NbLines(40, $this->convertText($data[$i])));
         $h = 5 * $nb;
         $this->CheckPageBreak($h);
         for($i=0;$i<count($data);$i++) {
@@ -57,7 +57,7 @@ class PDF extends FPDF
             $x = $this->GetX();
             $y = $this->GetY();
             $this->Rect($x, $y, $w, $h);
-            $this->MultiCell($w, 5, $data[$i], 0, $a);
+            $this->MultiCell($w, 5, $this->convertText($data[$i]), 0, $a);
             $this->SetXY($x + $w, $y);
         }
         $this->Ln($h);
