@@ -2,9 +2,9 @@
 session_start();
 include('config.php');
 
-if(empty($_POST['usuario']) || empty($_POST['senha'])) {
-	header('Location: acesso.php');
-	exit();
+if (empty($_POST['usuario']) || empty($_POST['senha'])) {
+    header('Location: acesso.php');
+    exit();
 }
 
 // Checa se o formulário foi submetido:
@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['recaptcha_response'])
 
 }
 
-if ($recaptcha_verified = true){
+if ($recaptcha_verified = true) {
 
     $usuario = mysqli_real_escape_string($link, $_POST['usuario']);
     $senha = mysqli_real_escape_string($link, $_POST['senha']);
@@ -40,21 +40,21 @@ if ($recaptcha_verified = true){
 
     $row = mysqli_num_rows($result);
 
-    if($row == 1) {
-	    $_SESSION['usuario'] = $usuario;
-	    header('Location: index.php');
-	    exit();
+    if ($row == 1) {
+        $_SESSION['usuario'] = $usuario;
+        header('Location: index.php');
+        exit();
     } else {
-	    $_SESSION['nao_autenticado'] = true;
-	    header('Location: acesso.php');
-	    exit();
+        $_SESSION['nao_autenticado'] = true;
+        header('Location: acesso.php');
+        exit();
     }
 
 } else {
 
     $_SESSION['nao_autenticado'] = true;
-	header('Location: acesso.php');
-	exit();
+    header('Location: acesso.php');
+    exit();
 
 }
-mysqli_close($link);
+//mysqli_close($link);
