@@ -29,7 +29,6 @@ if (!empty($_POST['usuario'])) {
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
     <link rel="stylesheet" href="css/bulma.min.css" />
     <link rel="stylesheet" type="text/css" href="css/login.css">
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css"> -->
     <script src="https://www.google.com/recaptcha/api.js?render=6Lc-XbUlAAAAACDgZwhPNK0L_C9rKKEsmAHX5OZh"></script>
     <script>
         grecaptcha.ready(function () {

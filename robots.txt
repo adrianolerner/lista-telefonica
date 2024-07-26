@@ -1,4 +1,7 @@
 User-agent: *
-Disallow: /
 Disallow: /css/
+Disallow: /usuarios/
+Disallow: /js/
+Disallow: /font/
+Disallow: /makefont/
 Disallow: /usuarios/

@@ -5,7 +5,7 @@
 include('verifica_login.php');
 
 // Inclui arquivo de configuração
-require_once "config.php";
+require_once "../config.php";
 
 // Definir variáveis e inicializar com valores vazios
 $usuario = $senha = $admin = "";
@@ -129,7 +129,7 @@ if (isset($_POST["id"]) && !empty($_POST["id"])) {
 <head>
     <meta charset="UTF-8">
     <title>Atualizar Usuário</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
     <style>
         .wrapper {
             width: 800px;

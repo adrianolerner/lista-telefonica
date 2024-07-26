@@ -7,7 +7,7 @@ include('verifica_login.php');
 // Verifique a existência do parâmetro id antes de processar mais
 if (isset($_GET["id"]) && !empty(trim($_GET["id"]))) {
     // Inclui arquivo de configuração
-    require_once "config.php";
+    require_once "../config.php";
 
     // Prepara uma declaração de seleção
     $sql = "SELECT * FROM usuarios WHERE id = ?";
@@ -60,7 +60,7 @@ if (isset($_GET["id"]) && !empty(trim($_GET["id"]))) {
 <head>
     <meta charset="UTF-8">
     <title>Ver registro</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
     <style>
         .wrapper {
             width: 800px;

@@ -7,7 +7,7 @@ include('verifica_login.php');
 // Processa a operação de exclusão após a confirmação
 if (isset($_POST["id"]) && !empty($_POST["id"])) {
     // Inclui arquivo de configuração
-    require_once "config.php";
+    require_once "../config.php";
 
     // Prepara uma declaração de exclusão
     $sql = "DELETE FROM usuarios WHERE id = ?";
@@ -50,7 +50,7 @@ if (isset($_POST["id"]) && !empty($_POST["id"])) {
 <head>
     <meta charset="UTF-8">
     <title>Apagar registro</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
     <style>
         .wrapper {
             width: 800px;

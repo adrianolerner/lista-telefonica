@@ -5,7 +5,7 @@
 include('verifica_login.php');
 
 // Include config file
-require_once "config.php";
+require_once "../config.php";
 
 //verifica admin
 $useradmin = @$_SESSION['usuario'];
@@ -92,7 +92,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <title>Criar usuário</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
     <style>
         .wrapper {
             width: 800px;
