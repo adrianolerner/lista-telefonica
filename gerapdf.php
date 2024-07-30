@@ -24,8 +24,8 @@ class PDF extends FPDF
         $this->Cell(40,10,$this->convertText('Secretaria'),1, 0, 'C');
         $this->Cell(40,10,$this->convertText('Setor'),1, 0, 'C');
         $this->Cell(40,10,$this->convertText('Nome'),1, 0, 'C');
-        $this->Cell(20,10,$this->convertText('Ramal'),1, 0, 'C');
-        $this->Cell(50,10,$this->convertText('Email'),1, 0, 'C');
+        $this->Cell(30,10,$this->convertText('Ramal'),1, 0, 'C');
+        $this->Cell(40,10,$this->convertText('Email'),1, 0, 'C');
         $this->Ln();
     }
 
@@ -52,7 +52,7 @@ class PDF extends FPDF
         $h = 5 * $nb;
         $this->CheckPageBreak($h);
         for($i=0;$i<count($data);$i++) {
-            $w = [40, 40, 40, 20, 50][$i];
+            $w = [40, 40, 40, 30, 40][$i];
             $a = 'C';
             $x = $this->GetX();
             $y = $this->GetY();
