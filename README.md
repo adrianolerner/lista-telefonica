@@ -94,3 +94,12 @@ Se você deseja contribuir com este projeto, siga as diretrizes abaixo:
 3. Commit suas alterações (`git commit -am 'Adicionar nova feature'`).
 4. Push para a branch (`git push origin minha-feature`).
 5. Crie um novo Pull Request.
+
+## Referências Usadas
+
+fpdf.org
+getbootstrap.com
+datatables.net
+jquery.org
+fontawesome.com
+bulma.io
