@@ -120,7 +120,7 @@ if (isset($_POST["usuario"]) && !empty($_POST["usuario"])) {
 <head>
     <meta charset="UTF-8">
     <title>Atualizar Usuário</title>
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
     <style>
         .wrapper {
             width: 800px;
