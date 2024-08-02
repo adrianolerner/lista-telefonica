@@ -61,7 +61,7 @@ Para configurar a aplicação, siga os passos abaixo:
     - Edite o campo de senha do usuário "admin" na tabela de usuários
 
 4. **Configuração dos arquivos PHP:**
-    - Nos arquivos `acesso.php`, `verifica_login.php` e `index.php`, altere as seguintes linhas conforme necessário para validar pelo IP a exibição do botão de login:
+    - Nos arquivos `acesso.php`, `verifica_login.php`. `login.php` e `index.php`, altere as seguintes linhas conforme necessário para validar pelo IP a exibição do botão de login:
         ```php
         $ip = $_SERVER['HTTP_X_REAL_IP'];
         //$ipaddress = "172.16.0.10";
@@ -76,6 +76,7 @@ Para configurar a aplicação, siga os passos abaixo:
         $ip = $_SERVER['HTTP_X_REAL_IP'];
         $ipaddress = strstr($ip, ',', true);
         ```
+    - Aterar codigo recaptcha nas referidas linhas nos arquivos login.php e acesso.php, sendo a chave privada em login.php e a publica em acesso.php
 
 5. **Edição do arquivo config.php:**
     - Edite o arquivo `config.php` com o usuário e senha do banco de dados:
