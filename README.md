@@ -58,6 +58,7 @@ Para configurar a aplicação, siga os passos abaixo:
         ```bash
         mysql -u usuario -p agenda < caminho/para/o/arquivo.sql
         ```
+    - Edite o campo de senha do usuário "admin" na tabela de usuários
 
 4. **Configuração dos arquivos PHP:**
     - Nos arquivos `acesso.php`, `verifica_login.php` e `index.php`, altere as seguintes linhas conforme necessário para validar pelo IP a exibição do botão de login:
