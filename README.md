@@ -1,7 +1,9 @@
 ```markdown
 # Aplicação de Lista Telefônica
 
-Bem-vindo ao repositório da aplicação de lista telefônica desenvolvida para um órgão público. Esta aplicação foi construída utilizando PHP, HTML, CSS, JavaScript e MariaDB. O objetivo desta aplicação é fornecer uma interface intuitiva para gerenciar contatos telefônicos.
+Bem-vindo ao repositório da aplicação de lista telefônica desenvolvida para um órgão público.
+Esta aplicação foi construída utilizando PHP, HTML, CSS, JavaScript e MariaDB.
+O objetivo desta aplicação é fornecer uma interface intuitiva para gerenciar contatos telefônicos.
 
 ## Índice
 
