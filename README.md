@@ -82,10 +82,21 @@ Para configurar a aplicação, siga os passos abaixo:
         define('DB_USERNAME', 'usuario');
         define('DB_PASSWORD', 'senha');
         ```
+6. **Alterar imagens/Titulos:**
+    - Altere o logo, na pagina principal:
+        ```png
+        logo.png
+        ```
+    - Altere o logo no footer do arquivo index.php:
+        ```php/html
+        <img src="data:image/png;base64,####### />
+        ```
+    - Altere os cabeçalhos e titulos para o nome do seu órgão/empresa.
 
 ## Uso
 
 Depois de configurar a aplicação, você pode acessar a aplicação de lista telefônica através do seu navegador apontando para o servidor onde a aplicação está hospedada.
+Mantenha os créditos do criador.
 
 ## Contribuição
 
