@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['recaptcha_response'])
 
     // Cria uma requisição POST:
     $recaptcha_url = 'https://www.google.com/recaptcha/api/siteverify';
-    $recaptcha_secret = '6Lc-XbUlAAAAACNLC8BNq9e4ZT_DAoTEQKyL8MlF';
+    $recaptcha_secret = 'COLOCAR_SECRET_GOOGLE';
     $recaptcha_response = $_POST['recaptcha_response'];
 
     // Cria e decodifica a requisição:
