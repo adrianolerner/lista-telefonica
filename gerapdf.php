@@ -31,14 +31,14 @@ class PDF extends FPDF
 
     function Footer()
     {
-		$ano = date("Y");
+        $ano = date("Y");
         // Posição a 1.5 cm da parte inferior
         $this->SetY(-25);
         // Fonte Helvetica itálico 8
         $this->SetFont('Helvetica','I',8);
         // Dados da empresa
         $this->Cell(0,10,$this->convertText('Prefeitura Municipal de Castro - Endereço: Praça Pedro Kaled, 22 - Castro - CEP: 84165-540 - Telefone: (42) 2122-5000'),0,1,'C');
-		$this->Cell(0,5,$this->convertText('©'.$ano.' Prefeitura Municipal de Castro | Departamento de Tecnologia | Adriano Lerner Biesek'),0,1,'C');
+        $this->Cell(0,5,$this->convertText('©'.$ano.' Prefeitura Municipal de Castro | Departamento de Tecnologia | Adriano Lerner Biesek'),0,1,'C');
         // Número da página
         $this->Cell(0,10,$this->convertText('Página ').$this->PageNo().'/{nb}',0,0,'C');
     }
@@ -56,6 +56,10 @@ class PDF extends FPDF
             $a = 'C';
             $x = $this->GetX();
             $y = $this->GetY();
+            // Modificação: Quebra de linha no caractere "@"
+            if($i == 4) { // Considerando que a coluna 'Email' está na posição 4
+                $data[$i] = $this->breakEmailLine($data[$i]);
+            }
             $this->Rect($x, $y, $w, $h);
             $this->MultiCell($w, 5, $this->convertText($data[$i]), 0, $a);
             $this->SetXY($x + $w, $y);
@@ -111,6 +115,12 @@ class PDF extends FPDF
                 $i++;
         }
         return $nl;
+    }
+
+    function breakEmailLine($email)
+    {
+        // Substitui o caractere "@" por "@\n" para quebrar a linha no caractere "@"
+        return str_replace('@', "\n@", $email);
     }
 
     function convertText($text)
