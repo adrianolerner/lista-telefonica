@@ -3,7 +3,8 @@
 
 Bem-vindo ao repositório da aplicação de lista telefônica desenvolvida para um órgão público.
 Esta aplicação foi construída utilizando PHP, HTML, CSS, JavaScript e MariaDB.
-O objetivo desta aplicação é fornecer uma interface intuitiva para gerenciar contatos telefônicos.
+O objetivo desta aplicação é fornecer uma interface intuitiva para gerenciar contatos
+telefônicos.
 
 ## Índice
 
@@ -54,15 +55,16 @@ Para configurar a aplicação, siga os passos abaixo:
         ```
 
 3. **Importar o arquivo SQL:**
-    - Importe o arquivo SQL incluído na release (ou crie as tabelas conforme exigido nos arquivos):
+    - Importe o arquivo SQL incluído na release (ou crie as tabelas conforme exigido nos
+arquivos):
         ```bash
         mysql -u usuario -p agenda < caminho/para/o/arquivo.sql
         ```
     - Edite o campo de senha do usuário "admin" na tabela de usuários
 
 4. **Configuração dos arquivos PHP:**
-    - Nos arquivos `acesso.php`, `verifica_login.php`. `login.php` e `index.php`, altere as seguintes
-linhas conforme necessário para validar pelo IP a exibição do botão de login:
+    - Nos arquivos `acesso.php`, `verifica_login.php`. `login.php` e `index.php`, altere as
+seguintes linhas conforme necessário para validar pelo IP a exibição do botão de login:
         ```php
         $ip = $_SERVER['HTTP_X_REAL_IP'];
         //$ipaddress = "172.16.0.10";
@@ -77,8 +79,8 @@ linhas conforme necessário para validar pelo IP a exibição do botão de login
         $ip = $_SERVER['HTTP_X_REAL_IP'];
         $ipaddress = strstr($ip, ',', true);
         ```
-    - Aterar codigo recaptcha nas referidas linhas nos arquivos login.php e acesso.php, sendo a chave
-privada em login.php e a publica em acesso.php
+    - Aterar codigo recaptcha nas referidas linhas nos arquivos login.php e acesso.php, sendo a
+chave privada em login.php e a publica em acesso.php
 
 5. **Edição do arquivo config.php:**
     - Edite o arquivo `config.php` com o usuário e senha do banco de dados:
