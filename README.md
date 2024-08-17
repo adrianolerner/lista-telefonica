@@ -116,7 +116,7 @@ UPDATE `lista` SET `secretaria`='NOME_CADASTRADO' WHERE `secretaria`='NOVO_ID_DA
 ALTER TABLE `lista` ADD CONSTRAINT `fk_secretaria` FOREIGN KEY (`secretaria`) REFERENCES `secretarias`(`id_secretaria`)
 ON DELETE RESTRICT ON UPDATE RESTRICT;
 
-        Observação: Para efeito didático, abaixo segue explicação visual:
+### ** Para efeito didático, abaixo segue explicação visual para a versão 0.7:**
 
 ### 1. Estrutura das Tabelas
 
