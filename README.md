@@ -1,4 +1,3 @@
-```markdown
 ## Aplicação de Lista Telefônica
 
 Bem-vindo ao repositório da aplicação de lista telefônica desenvolvida para um órgão público.
