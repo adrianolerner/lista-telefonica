@@ -2,7 +2,7 @@
 require('fpdf.php');
 include('config.php');
 
-$querypdf = "SELECT secretaria, setor, nome, ramal, email, id_lista FROM lista ORDER BY secretaria, id_lista, setor, nome";
+$querypdf = "SELECT l.id_lista, l.nome, l.ramal, l.email, l.setor, s.secretaria FROM lista l JOIN secretarias s ON l.secretaria = s.id_secretaria ORDER BY secretaria, id_lista, setor, nome";
 $resultpdf = mysqli_query($link, $querypdf);
 
 class PDF extends FPDF

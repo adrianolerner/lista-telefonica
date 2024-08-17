@@ -90,7 +90,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Fechar conexão
+    if (!empty($nome_err) && !empty($ramal_err) && !empty($email_err) && !empty($setor_err) && !empty($secretaria_err)) {
     mysqli_close($link);
+    }
 }
 ?>
 
@@ -108,7 +110,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     </style>
 </head>
-
 <body>
     <div class="wrapper">
         <div class="container-fluid">
@@ -153,11 +154,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <?php echo $setor_err; ?>
                             </span>
                         </div>
+                        <?php
+                            // Preparando a consulta SQL para selecionar todas as secretarias
+                            $stmt_sec = $link->prepare("SELECT id_secretaria, secretaria FROM secretarias");
+                            // Executando a consulta
+                            $stmt_sec->execute();
+                            // Obtendo o resultado
+                            $result = $stmt_sec->get_result();
+                        ?>
                         <div class="form-group">
-                            <label>Secretaria</label>
-                            <input type="text" name="secretaria"
-                                class="form-control <?php echo (!empty($secretaria_err)) ? 'is-invalid' : ''; ?>"
-                                value="<?php echo $secretaria; ?>">
+                            <label for="secretaria">Secretaria</label>
+                            <select class="form-control <?php echo (!empty($setor_err)) ? 'is-invalid' : ''; ?>" name="secretaria" id="secretaria">
+                            <?php
+                                if ($result->num_rows > 0) {
+                                $first = true;
+                                // Loop pelos resultados e cria as opções do dropdown
+                                while($row = $result->fetch_assoc()) {
+                                // Verifica se é o primeiro item para marcá-lo como selecionado
+                                if ($first) {
+                                    echo '<option value="' . htmlspecialchars($row["id_secretaria"]) . '" selected>' . htmlspecialchars($row["secretaria"]) . '</option>';
+                                    $first = false; // Após o primeiro item, desabilita a seleção automática
+                                } else {
+                                    echo '<option value="' . htmlspecialchars($row["id_secretaria"]) . '">' . htmlspecialchars($row["secretaria"]) . '</option>';
+                                }
+                                }
+                                } else {
+                                    echo '<option value="">Nenhuma secretaria encontrada</option>';
+                                }
+                            ?>
+                            </select>
                             <span class="invalid-feedback">
                                 <?php echo $secretaria_err; ?>
                             </span>

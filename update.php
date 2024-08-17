@@ -94,7 +94,9 @@ if (isset($_POST["id_lista"]) && !empty($_POST["id_lista"])) {
     }
 
     // Fechar conexão
-    mysqli_close($link);
+        if (empty($nome_err) && empty($ramal_err) && empty($email_err) && empty($setor_err) && empty($secretaria_err)) {
+            mysqli_close($link);
+        }
 } else {
     // Verifique a existência do parâmetro id antes de processar mais
     if (isset($_GET["id_lista"]) && !empty(trim($_GET["id_lista"]))) {
@@ -139,8 +141,11 @@ if (isset($_POST["id_lista"]) && !empty($_POST["id_lista"])) {
         // Fecha declaração
         mysqli_stmt_close($stmt);
 
-        // Fechar Conexão
-        mysqli_close($link);
+        // Fechar conexão
+        if (!empty($nome_err) && !empty($ramal_err) && !empty($email_err) && !empty($setor_err) && !empty($secretaria_err)) {
+            mysqli_close($link);
+        }
+        
     } else {
         // URL não contém o parâmetro id. Redirecionar para a página de erro
         header("location: error.php");
@@ -163,7 +168,6 @@ if (isset($_POST["id_lista"]) && !empty($_POST["id_lista"])) {
         }
     </style>
 </head>
-
 <body>
     <div class="wrapper">
         <div class="container-fluid">
@@ -194,7 +198,7 @@ if (isset($_POST["id_lista"]) && !empty($_POST["id_lista"])) {
                             <label>E-mail</label>
                             <input type="text" name="email"
                                 class="form-control <?php echo (!empty($email_err)) ? 'is-invalid' : ''; ?>"
-                                value="<?php echo $email; ?>">
+                                value="<?php if ($email == "-"){ echo ""; } else { echo $email; } ?>">
                             <span class="invalid-feedback">
                                 <?php echo $email_err; ?>
                             </span>
@@ -208,11 +212,30 @@ if (isset($_POST["id_lista"]) && !empty($_POST["id_lista"])) {
                                 <?php echo $setor_err; ?>
                             </span>
                         </div>
+                        <?php
+                            // Preparando a consulta SQL para selecionar todas as secretarias
+                            $stmt_sec = $link->prepare("SELECT id_secretaria, secretaria FROM secretarias");
+                            // Executando a consulta
+                            $stmt_sec->execute();
+                            // Obtendo o resultado
+                            $result = $stmt_sec->get_result();
+                        ?>
                         <div class="form-group">
-                            <label>Secretaria</label>
-                            <input type="text" name="secretaria"
-                                class="form-control <?php echo (!empty($secretaria_err)) ? 'is-invalid' : ''; ?>"
-                                value="<?php echo $secretaria; ?>">
+                            <label for="secretaria">Secretaria</label>
+                            <select class="form-control <?php echo (!empty($setor_err)) ? 'is-invalid' : ''; ?>" name="secretaria" id="secretaria">
+                            <?php
+                                if ($result->num_rows > 0) {
+                                // Iterando sobre os resultados e criando as opções do dropdown
+                                while($row = $result->fetch_assoc()) {
+                                // Verificando se o valor atual é o selecionado
+                                $selected = $row["id_secretaria"] == $secretaria ? ' selected' : '';
+                                echo '<option value="' . htmlspecialchars($row["id_secretaria"]) . '"' . $selected . '>' . htmlspecialchars($row["secretaria"]) . '</option>';
+                                }
+                                } else {
+                                    echo '<option value="">Nenhuma secretaria encontrada</option>';
+                                }
+                            ?>
+                            </select>
                             <span class="invalid-feedback">
                                 <?php echo $secretaria_err; ?>
                             </span>
