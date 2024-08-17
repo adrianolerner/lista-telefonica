@@ -105,16 +105,16 @@ fazer ajustes ao banco de dados para poder utilizar esta versão.
     - Para os ajustes, você pode importar o arquivo SQL anexo a versão em um novo banco ou banco de testes, e migrar os
 registros conforme necessário através da console do banco de dados ou usando uma ferramenta grafica como o phpmyadmin.
     - Caso queira ajustar manualmente, é necessário:
-        A. Incluir uma tabela chamada "secretarias", e nela as colunas "id_secretaria" do tipo int e "secretaria" do
+        - A. Incluir uma tabela chamada "secretarias", e nela as colunas "id_secretaria" do tipo int e "secretaria" do
 tipo VARCHAR (100).
-        B. Cadastrar nesta tabela todas as secretarias necessárias.
-        C. Na tabela lista atualizar os registros, trocando estes da coluna "secretaria", pelo código (id_secretaria)
+        - B. Cadastrar nesta tabela todas as secretarias necessárias.
+        - C. Na tabela lista atualizar os registros, trocando estes da coluna "secretaria", pelo código (id_secretaria)
 correspondente da tabela "secretarias".Isto pode ser feito usando o comando SQL abaixo:
-UPDATE `lista` SET `secretaria`='NOME_CADASTRADO' WHERE `secretaria`='NOVO_ID_DA_TABELA_SECRETARIAS';
-        D. Adicionar o relacionamento das tabelas, relacionado o campo "secretarias" da tabela "lista", com o campo
+            - ``` UPDATE `lista` SET `secretaria`='NOME_CADASTRADO' WHERE `secretaria`='NOVO_ID_DA_TABELA_SECRETARIAS'; ```
+        - D. Adicionar o relacionamento das tabelas, relacionado o campo "secretarias" da tabela "lista", com o campo
 "id_secretaria" da tabela "secretarias". Isto pode ser feito usando o comando SQL abaixo:
-ALTER TABLE `lista` ADD CONSTRAINT `fk_secretaria` FOREIGN KEY (`secretaria`) REFERENCES `secretarias`(`id_secretaria`)
-ON DELETE RESTRICT ON UPDATE RESTRICT;
+            - ``` ALTER TABLE `lista` ADD CONSTRAINT `fk_secretaria` FOREIGN KEY (`secretaria`) REFERENCES `secretarias`
+(`id_secretaria`); ON DELETE RESTRICT ON UPDATE RESTRICT; ```
 
 ### ** Para efeito didático, abaixo segue explicação visual para a versão 0.7:**
 
@@ -231,9 +231,9 @@ Se você deseja contribuir com este projeto, siga as diretrizes abaixo:
 
 ## Referências Usadas
 
-fpdf.org
-getbootstrap.com
-datatables.net
-jquery.org
-fontawesome.com
-bulma.io
+- fpdf.org
+- getbootstrap.com
+- datatables.net
+- jquery.org
+- fontawesome.com
+- bulma.io
