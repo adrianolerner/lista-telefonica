@@ -231,7 +231,7 @@ Se você deseja contribuir com este projeto, siga as diretrizes abaixo:
 
 ## Referências Usadas
 
-- [fpdf.org](https://fpdf.org)
+- [fpdf.org](http://fpdf.org)
 - [getbootstrap.com](https://getbootstrap.com)
 - [datatables.net](https://datatables.net)
 - [jquery.org](https://jquery.org)
