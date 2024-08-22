@@ -231,9 +231,9 @@ Se você deseja contribuir com este projeto, siga as diretrizes abaixo:
 
 ## Referências Usadas
 
-- fpdf.org
-- getbootstrap.com
-- datatables.net
-- jquery.org
-- fontawesome.com
-- bulma.io
+- [fpdf.org](fpdf.org)
+- [getbootstrap.com](getbootstrap.com)
+- [datatables.net](datatables.net)
+- [jquery.org](jquery.org)
+- [fontawesome.com](fontawesome.com)
+- [bulma.io](bulma.io)
