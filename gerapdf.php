@@ -2,15 +2,28 @@
 require('fpdf.php');
 include('config.php');
 
-$querypdf = "SELECT l.id_lista, l.nome, l.ramal, l.email, l.setor, s.secretaria FROM lista l JOIN secretarias s ON l.secretaria = s.id_secretaria ORDER BY secretaria, id_lista, setor, nome";
-$resultpdf = mysqli_query($link, $querypdf);
+// Preparar consulta SQL usando prepared statements
+$querypdf = "SELECT l.id_lista, l.nome, l.ramal, l.email, l.setor, s.secretaria 
+             FROM lista l 
+             JOIN secretarias s ON l.secretaria = s.id_secretaria 
+             ORDER BY s.secretaria, l.id_lista, l.setor, l.nome";
+
+// Preparar e executar a consulta com prepared statements
+$stmt = $link->prepare($querypdf);
+
+if ($stmt) {
+    $stmt->execute();
+    $resultpdf = $stmt->get_result();
+} else {
+    die("Erro na preparação da consulta: " . $link->error);
+}
 
 class PDF extends FPDF
 {
     function Header()
     {
         // Logo
-        $this->Image('logo.png',10,6,20);
+        $this->Image('img/logo.png',10,6,20);
         // Fonte Helvetica em negrito 15
         $this->SetFont('Helvetica','B',15);
         // Mover para a direita
@@ -135,17 +148,21 @@ $pdf->AddPage();
 
 if ($resultpdf->num_rows > 0) {
     while($row = $resultpdf->fetch_assoc()) {
-        $pdf->Row([
-            $row['secretaria'],
-            $row['setor'],
-            $row['nome'],
-            $row['ramal'],
-            $row['email']
-        ]);
+        // Sanitização dos dados antes de exibir
+        $secretaria = htmlspecialchars($row['secretaria'], ENT_QUOTES, 'UTF-8');
+        $setor = htmlspecialchars($row['setor'], ENT_QUOTES, 'UTF-8');
+        $nome = htmlspecialchars($row['nome'], ENT_QUOTES, 'UTF-8');
+        $ramal = htmlspecialchars($row['ramal'], ENT_QUOTES, 'UTF-8');
+        $email = htmlspecialchars($row['email'], ENT_QUOTES, 'UTF-8');
+
+        $pdf->Row([$secretaria, $setor, $nome, $ramal, $email]);
     }
 } else {
     $pdf->Cell(190,10,$pdf->convertText('Nenhum dado encontrado'),1,0,'C');
 }
 
 $pdf->Output("lista_telefonica_castro.pdf","I");
+
+$stmt->close();
+$link->close();
 ?>

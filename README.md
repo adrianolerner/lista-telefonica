@@ -81,12 +81,88 @@ seguintes linhas conforme necessário para validar pelo IP a exibição do botã
     - Aterar codigo recaptcha nas referidas linhas nos arquivos login.php e acesso.php, sendo a
 chave privada em login.php e a publica em acesso.php
 
-5. **Edição do arquivo config.php:**
-    - Edite o arquivo `config.php` com o usuário e senha do banco de dados:
-        ```php
-        define('DB_USERNAME', 'usuario');
-        define('DB_PASSWORD', 'senha');
-        ```
+5. **Inclusão de usuário e senha do banco de dados**
+Para configurar variáveis de ambiente no Ubuntu Server com Apache 2 e usá-las no seu código PHP, você pode seguir estas etapas:
+
+    1. **Criar as Variáveis de Ambiente no Sistema**
+    As variáveis de ambiente podem ser definidas no sistema operacional e acessadas pelo Apache e PHP.
+
+    2. **Editar o Arquivo de Configuração do Apache**:
+       - Abra o arquivo de configuração do Apache para o site em questão. Geralmente, o arquivo está localizado em `/etc/apache2/sites-available/000-default.conf` (ou em outro arquivo de configuração se estiver usando hosts virtuais específicos).
+       - Adicione as variáveis de ambiente usando a diretiva `SetEnv` dentro do bloco `<VirtualHost>`.
+
+       ```bash
+       sudo nano /etc/apache2/sites-available/000-default.conf
+       ```
+
+       **Exemplo de configuração:**
+
+       ```apache
+       <VirtualHost *:80>
+       ServerAdmin webmaster@localhost
+       DocumentRoot /var/www/html
+
+       # Definir variáveis de ambiente
+       SetEnv DB_SERVER localhost
+       SetEnv DB_USERNAME USUARIO-DB
+       SetEnv DB_PASSWORD SENHA-DB
+       SetEnv DB_NAME agenda
+
+       ErrorLog ${APACHE_LOG_DIR}/error.log
+       CustomLog ${APACHE_LOG_DIR}/access.log combined
+       </VirtualHost>
+       ```
+
+    3. **Recarregar o Apache**:
+       - Após editar o arquivo de configuração, recarregue o Apache para aplicar as mudanças.
+
+       ```bash
+       sudo systemctl reload apache2
+       ```
+
+	**Alternativa: Usar `.htaccess` para Definir Variáveis de Ambiente**
+
+	Se preferir, as variáveis de ambiente também podem ser definidas em um arquivo `.htaccess` na raiz do seu projeto.
+
+    1. **Criar ou Editar o Arquivo `.htaccess`**:
+       - Se o arquivo `.htaccess` não existir, crie um na raiz do diretório do seu projeto web (`/var/www/html` ou o diretório correspondente).
+
+       ```bash
+       sudo nano /var/www/html/.htaccess
+       ```
+
+    2. **Adicionar as Variáveis de Ambiente**:
+       - Insira as diretivas `SetEnv` no arquivo `.htaccess`.
+
+       **Exemplo:**
+
+       ```apache
+       SetEnv DB_SERVER localhost
+       SetEnv DB_USERNAME USUARIO-DB
+       SetEnv DB_PASSWORD SENHA-DB
+       SetEnv DB_NAME agenda
+       ```
+
+    3. **Reiniciar o Apache**:
+       - Certifique-se de que o módulo `mod_env` do Apache está habilitado e reinicie o Apache para aplicar as mudanças.
+
+       ```bash
+       sudo a2enmod env
+       sudo systemctl restart apache2
+       ```
+
+    4. **Segurança Adicional**
+
+	Para aumentar a segurança, especialmente ao definir variáveis de ambiente com credenciais sensíveis, considere:
+
+    - **Restringir o acesso ao arquivo `.htaccess`**: Apenas o proprietário e o servidor web devem ter permissões de leitura.
+  
+  	```bash
+	sudo chmod 640 /var/www/html/.htaccess
+ 	 ```
+
+    - **Habilitar HTTPS**: Isso garante que as credenciais transmitidas entre o cliente e o servidor estejam criptografadas.
+
 6. **Alterar imagens/Titulos:**
     - Altere o logo, na pagina principal:
         ```png

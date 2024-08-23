@@ -1,15 +1,25 @@
 <?php
-// Credenciais do banco de dados.
-define('DB_SERVER', 'localhost');
-define('DB_USERNAME', 'USUARIO-DB');
-define('DB_PASSWORD', 'SENHA-DB');
-define('DB_NAME', 'agenda');
+// Usando variáveis de ambiente para armazenar credenciais
+$DB_SERVER = getenv('DB_SERVER');
+$DB_USERNAME = getenv('DB_USERNAME');
+$DB_PASSWORD = getenv('DB_PASSWORD');
+$DB_NAME = getenv('DB_NAME');
 
-/* Tentativa de conectar ao banco de dados MySQL */
-$link = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
+try {
+    // Tentativa de conectar ao banco de dados MySQL
+    $link = new mysqli($DB_SERVER, $DB_USERNAME, $DB_PASSWORD, $DB_NAME);
+    
+    if ($link->connect_error) {
+        // Registrar erro sem expor detalhes
+        error_log("Erro de conexão: " . $link->connect_error);
+        throw new Exception("Erro ao conectar ao banco de dados. Tente novamente mais tarde.");
+    }
 
-// Chaca conexão
-if ($link === false) {
-    die("ERRO: Não foi possível conectar. " . mysqli_connect_error());
+    // Configurar charset para evitar problemas com codificação
+    $link->set_charset("utf8mb4");
+
+} catch (Exception $e) {
+    // Mensagem de erro genérica para o usuário final
+    die("Erro ao conectar ao banco de dados. Tente novamente mais tarde.");
 }
 ?>

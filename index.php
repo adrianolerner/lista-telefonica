@@ -195,7 +195,7 @@ $bannerarray = ['banner' => $banner];
             <div class="maincontainer">
                 <br />
                 <p align="center"><a href="gerapdf.php" class="btn btn-primary pull-center">GERAR LISTA EM PDF</a></p>
-                <p align="center"><img src="logo2.png" width="200px" /> | <img src="logo3.png" width="180px" /></p>
+                <p align="center"><img src="img/logo2.png" width="200px" /> | <img src="img/logo3.png" width="180px" /></p>
                 <p align="center">IP: <?php echo htmlspecialchars($ipaddress, ENT_QUOTES, 'UTF-8'); ?></p>
                 <p align="center"><a href="https://github.com/adrianolerner/lista-telefonica">©<?php echo date("Y"); ?> Prefeitura Municipal de Castro | Departamento de Tecnologia | Adriano Lerner Biesek</a></p>
             </div>

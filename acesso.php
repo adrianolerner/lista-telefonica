@@ -50,7 +50,7 @@ if (!empty($_POST['usuario'])) {
         <div class="hero-body">
             <div class="container has-text-centered">
                 <div class="column is-4 is-offset-4">
-                <img src="logo4.png"></img>
+                <img src="img/logo4.png"></img>
                 <h3 class="title has-text-black">Administrador Lista Telefônica</h3>
                 </div>
                 <br />
