@@ -81,7 +81,7 @@ seguintes linhas conforme necessário para validar pelo IP a exibição do botã
     - Aterar codigo recaptcha nas referidas linhas nos arquivos login.php e acesso.php, sendo a
 chave privada em login.php e a publica em acesso.php
 
-5. **Inclusão de usuário e senha do banco de dados**
+5. **Inclusão de usuário e senha do banco de dados (mudança da versão 0.8 - passos obrigatórios para atualização)**
 Para configurar variáveis de ambiente no Ubuntu Server com Apache 2 e usá-las no seu código PHP, você pode seguir estas etapas:
 
     1. **Criar as Variáveis de Ambiente no Sistema**
