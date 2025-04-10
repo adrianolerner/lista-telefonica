@@ -57,4 +57,3 @@ if ($recaptcha_verified = true) {
     exit();
 
 }
-//mysqli_close($link);

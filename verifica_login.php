@@ -5,7 +5,7 @@ $ipaddress = "172.16.0.10";
 //$ipaddress = strstr($ip, ',', true);
 
 if (!fnmatch("172.16.0.*", $ipaddress)) {
-	header('Location: index.php');
+	header('Location: /lista/index.php');
 	exit();
 }
 

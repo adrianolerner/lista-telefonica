@@ -59,15 +59,20 @@ arquivos):
         ```bash
         mysql -u usuario -p agenda < caminho/para/o/arquivo.sql
         ```
-    - Edite o campo de senha do usuário "admin" na tabela de usuários
+    - Edite o campo de senha do usuário "admin" na tabela de usuários (a senha padrão do arquivo é admin)
 
 4. **Configuração dos arquivos PHP:**
-    - Nos arquivos `acesso.php`, `verifica_login.php`. `login.php` e `index.php`, altere as
+    - Nos arquivos `acesso.php`, `verifica_login.php` e `index.php`, altere as
 seguintes linhas conforme necessário para validar pelo IP a exibição do botão de login:
         ```php
         $ip = $_SERVER['HTTP_X_REAL_IP'];
         //$ipaddress = "172.16.0.10";
         $ipaddress = strstr($ip, ',', true);
+        ```
+         - Nos arquivos `acesso.php` e `index.php`, altere o IP  das
+seguintes linhas conforme necessário para validar pelo IP.
+        ```
+        if (!fnmatch("172.16.0.\*", $ipaddress))
         ```
     - Caso não queira validar pelo IP, descomente a linha:
         ```php
@@ -78,6 +83,7 @@ seguintes linhas conforme necessário para validar pelo IP a exibição do botã
         $ip = $_SERVER['HTTP_X_REAL_IP'];
         $ipaddress = strstr($ip, ',', true);
         ```
+    - Criar no google recaptcha v2 um novo site conforme seu dominio e copiar as chaves privada e pública.
     - Aterar codigo recaptcha nas referidas linhas nos arquivos login.php e acesso.php, sendo a
 chave privada em login.php e a publica em acesso.php
 
@@ -191,6 +197,17 @@ correspondente da tabela "secretarias".Isto pode ser feito usando o comando SQL 
 "id_secretaria" da tabela "secretarias". Isto pode ser feito usando o comando SQL abaixo:
             - ``` ALTER TABLE `lista` ADD CONSTRAINT `fk_secretaria` FOREIGN KEY (`secretaria`) REFERENCES `secretarias`
 (`id_secretaria`); ON DELETE RESTRICT ON UPDATE RESTRICT; ```
+8. **Mudança da Versão 0.9:**
+    - Nesta nova versão foi incluida a tabela de log_importacoes referente a nova função de importação de lista via CSV.
+    - Para não ocorrerem inconsistências, esta nova tabela deve ser criada, ou importada do arquivo SQL que acompanha o projeto, conforme as recomendações abaixo:
+    - Nome da tabela "log_importacoes".
+    - Colunas:
+        - 1 	id_log 	int(11)
+        - 2 	usuario 	varchar(100) 	utf8mb4_general_ci
+        - 3 	ip 	varchar(15) 	utf8mb4_general_ci
+        - 4 	inseridos 	int(100)
+        - 5 	ignorados 	int(100)
+        - 6 	data_hora 	datetime 	
 
 ### ** Para efeito didático, abaixo segue explicação visual para a versão 0.7:**
 

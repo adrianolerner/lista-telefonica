@@ -29,6 +29,7 @@ if (!empty($_POST['usuario'])) {
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
     <link rel="stylesheet" href="css/bulma.min.css" />
     <link rel="stylesheet" type="text/css" href="css/login.css">
+    <link rel="stylesheet" href="css/font-awesome.min.css">
     <script src="https://www.google.com/recaptcha/api.js?render=COLOCAR_CODIGO_GOOGLE_RECAPCHA"></script>
     <script>
         grecaptcha.ready(function () {
@@ -40,7 +41,7 @@ if (!empty($_POST['usuario'])) {
     </script>
     <style>
         img {
-            max-width:100%;
+            max-width: 100%;
         }
     </style>
 </head>
@@ -50,8 +51,8 @@ if (!empty($_POST['usuario'])) {
         <div class="hero-body">
             <div class="container has-text-centered">
                 <div class="column is-4 is-offset-4">
-                <img src="img/logo4.png"></img>
-                <h3 class="title has-text-black">Administrador Lista Telefônica</h3>
+                    <img src="img/logo4.png" width="200px"></img>
+                    <h3 class="title has-text-black">Administrador Lista Telefônica</h3>
                 </div>
                 <br />
                 <br />
@@ -61,7 +62,7 @@ if (!empty($_POST['usuario'])) {
                     if (isset($_SESSION['nao_autenticado'])):
                         ?>
                         <div class="notification is-danger">
-                          <p>ERRO: Usuário ou senha inválidos.</p>
+                            <p>ERRO: Usuário ou senha inválidos.</p>
                         </div>
                         <?php
                     endif;
@@ -71,7 +72,8 @@ if (!empty($_POST['usuario'])) {
                         <form action="login.php" method="POST">
                             <div class="field">
                                 <div class="control">
-                                    <input name="usuario" name="text" class="input is-large" placeholder="Seu usuário" autofocus="">
+                                    <input name="usuario" name="text" class="input is-large" placeholder="Seu usuário"
+                                        autofocus="">
                                 </div>
                             </div>
                             <div class="field">
@@ -79,13 +81,18 @@ if (!empty($_POST['usuario'])) {
                                     <input name="senha" class="input is-large" type="password" placeholder="Sua senha">
                                 </div>
                             </div>
-                            <button type="submit" class="button is-block is-link is-large is-fullwidth">Entrar</button>
+                            <button type="submit" class="button is-block is-link is-large is-fullwidth"><i
+                                    class="fa fa-sign-in"></i> Entrar</button>
                         </form>
                     </div>
                 </div>
                 <div class="column is-4 is-offset-4">
                     <div class="box">
-                        <p align="center">Por favor entre com seu usuário e senha para acessar a administração da lista telefônica.</p>
+                        <p align="center">Por favor entre com seu usuário e senha para acessar a administração da lista
+                            telefônica.</p>
+                    </div>
+                    <div class="box">
+                        <p align="center">IP: <?php echo htmlspecialchars($ipaddress, ENT_QUOTES, 'UTF-8'); ?></p>
                     </div>
                 </div>
             </div>
