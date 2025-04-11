@@ -91,8 +91,6 @@ if (!fnmatch("172.16.0.*", $ipaddress)) {
             color: #ccc;
         }
     </style>
-
-    </style>
 </head>
 
 <body>
@@ -132,6 +130,8 @@ if (!fnmatch("172.16.0.*", $ipaddress)) {
                             </div>
                             <button type="submit" class="button is-block is-link is-large is-fullwidth"><i
                                     class="fa fa-sign-in"></i> Entrar</button>
+                            <input type="hidden" name="recaptcha_response" id="recaptchaResponse">
+
                         </form>
                     </div>
                 </div>
