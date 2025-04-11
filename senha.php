@@ -1,25 +1,23 @@
 <?php
-
-//Mecanismo de login
-//session_start();
+// Mecanismo de login
 include('verifica_login.php');
 
 // Inclui arquivo de configuração
 require_once "config.php";
 
 // Definir variáveis e inicializar com valores vazios
-$usuario = $senha = $admin = "";
-$usuario_err = $senha_err = $admin_err = "";
+$usuario = $senha = "";
+$usuario_err = $senha_err = $confirma_err = "";
 
 // Processamento de dados do formulário quando o formulário é enviado
-if (isset($_POST["usuario"]) && !empty($_POST["usuario"])) {
-    // Get hidden input value
-    $usuario = $_POST["usuario"];
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["usuario"])) {
+    // Recupera o nome do usuário do campo oculto
+    $usuario = trim($_POST["usuario"]);
 
     // Valida senha
     $input_senha = trim($_POST["senha"]);
     if (empty($input_senha)) {
-        $senha_err = "Por favor entre uma senha.";
+        $senha_err = "Por favor, informe uma nova senha.";
     } else {
         $senha = $input_senha;
     }
@@ -27,95 +25,76 @@ if (isset($_POST["usuario"]) && !empty($_POST["usuario"])) {
     // Valida confirmação
     $input_confirma = trim($_POST["confirma"]);
     if (empty($input_confirma)) {
-        $confirma_err = "Por favor entre uma senha.";
-    } elseif ($input_confirma = $input_senha) {
-        $confirma_err = "Senha não confere, por favor entre a confirmação da senha novamente.";
-    } else {
-        $confirma = $input_confirma;
+        $confirma_err = "Por favor, confirme a nova senha.";
+    } elseif ($input_confirma !== $input_senha) {
+        $confirma_err = "A confirmação da senha não confere.";
     }
 
-    // Verifica os erros de entrada antes de inserir no banco de dados
+    // Se não houver erros, atualiza a senha no banco
     if (empty($senha_err) && empty($confirma_err)) {
-        // Prepara uma instrução de atualização
-        $sql = "UPDATE usuarios SET senha=? WHERE usuario=?";
+        // Prepara a instrução de atualização
+        $sql = "UPDATE usuarios SET senha = ? WHERE usuario = ?";
 
         if ($stmt = mysqli_prepare($link, $sql)) {
-            // Vincula as variáveis à instrução preparada como parâmetros
+            // Cria o hash da senha
+            $param_senha = password_hash($senha, PASSWORD_DEFAULT);
+            $param_usuario = $usuario;
+
+            // Vincula os parâmetros
             mysqli_stmt_bind_param($stmt, "ss", $param_senha, $param_usuario);
 
-            // Definir parâmetros
-            $param_usuario = $usuario;
-            $param_senha = md5($senha);
-
-            // Tentativa de executar a instrução preparada
+            // Executa a query
             if (mysqli_stmt_execute($stmt)) {
-                // Registros atualizados com sucesso. Redirecionar para a página de destino
                 header("location: index.php");
                 exit();
             } else {
-                echo "Oops! Algo saiu errado. Tente novamente mais tarde.";
+                echo "Erro ao atualizar senha. Tente novamente mais tarde.";
             }
+
+            mysqli_stmt_close($stmt);
+        }
+    }
+
+    mysqli_close($link);
+
+} elseif (isset($_GET["user"]) && !empty(trim($_GET["user"]))) {
+    // Recupera o usuário pela URL
+    $user = trim($_GET["user"]);
+
+    // Busca o usuário no banco
+    $sql = "SELECT usuario FROM usuarios WHERE usuario = ?";
+    if ($stmt = mysqli_prepare($link, $sql)) {
+        mysqli_stmt_bind_param($stmt, "s", $param_user);
+        $param_user = $user;
+
+        if (mysqli_stmt_execute($stmt)) {
+            $result = mysqli_stmt_get_result($stmt);
+
+            if (mysqli_num_rows($result) == 1) {
+                $row = mysqli_fetch_array($result, MYSQLI_ASSOC);
+                $usuario = $row["usuario"];
+            } else {
+                header("location: error.php");
+                exit();
+            }
+        } else {
+            echo "Erro ao consultar usuário.";
         }
 
-        // Fecha declaração
         mysqli_stmt_close($stmt);
     }
 
-    // Fecha conexão
     mysqli_close($link);
 } else {
-    // Verifique a existência do parâmetro id antes de processar mais
-    if (isset($_GET["user"]) && !empty(trim($_GET["user"]))) {
-        // Obter parâmetro de URL
-        $user = trim($_GET["user"]);
-
-        // Prepara uma declaração de seleção
-        $sql = "SELECT * FROM usuarios WHERE usuario = ?";
-        if ($stmt = mysqli_prepare($link, $sql)) {
-            // Vincula as variáveis à instrução preparada como parâmetros
-            mysqli_stmt_bind_param($stmt, "s", $param_user);
-
-            // Definir parâmetros
-            $param_user = $user;
-
-            // Tentativa de executar a instrução preparada
-            if (mysqli_stmt_execute($stmt)) {
-                $result = mysqli_stmt_get_result($stmt);
-
-                if (mysqli_num_rows($result) == 1) {
-                    /* Busca a linha do resultado como um array associativo. Como o conjunto de resultados
-                     contém apenas uma linha */
-                    $row = mysqli_fetch_array($result, MYSQLI_ASSOC);
-
-                    // Recupera o valor do campo individual
-                    $usuario = $row["usuario"];
-                    $senha = $row["senha"];
-                } else {
-                    // URL não contém id válido. Redirecionar para a página de erro
-                    header("location: error.php");
-                    exit();
-                }
-
-            } else {
-                echo "Oops! Algo saiu errado. Tente novamente mais tarde.";
-            }
-        }
-
-        // Fecha declaração
-        mysqli_stmt_close($stmt);
-
-        // Fechar Conexão
-        mysqli_close($link);
-    } else {
-        // URL não contém o parâmetro id. Redirecionar para a página de erro
-        header("location: error.php");
-        exit();
-    }
+    header("location: error.php");
+    exit();
 }
 ?>
 
+
 <!DOCTYPE html>
 <html lang="pt-br" class="dark" data-bs-theme="dark">
+
 <head>
     <meta charset="UTF-8">
     <title>Atualizar Usuário</title>
@@ -126,22 +105,28 @@ if (isset($_POST["usuario"]) && !empty($_POST["usuario"])) {
             width: 800px;
             margin: 0 auto;
         }
+
         body {
             background-color: #1C1C1C;
             color: white;
         }
+
         section {
             width: 150vh;
             margin: auto;
             padding: 10px;
         }
-        #userTable th, #userTable td {
+
+        #userTable th,
+        #userTable td {
             border: 1px solid #ccc;
             text-align: center;
         }
+
         #userTable thead {
             background: #4F4F4F;
         }
+
         .headcontainer {
             width: auto;
             height: auto;
@@ -149,9 +134,11 @@ if (isset($_POST["usuario"]) && !empty($_POST["usuario"])) {
             justify-content: center;
             align-items: center;
         }
+
         body {
             margin: 0px;
         }
+
         .h2 {
             text-align: center;
         }
@@ -171,35 +158,29 @@ if (isset($_POST["usuario"]) && !empty($_POST["usuario"])) {
                     </p>
                     <form action="<?php echo htmlspecialchars(basename($_SERVER['REQUEST_URI'])); ?>" method="post">
                         <div class="form-group">
-                            <input type="hidden" name="usuario"
-                                class="form-control <?php echo (!empty($usuario_err)) ? 'is-invalid' : ''; ?>"
-                                value="<?php echo $usuario; ?>">
-                            <span class="invalid-feedback">
-                                <?php echo $usuario_err; ?>
-                            </span>
+                            <input type="hidden" name="usuario" value="<?php echo $usuario; ?>">
                         </div>
+
                         <div class="form-group">
                             <label>Senha</label>
                             <input type="password" name="senha"
                                 class="form-control <?php echo (!empty($senha_err)) ? 'is-invalid' : ''; ?>"
                                 placeholder="*********">
-                            <span class="invalid-feedback">
-                                <?php echo $senha_err; ?>
-                            </span>
+                            <span class="invalid-feedback"><?php echo $senha_err; ?></span>
                         </div>
+
                         <div class="form-group">
                             <label>Confirmar Senha</label>
                             <input type="password" name="confirma"
                                 class="form-control <?php echo (!empty($confirma_err)) ? 'is-invalid' : ''; ?>"
                                 placeholder="*********">
-                            <span class="invalid-feedback">
-                                <?php echo $confirma_err; ?>
-                            </span>
+                            <span class="invalid-feedback"><?php echo $confirma_err; ?></span>
                         </div>
-                        <input type="hidden" name="id" value="<?php echo $id; ?>" />
+
                         <input type="submit" class="btn btn-primary" value="Salvar">
                         <a href="index.php" class="btn btn-secondary ml-2">Cancelar</a>
                     </form>
+
                 </div>
             </div>
         </div>

@@ -11,11 +11,6 @@ if (!fnmatch("172.16.0.*", $ipaddress)) {
     exit();
 }
 
-// ini_set('default_charset','iso-8859-1');
-if (!empty($_POST['usuario'])) {
-    header('Location: index.php');
-    exit();
-}
 ?>
 
 <!DOCTYPE html>
@@ -43,6 +38,60 @@ if (!empty($_POST['usuario'])) {
         img {
             max-width: 100%;
         }
+
+        body,
+        .hero.is-success {
+            background-color: #121212 !important;
+            color: #e0e0e0;
+        }
+
+        .box {
+            background-color: #1e1e1e;
+            border: 1px solid #333;
+            color: #e0e0e0;
+        }
+
+        .title,
+        .has-text-grey,
+        .has-text-black {
+            color: #ffffff !important;
+        }
+
+        input.input {
+            background-color: #2c2c2c;
+            border: 1px solid #444;
+            color: #f0f0f0;
+        }
+
+        input.input::placeholder {
+            color: #aaa;
+        }
+
+        .button.is-link {
+            background-color: #3a7bd5;
+            border-color: #3a7bd5;
+            color: #ffffff;
+        }
+
+        .button.is-link:hover {
+            background-color: #346ac3;
+            border-color: #346ac3;
+        }
+
+        .notification.is-danger {
+            background-color: #8b0000;
+            color: #ffffff;
+        }
+
+        .container.has-text-centered {
+            color: #e0e0e0;
+        }
+
+        p {
+            color: #ccc;
+        }
+    </style>
+
     </style>
 </head>
 
@@ -72,7 +121,7 @@ if (!empty($_POST['usuario'])) {
                         <form action="login.php" method="POST">
                             <div class="field">
                                 <div class="control">
-                                    <input name="usuario" name="text" class="input is-large" placeholder="Seu usuário"
+                                    <input type="text" name="usuario" class="input is-large" placeholder="Seu usuário"
                                         autofocus="">
                                 </div>
                             </div>

@@ -1,221 +1,140 @@
 <?php
-
-//Mecanismo de login
+// Mecanismo de login
 include('../verifica_login.php');
 
 // Include config file
 require_once "../config.php";
 
-
-//Verificação de Admin
-$useradmin = @$_SESSION['usuario'];
-
-if ($stmt = mysqli_prepare($link, "SELECT admin FROM usuarios WHERE usuario = ?")) {
-    // Bind parameters
-    mysqli_stmt_bind_param($stmt, "s", $useradmin);
-
-    // Execute statement
-    mysqli_stmt_execute($stmt);
-
-    // Bind result variables
-    mysqli_stmt_bind_result($stmt, $admin);
-
-    // Fetch the result
-    mysqli_stmt_fetch($stmt);
-
-    // Close the statement
-    mysqli_stmt_close($stmt);
-}
-
-$adminarray = ['admin' => $admin];
+// Verificação de Admin
+$useradmin = isset($_SESSION['usuario']) ? $_SESSION['usuario'] : null;
 
 if (!$useradmin) {
     header("Location: login.php");
     exit;
 }
 
-if ($adminarray['admin'] == "s") {
+// Verifica se o usuário é admin
+$admin = "n";
+if ($stmt = mysqli_prepare($link, "SELECT admin FROM usuarios WHERE usuario = ?")) {
+    mysqli_stmt_bind_param($stmt, "s", $useradmin);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_bind_result($stmt, $admin);
+    mysqli_stmt_fetch($stmt);
+    mysqli_stmt_close($stmt);
+}
 
-
-    //verifica admin
-    $useradmin = @$_SESSION['usuario'];
-    $useradminL = mysqli_real_escape_string($link, $useradmin);
-    $queryadmin = "SELECT admin FROM usuarios WHERE usuario = '{$useradminL}'";
-    $resultadmin = mysqli_query($link, $queryadmin);
-    $adminarray = mysqli_fetch_array($resultadmin);
-
-    // Definir variáveis e inicializar com valores vazios
-    $usuario = $senha = $admin = "";
-    $usuario_err = $senha_err = $admin_err = "";
-
-    // Processamento de dados do formulário quando o formulário é enviado
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        // Valida usuario
-        $input_usuario = trim($_POST["usuario"]);
-        if (empty($input_usuario)) {
-            $usuario_err = "Por favor entre um usuário";
-        } else {
-            $usuario = $input_usuario;
-        }
-
-        // Valida senha
-        $input_senha = trim($_POST["senha"]);
-        if (empty($input_senha)) {
-            $senha_err = "Por favor entre uma senha.";
-        } else {
-            $senha = $input_senha;
-        }
-
-        // Valida admin
-        $input_admin = trim($_POST["admin"]);
-        if (empty($input_admin)) {
-            $admin_err = "Por favor entre se é admin";
-        } else {
-            $admin = $input_admin;
-        }
-
-        // Verifica os erros de entrada antes de inserir no banco de dados
-        if (empty($usuario_err) && empty($senha_err) && empty($admin_err)) {
-            // Prepara uma instrução de inserção
-            $sql = "INSERT INTO usuarios (usuario, senha, admin) VALUES (?, ?, ?)";
-
-            if ($stmt = mysqli_prepare($link, $sql)) {
-                // Vincula as variáveis à instrução preparada como parâmetros
-                mysqli_stmt_bind_param($stmt, "sss", $param_usuario, $param_senha, $param_admin);
-
-                // Definir parâmetros
-                $param_usuario = $usuario;
-                $param_senha = md5($senha);
-                $param_admin = $admin;
-
-                $sql_duplicate = "SELECT * FROM usuarios WHERE usuario = '{$usuario}'";
-                $duplicate_result = mysqli_query($link, $sql_duplicate);
-                $check_duplicate = mysqli_num_rows($duplicate_result);
-
-                if ($check_duplicate) {
-                    header("location: error.php");
-                    exit();
-                } else {
-                    // Tentativa de executar a instrução preparada
-                    if (mysqli_stmt_execute($stmt)) {
-                        // Registros criados com sucesso. Redirecionar para a página de destino
-                        header("location: index.php");
-                        exit();
-                    } else {
-                        echo "Oops! Algo saiu errado. Tente novamente mais tarde.";
-                    }
-                }
-            }
-
-            // Fecha declaração
-            mysqli_stmt_close($stmt);
-        }
-
-        // Fecha conexão
-        mysqli_close($link);
-    }
-    ?>
-
-    <!DOCTYPE html>
-    <html lang="pt-br" class="dark" data-bs-theme="dark">
-
-    <head>
-        <meta charset="UTF-8">
-        <title>Criar usuário</title>
-        <link rel="stylesheet" href="../css/bootstrap.min.css">
-        <style>
-            .wrapper {
-                width: 800px;
-                margin: 0 auto;
-            }
-
-            body {
-                background-color: #1C1C1C;
-                color: white;
-            }
-
-            section {
-                width: 150vh;
-                margin: auto;
-                padding: 10px;
-            }
-
-            #userTable th,
-            #userTable td {
-                border: 1px solid #ccc;
-                text-align: center;
-            }
-
-            #userTable thead {
-                background: #4F4F4F;
-            }
-
-            .headcontainer {
-                width: auto;
-                height: auto;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-            }
-
-            body {
-                margin: 0px;
-            }
-
-            .h2 {
-                text-align: center;
-            }
-        </style>
-    </head>
-
-    <body>
-        <div class="wrapper">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-md-12">
-                        <h2 class="mt-5">Criar usuário</h2>
-                        <p>Por favor preencha os campos para adicionar um novo usuário a lista</p>
-                        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-                            <div class="form-group">
-                                <label>Usuário</label>
-                                <input type="text" name="usuario"
-                                    class="form-control <?php echo (!empty($usuario_err)) ? 'is-invalid' : ''; ?>"
-                                    value="<?php echo $usuario; ?>">
-                                <span class="invalid-feedback">
-                                    <?php echo $usuario_err; ?>
-                                </span>
-                            </div>
-                            <div class="form-group">
-                                <label>Senha</label>
-                                <input type="password" name="senha"
-                                    class="form-control <?php echo (!empty($senha_err)) ? 'is-invalid' : ''; ?>"
-                                    value="<?php echo $senha; ?>">
-                                <span class="invalid-feedback">
-                                    <?php echo $senha_err; ?>
-                                </span>
-                            </div>
-                            <div class="form-group">
-                                <label>Admin</label>
-                                <select name="admin" class="form-control">
-                                    <option value="s">SIM</option>
-                                    <option value="n">NÃO</option>
-                                </select>
-                                <span class="invalid-feedback">
-                                    <?php echo $admin_err; ?>
-                                </span>
-                            </div>
-                            <input type="submit" class="btn btn-primary" value="Salvar">
-                            <a href="index.php" class="btn btn-secondary ml-2">Cancelar</a>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </body>
-
-    </html>
-<?php } else {
+if ($admin !== "s") {
     header("Location: /lista/index.php");
     exit;
 }
+
+// Definir variáveis e inicializar com valores vazios
+$usuario = $senha = $admin = "";
+$usuario_err = $senha_err = $admin_err = "";
+
+// Processamento de dados do formulário
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Valida usuário
+    $usuario = trim($_POST["usuario"]);
+    if (empty($usuario)) {
+        $usuario_err = "Por favor entre um usuário.";
+    }
+
+    // Valida senha
+    $senha = trim($_POST["senha"]);
+    if (empty($senha)) {
+        $senha_err = "Por favor entre uma senha.";
+    }
+
+    // Valida admin
+    $admin = $_POST["admin"] ?? "";
+    if ($admin !== "s" && $admin !== "n") {
+        $admin_err = "Valor inválido para o campo admin.";
+    }
+
+    // Verifica erros antes de inserir
+    if (empty($usuario_err) && empty($senha_err) && empty($admin_err)) {
+        // Verifica se já existe
+        $sql_duplicate = "SELECT id FROM usuarios WHERE usuario = ?";
+        if ($stmt = mysqli_prepare($link, $sql_duplicate)) {
+            mysqli_stmt_bind_param($stmt, "s", $usuario);
+            mysqli_stmt_execute($stmt);
+            mysqli_stmt_store_result($stmt);
+
+            if (mysqli_stmt_num_rows($stmt) > 0) {
+                $usuario_err = "Este usuário já está cadastrado.";
+            } else {
+                // Insere novo usuário
+                $sql_insert = "INSERT INTO usuarios (usuario, senha, admin) VALUES (?, ?, ?)";
+                if ($stmt_insert = mysqli_prepare($link, $sql_insert)) {
+                    $hash_senha = password_hash($senha, PASSWORD_DEFAULT);
+                    mysqli_stmt_bind_param($stmt_insert, "sss", $usuario, $hash_senha, $admin);
+                    if (mysqli_stmt_execute($stmt_insert)) {
+                        header("location: index.php");
+                        exit();
+                    } else {
+                        echo "Oops! Algo deu errado. Tente novamente mais tarde.";
+                    }
+                    mysqli_stmt_close($stmt_insert);
+                }
+            }
+            mysqli_stmt_close($stmt);
+        }
+    }
+
+    mysqli_close($link);
+}
 ?>
+
+<!DOCTYPE html>
+<html lang="pt-br" class="dark" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <title>Criar usuário</title>
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <style>
+        .wrapper { width: 800px; margin: 0 auto; }
+        body { background-color: #1C1C1C; color: white; margin: 0; }
+        .form-control:focus { box-shadow: none; }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="mt-5">Criar usuário</h2>
+                <p>Por favor preencha os campos para adicionar um novo usuário à lista.</p>
+                <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+                    <div class="form-group">
+                        <label>Usuário</label>
+                        <input type="text" name="usuario"
+                               class="form-control <?php echo (!empty($usuario_err)) ? 'is-invalid' : ''; ?>"
+                               value="<?php echo htmlspecialchars($usuario); ?>">
+                        <span class="invalid-feedback"><?php echo $usuario_err; ?></span>
+                    </div>
+                    <div class="form-group">
+                        <label>Senha</label>
+                        <input type="password" name="senha"
+                               class="form-control <?php echo (!empty($senha_err)) ? 'is-invalid' : ''; ?>"
+                               value="<?php echo htmlspecialchars($senha); ?>">
+                        <span class="invalid-feedback"><?php echo $senha_err; ?></span>
+                    </div>
+                    <div class="form-group">
+                        <label>Admin</label>
+                        <select name="admin" class="form-control <?php echo (!empty($admin_err)) ? 'is-invalid' : ''; ?>">
+                            <option value="s" <?php echo ($admin === "s") ? 'selected' : ''; ?>>SIM</option>
+                            <option value="n" <?php echo ($admin === "n") ? 'selected' : ''; ?>>NÃO</option>
+                        </select>
+                        <span class="invalid-feedback"><?php echo $admin_err; ?></span>
+                    </div>
+                    <br>
+                    <input type="submit" class="btn btn-primary" value="Salvar">
+                    <a href="index.php" class="btn btn-secondary ml-2">Cancelar</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

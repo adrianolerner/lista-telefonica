@@ -71,7 +71,7 @@ seguintes linhas conforme necessário para validar pelo IP a exibição do botã
         ```
          - Nos arquivos `acesso.php` e `index.php`, altere o IP  das
 seguintes linhas conforme necessário para validar pelo IP.
-        ```
+        ```php
         if (!fnmatch("172.16.0.\*", $ipaddress))
         ```
     - Caso não queira validar pelo IP, descomente a linha:
@@ -83,9 +83,14 @@ seguintes linhas conforme necessário para validar pelo IP.
         $ip = $_SERVER['HTTP_X_REAL_IP'];
         $ipaddress = strstr($ip, ',', true);
         ```
-    - Criar no google recaptcha v2 um novo site conforme seu dominio e copiar as chaves privada e pública.
+    - Caso queira usar o recaptcha para validação de login, mude para "false" o valor da variável $recaptcha_verified na linha 12. Caso não queira utilizar, basta manter como "true".
+      ```php
+      $recaptcha_verified = true;
+      ```
+    - Criar no google recaptcha v3 um novo site conforme seu dominio e copiar as chaves privada e pública. (Caso queira usar)
     - Aterar codigo recaptcha nas referidas linhas nos arquivos login.php e acesso.php, sendo a
-chave privada em login.php e a publica em acesso.php
+chave privada em login.php e a publica em acesso.php.
+    - Caso a variavel acima esteja como "false" e não seja indicado o código recaptcha nas paginas indicadas, a tela de login não funcionará.
 
 5. **Inclusão de usuário e senha do banco de dados (mudança da versão 0.8 - passos obrigatórios para atualização)**
 Para configurar variáveis de ambiente no Ubuntu Server com Apache 2 e usá-las no seu código PHP, você pode seguir estas etapas:
@@ -180,136 +185,15 @@ Para configurar variáveis de ambiente no Ubuntu Server com Apache 2 e usá-las 
         ```
     - Altere os cabeçalhos e titulos das páginas para o nome do seu órgão/empresa.
 
-7. **Mudança da Versão 0.7:**
-    - Nesta nova versão foram feitas mudanças significativas no código relacionado as consultas ao banco de cados.
-    - Há uma nova tabela de secretaria, que está relacionada ao campo "secretaria" da tabela lista, então é necessário
-fazer ajustes ao banco de dados para poder utilizar esta versão.
-    - Para os ajustes, você pode importar o arquivo SQL anexo a versão em um novo banco ou banco de testes, e migrar os
-registros conforme necessário através da console do banco de dados ou usando uma ferramenta grafica como o phpmyadmin.
-    - Caso queira ajustar manualmente, é necessário:
-        - A. Incluir uma tabela chamada "secretarias", e nela as colunas "id_secretaria" do tipo int e "secretaria" do
-tipo VARCHAR (100).
-        - B. Cadastrar nesta tabela todas as secretarias necessárias.
-        - C. Na tabela lista atualizar os registros, trocando estes da coluna "secretaria", pelo código (id_secretaria)
-correspondente da tabela "secretarias".Isto pode ser feito usando o comando SQL abaixo:
-            - ``` UPDATE `lista` SET `secretaria`='NOME_CADASTRADO' WHERE `secretaria`='NOVO_ID_DA_TABELA_SECRETARIAS'; ```
-        - D. Adicionar o relacionamento das tabelas, relacionado o campo "secretarias" da tabela "lista", com o campo
-"id_secretaria" da tabela "secretarias". Isto pode ser feito usando o comando SQL abaixo:
-            - ``` ALTER TABLE `lista` ADD CONSTRAINT `fk_secretaria` FOREIGN KEY (`secretaria`) REFERENCES `secretarias`
-(`id_secretaria`); ON DELETE RESTRICT ON UPDATE RESTRICT; ```
-8. **Mudança da Versão 0.9:**
-    - Nesta nova versão foi incluida a tabela de log_importacoes referente a nova função de importação de lista via CSV.
-    - Para não ocorrerem inconsistências, esta nova tabela deve ser criada, ou importada do arquivo SQL que acompanha o projeto, conforme as recomendações abaixo:
-    - Nome da tabela "log_importacoes".
-    - Colunas:
-        - 1 	id_log 	int(11)
-        - 2 	usuario 	varchar(100) 	utf8mb4_general_ci
-        - 3 	ip 	varchar(15) 	utf8mb4_general_ci
-        - 4 	inseridos 	int(100)
-        - 5 	ignorados 	int(100)
-        - 6 	data_hora 	datetime 	
-
-### ** Para efeito didático, abaixo segue explicação visual para a versão 0.7:**
-
-### 1. Estrutura das Tabelas
-
-**Tabela `lista`:**
-
-| id_lista | nome | ramal | email | setor | secretaria |
-|----------|------|-------|-------|-------|------------|
-| 1        | Ana  | 1234  | ana@empresa.com | TI   | 2          |
-| 2        | José | 5678  | jose@empresa.com | RH   | 1          |
-
-**Tabela `secretarias`:**
-
-| id_secretaria | secretaria     |
-|---------------|----------------|
-| 1             | Administração  |
-| 2             | Tecnologia     |
-| 3             | Finanças       |
-
-### 2. Criação das Tabelas com Chave Estrangeira
-
-Primeiro, você cria a tabela `secretarias`:
-
-```sql
-CREATE TABLE secretarias (
-    id_secretaria INT PRIMARY KEY,
-    secretaria VARCHAR(100) NOT NULL
-);
-```
-
-Em seguida, você cria a tabela `lista`, com a chave estrangeira `secretaria`:
-
-```sql
-CREATE TABLE lista (
-    id_lista INT PRIMARY KEY,
-    nome VARCHAR(100) NOT NULL,
-    ramal VARCHAR(10),
-    email VARCHAR(100),
-    setor VARCHAR(50),
-    secretaria INT,
-    FOREIGN KEY (secretaria) REFERENCES secretarias(id_secretaria)
-);
-```
-
-### 3. Inserção de Dados nas Tabelas
-
-Aqui está como você pode inserir dados em ambas as tabelas:
-
-**Tabela `secretarias`:**
-
-```sql
-INSERT INTO secretarias (id_secretaria, secretaria) VALUES 
-(1, 'Administração'),
-(2, 'Tecnologia'),
-(3, 'Finanças');
-```
-
-**Tabela `lista`:**
-
-```sql
-INSERT INTO lista (id_lista, nome, ramal, email, setor, secretaria) VALUES 
-(1, 'Ana', '1234', 'ana@empresa.com', 'TI', 2),
-(2, 'José', '5678', 'jose@empresa.com', 'RH', 1);
-```
-
-### 4. Consulta com `JOIN`
-
-Para trazer as informações da tabela `secretarias` na consulta da tabela `lista`, você pode usar um `JOIN`. Aqui está um exemplo de consulta:
-
-```sql
-SELECT 
-    l.id_lista,
-    l.nome,
-    l.ramal,
-    l.email,
-    l.setor,
-    s.secretaria
-FROM 
-    lista l
-JOIN 
-    secretarias s ON l.secretaria = s.id_secretaria;
-```
-
-### 5. Resultado da Consulta
-
-A consulta acima retornará algo como:
-
-| id_lista | nome | ramal | email           | setor | secretaria   |
-|----------|------|-------|-----------------|-------|--------------|
-| 1        | Ana  | 1234  | ana@empresa.com | TI    | Tecnologia   |
-| 2        | José | 5678  | jose@empresa.com | RH    | Administração|
-
-### Explicação
-
-- **Chave estrangeira (Foreign Key)**: No exemplo, o campo `secretaria` da tabela `lista` refere-se ao campo `id_secretaria` da tabela `secretarias`, criando uma relação entre as duas tabelas.
-- **JOIN**: A consulta com `JOIN` permite que você combine dados das duas tabelas, unindo-as pela chave estrangeira.
+7. **Caso seja necessário a atualização de versão anterior, por conta das mudaças no código e banco de dados, recomendamos que seja feito backup dos arquivos do projeto e do banco de dados, e seja criado novo banco, importando do exemplo disponibilizado, e importados os registros no sistema já atualizado, para evitar conflitos.
 
 ## Uso
 
 Depois de configurar a aplicação, você pode acessar a aplicação de lista telefônica através do
 seu navegador apontando para o servidor onde a aplicação está hospedada.
+O usuário pré-cadastrado é "admin" e senha "admin".
+Em caso de necessidade, é possível gerar o hash de senha para inserção diretamente no banco de dos, editando o arquivo trocahash.php, inserindo a senha desejada no campo `INSIRA_A_SENHA_AQUI` e depois executando-o no terminal em sua pasta com o PHP com o comando `php trocahash.php`.
+
 Por gentileza mantenha os créditos do criador.
 
 ## Contribuição

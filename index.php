@@ -103,21 +103,27 @@ $bannerarray = ['banner' => $banner];
                 <h2 class="h2">LISTA TELEFÔNICA PREFEITURA DE CASTRO</h2>
             </div>
             <div class="headcontainer">
+                <p>Seja bem-vindo a lista telefônica <?php if (!empty($useradmin)) {echo $useradmin;} else {echo "visitante";} ?></p>
+            </div>
+            <div class="headcontainer">
+                <p><?php if (!empty($useradmin)) {echo "Use as opções abaixo para gerenciar a lista telefônica.";}?></p>
+            </div>
+            <div class="headcontainer">
                 <?php if (fnmatch("172.16.0.*", $ipaddress)) { ?>
                     <?php if (!empty($useradmin)) { ?>
-                        <a href="logout.php" class="btn btn-secondary pull-right"><i class="fa fa-sign-out"></i> Sair</a>&nbsp;
+                        <a href="logout.php" class="btn btn-secondary pull-center"><i class="fa fa-sign-out"></i> Sair</a>&nbsp;
                         <a href="senha.php?user=<?php echo htmlspecialchars($useradmin, ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-primary pull-right"><i class="fa fa-lock"></i> Alterar Senha</a>&nbsp;
                         <?php if ($adminarray['admin'] == "s") { ?>
-                            <a href="usuarios/index.php" class="btn btn-primary pull-right"><i class="fa fa-users"></i> Gerenciar Usuários</a>&nbsp;
-                            <a href="secretarias/index.php" class="btn btn-primary pull-right"><i class="fa fa-home"></i> Gerenciar Secretarias</a>&nbsp;
-                            <a href="update_banner.php?id_banner=1" class="btn btn-primary pull-right"><i class="fa fa-info-circle"></i> Atualizar Banner</a>&nbsp;
-                            <a href="delete_all.php" class="btn btn-danger"><i class="fa fa-exclamation-triangle"></i> Apagar Tudo</a>&nbsp;
-                            <a href="importar.php" class="btn btn-success pull-right"><i class="fa fa-upload"></i> Importar CSV</a>
+                            <a href="usuarios/index.php" class="btn btn-primary pull-center"><i class="fa fa-users"></i> Gerenciar Usuários</a>&nbsp;
+                            <a href="secretarias/index.php" class="btn btn-primary pull-center"><i class="fa fa-home"></i> Gerenciar Secretarias</a>&nbsp;
+                            <a href="update_banner.php?id_banner=1" class="btn btn-primary pull-center"><i class="fa fa-info-circle"></i> Atualizar Banner</a>&nbsp;
+                            <a href="delete_all.php" class="btn btn-danger pull-center"><i class="fa fa-exclamation-triangle"></i> Apagar Tudo</a>&nbsp;
+                            <a href="importar.php" class="btn btn-success pull-center"><i class="fa fa-upload"></i> Importar CSV</a>
                         <?php } ?>&nbsp;
-                        <a href="create.php" class="btn btn-success pull-right"><i class="fa fa-plus"></i> Adicionar Ramal</a>
+                        <a href="create.php" class="btn btn-success pull-center"><i class="fa fa-plus"></i> Adicionar Ramal</a>
                     <?php } ?>
                     <?php if (empty($useradmin)) { ?>
-                        <a href="login.php" class="btn btn-primary pull-right"><i class="fa fa-sign-in"></i> LOGIN</a>
+                        <a href="login.php" class="btn btn-primary pull-center"><i class="fa fa-sign-in"></i> LOGIN</a>
                     <?php } ?>
                 <?php } ?>
             </div>
@@ -196,7 +202,7 @@ $bannerarray = ['banner' => $banner];
         <section>
             <div class="maincontainer">
                 <br />
-                <p align="center"><a href="gerapdf.php" class="btn btn-primary pull-center"><i class="fa fa-download"></i> GERAR LISTA EM PDF</a></p>
+                <p align="center"><a href="exportar_csv.php" class="btn btn-primary pull-center"><i class="fa fa-download"></i> GERAR LISTA EM CSV</a>&nbsp;<a href="gerapdf.php" class="btn btn-primary pull-center"><i class="fa fa-download"></i> GERAR LISTA EM PDF</a></p>
                 <p align="center"><img src="img/logo2.png" width="150px" /> | <img src="img/logo3.png" width="180px" /></p>
                 <p align="center">IP: <?php echo htmlspecialchars($ipaddress, ENT_QUOTES, 'UTF-8'); ?></p>
                 <p align="center"><a href="https://github.com/adrianolerner/lista-telefonica">©<?php echo date("Y"); ?> Prefeitura Municipal de Castro | Departamento de Tecnologia | Adriano Lerner Biesek</a></p>
