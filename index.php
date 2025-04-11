@@ -202,7 +202,13 @@ $bannerarray = ['banner' => $banner];
         <section>
             <div class="maincontainer">
                 <br />
-                <p align="center"><a href="exportar_csv.php" class="btn btn-primary pull-center"><i class="fa fa-download"></i> GERAR LISTA EM CSV</a>&nbsp;<a href="gerapdf.php" class="btn btn-primary pull-center"><i class="fa fa-download"></i> GERAR LISTA EM PDF</a></p>
+                <p align="center">
+                    <?php if (!empty($useradmin)) {
+                        echo "<a href='exportar_csv.php' class='btn btn-primary pull-center'><i class='fa fa-download'></i> GERAR LISTA EM CSV</a>&nbsp;";
+                    } else {
+                        echo "<a href='gerapdf.php' class='btn btn-primary pull-center'><i class='fa fa-download'></i> GERAR LISTA EM PDF</a>";
+                    } ?>
+                </p>
                 <p align="center"><img src="img/logo2.png" width="150px" /> | <img src="img/logo3.png" width="180px" /></p>
                 <p align="center">IP: <?php echo htmlspecialchars($ipaddress, ENT_QUOTES, 'UTF-8'); ?></p>
                 <p align="center"><a href="https://github.com/adrianolerner/lista-telefonica">©<?php echo date("Y"); ?> Prefeitura Municipal de Castro | Departamento de Tecnologia | Adriano Lerner Biesek</a></p>
