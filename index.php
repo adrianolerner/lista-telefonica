@@ -94,6 +94,31 @@ $bannerarray = ['banner' => $banner];
         .h2 {
             text-align: center;
         }
+        .scrolling-container {
+            width: calc(100% - 30px);
+            /* 15px de cada lado */
+            margin: 0 15px;
+            overflow: hidden;
+        }
+
+        .scrolling-text {
+            display: inline-block;
+            white-space: nowrap;
+            padding-left: 100%;
+            /* Espaço inicial */
+            animation: scroll 12s linear infinite;
+        }
+
+        @keyframes scroll {
+            from {
+                transform: translateX(0);
+            }
+
+            to {
+                transform: translateX(calc(-100% - 15px));
+                /* Compensa a margem direita */
+            }
+        }
     </style>
 </head>
 <body>
@@ -130,7 +155,10 @@ $bannerarray = ['banner' => $banner];
         </section>
     </header>
     <section>
-        <marquee><?php echo htmlspecialchars($bannerarray["banner"], ENT_QUOTES, 'UTF-8'); ?></marquee>
+        <div class="scrolling-container">
+            <div class="scrolling-text"><?php echo htmlspecialchars($bannerarray["banner"], ENT_QUOTES, 'UTF-8'); ?>
+            </div>
+        </div>
     </section>
     <section>
         <?php
