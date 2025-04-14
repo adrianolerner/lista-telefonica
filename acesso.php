@@ -144,6 +144,13 @@ if (!fnmatch("172.16.0.*", $ipaddress)) {
                         <p align="center">IP: <?php echo htmlspecialchars($ipaddress, ENT_QUOTES, 'UTF-8'); ?></p>
                     </div>
                 </div>
+                <div style="text-align: center; margin-top: 1rem;">
+                    <small>
+                        Este site é protegido pelo reCAPTCHA e está sujeito à
+                    <a href="https://policies.google.com/privacy" target="_blank">Política de Privacidade</a> e aos
+                    <a href="https://policies.google.com/terms" target="_blank">Termos de Serviço</a> do Google.
+                    </small>
+                </div>
             </div>
         </div>
     </section>
