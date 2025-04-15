@@ -1,27 +1,53 @@
 <?php
 
-//Mecanismo de login
-//session_start();
+// Mecanismo de login
 include('verifica_login.php');
+
+//Verificação de IP (usado para inserção do IP no LOG)
+$ip = $_SERVER['HTTP_X_REAL_IP'];
+//$ipaddress = "172.16.0.10";
+$ipaddress = strstr($ip, ',', true);
 
 // Processa a requisição de delete após a confirmação
 if (isset($_POST["id_lista"]) && !empty($_POST["id_lista"])) {
     // Inclui config file
     require_once "config.php";
 
+    // Primeiro buscamos o ramal para registrar no log antes de apagar
+    $id_lista = trim($_POST["id_lista"]);
+    $ramal = "";
+    $sql_ramal = "SELECT ramal FROM lista WHERE id_lista = ?";
+    if ($stmt_ramal = mysqli_prepare($link, $sql_ramal)) {
+        mysqli_stmt_bind_param($stmt_ramal, "i", $id_lista);
+        if (mysqli_stmt_execute($stmt_ramal)) {
+            $result = mysqli_stmt_get_result($stmt_ramal);
+            if ($row = mysqli_fetch_assoc($result)) {
+                $ramal = $row['ramal'];
+            }
+        }
+        mysqli_stmt_close($stmt_ramal);
+    }
+
     // Prepara o statement de delete
     $sql = "DELETE FROM lista WHERE id_lista = ?";
-
     if ($stmt = mysqli_prepare($link, $sql)) {
-
-        mysqli_stmt_bind_param($stmt, "i", $param_id);
-
-        // Configura os paramentros
-        $param_id = trim($_POST["id_lista"]);
+        mysqli_stmt_bind_param($stmt, "i", $id_lista);
 
         // Tenta executar os parametros configurados
         if (mysqli_stmt_execute($stmt)) {
-            // Registros apagados. Redireciona para o index
+
+            // REGISTRA O LOG DE EXCLUSÃO
+            $acao = "Exclusão";
+            $usuario = $_SESSION['usuario'];
+            $datahora = date('Y-m-d H:i:s');
+            $sql_log = "INSERT INTO log_alteracoes (acao, id_lista, ramal, usuario, ip, datahora) VALUES (?, ?, ?, ?, ?, ?)";
+            if ($stmt_log = mysqli_prepare($link, $sql_log)) {
+                mysqli_stmt_bind_param($stmt_log, "sissss", $acao, $id_lista, $ramal, $usuario, $ipaddress, $datahora);
+                mysqli_stmt_execute($stmt_log);
+                mysqli_stmt_close($stmt_log);
+            }
+
+            // Redireciona para o index após exclusão
             header("location: index.php");
             exit();
         } else {
@@ -35,9 +61,9 @@ if (isset($_POST["id_lista"]) && !empty($_POST["id_lista"])) {
     // Fecha a conexão
     mysqli_close($link);
 } else {
-    // Checa a existencia de id de parametros
+    // Checa a existência de id de parâmetros
     if (empty(trim($_GET["id_lista"]))) {
-        // URL não possui paramentro, redireciona para a pagina de erro
+        // URL não possui parâmetro, redireciona para a página de erro
         header("location: error.php");
         exit();
     }
@@ -46,6 +72,7 @@ if (isset($_POST["id_lista"]) && !empty($_POST["id_lista"])) {
 
 <!DOCTYPE html>
 <html lang="pt-br" class="dark" data-bs-theme="dark">
+
 <head>
     <meta charset="UTF-8">
     <title>Apagar registro</title>
@@ -56,22 +83,28 @@ if (isset($_POST["id_lista"]) && !empty($_POST["id_lista"])) {
             width: 800px;
             margin: 0 auto;
         }
+
         body {
             background-color: #1C1C1C;
             color: white;
         }
+
         section {
             width: 150vh;
             margin: auto;
             padding: 10px;
         }
-        #userTable th, #userTable td {
+
+        #userTable th,
+        #userTable td {
             border: 1px solid #ccc;
             text-align: center;
         }
+
         #userTable thead {
             background: #4F4F4F;
         }
+
         .headcontainer {
             width: auto;
             height: auto;
@@ -79,9 +112,11 @@ if (isset($_POST["id_lista"]) && !empty($_POST["id_lista"])) {
             justify-content: center;
             align-items: center;
         }
+
         body {
             margin: 0px;
         }
+
         .h2 {
             text-align: center;
         }

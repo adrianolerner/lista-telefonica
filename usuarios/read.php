@@ -161,7 +161,7 @@ if ($adminarray['admin'] == "s") {
                             }
                             ; ?>
                         </div>
-                        <p><a href="index.php" class="btn btn-primary">Voltar</a></p>
+                        <p><a href="index.php" class="btn btn-secondary">← Voltar</a></p>
                     </div>
                 </div>
             </div>

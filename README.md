@@ -185,7 +185,7 @@ Para configurar variáveis de ambiente no Ubuntu Server com Apache 2 e usá-las 
         ```
     - Altere os cabeçalhos e titulos das páginas para o nome do seu órgão/empresa.
 
-7. **Caso seja necessário a atualização de versão anterior, por conta das mudaças no código e banco de dados, recomendamos que seja feito backup dos arquivos do projeto e do banco de dados, e seja criado novo banco, importando do exemplo disponibilizado, e importados os registros no sistema já atualizado, para evitar conflitos.
+7. **Caso seja necessário a atualização de versão anterior, por conta das mudaças no código e banco de dados, recomendamos que seja feito backup dos arquivos do projeto e do banco de dados, e seja criado novo banco, importando do exemplo disponibilizado, e importados os registros no sistema já atualizado, para evitar conflitos.**
 
 ## Uso
 

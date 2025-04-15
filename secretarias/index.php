@@ -1,27 +1,18 @@
 <?php
 
-//Mecanismo de login
+// Mecanismo de login
 include('../verifica_login.php');
 // Inclui arquivo de configuração
 require_once "../config.php";
 
-//Verificação de Admin
+// Verificação de Admin
 $useradmin = @$_SESSION['usuario'];
 
 if ($stmt = mysqli_prepare($link, "SELECT admin FROM usuarios WHERE usuario = ?")) {
-    // Bind parameters
     mysqli_stmt_bind_param($stmt, "s", $useradmin);
-
-    // Execute statement
     mysqli_stmt_execute($stmt);
-
-    // Bind result variables
     mysqli_stmt_bind_result($stmt, $admin);
-
-    // Fetch the result
     mysqli_stmt_fetch($stmt);
-
-    // Close the statement
     mysqli_stmt_close($stmt);
 }
 
@@ -33,7 +24,6 @@ if (!$useradmin) {
 }
 
 if ($adminarray['admin'] == "s") {
-
     ?>
     <!DOCTYPE html>
     <html lang="pt-br" class="dark" data-bs-theme="dark">
@@ -45,53 +35,47 @@ if ($adminarray['admin'] == "s") {
         <title>Secretarias Lista Telefônica</title>
         <link rel="stylesheet" href="../css/bootstrap.min.css">
         <link rel="stylesheet" href="../css/font-awesome.min.css">
-        <link href="css/datatables.min.css" rel="stylesheet">
-    </head>
-    <style>
-        body {
-            background-color: #1C1C1C;
-            color: white;
-        }
+        <link rel="stylesheet" href="../css/datatables.min.css">
+        <style>
+            body {
+                background-color: #1C1C1C;
+                color: white;
+                margin: 0px;
+            }
 
-        section {
-            width: fit-content;
-            margin: auto;
-            padding: 10px;
-        }
+            section {
+                width: fit-content;
+                margin: auto;
+                padding: 10px;
+            }
 
-        #userTable th,
-        #userTable td {
-            border: 1px solid #ccc;
-            text-align: center;
-            padding-right: 10px;
-            padding-left: 10px;
-        }
+            #userTable th,
+            #userTable td {
+                border: 1px solid #ccc;
+                text-align: center;
+                padding: 10px;
+            }
 
-        #userTable thead {
-            background: #4F4F4F;
-        }
+            #userTable thead {
+                background: #4F4F4F;
+            }
 
-        #userTable {
-            margin: auto;
-        }
+            #userTable {
+                margin: auto;
+                width: 100%;
+            }
 
-        .headcontainer {
-            width: auto;
-            height: auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+            .headcontainer {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin-bottom: 15px;
+            }
 
-        body {
-            margin: 0px;
-        }
-
-        .h2 {
-            text-align: center;
-        }
-    </style>
-
+            .h2 {
+                text-align: center;
+            }
+        </style>
     </head>
 
     <body>
@@ -101,23 +85,22 @@ if ($adminarray['admin'] == "s") {
                     <h2 class="pull-left">SECRETARIAS LISTA TELEFÔNICA</h2>
                 </div>
                 <div class="headcontainer">
-                    <a href="../index.php" class="btn btn-secondary ml-2">← Voltar</a><b>&nbsp </b>
+                    <a href="../index.php" class="btn btn-secondary ml-2">← Voltar</a><b>&nbsp;</b>
                     <a href="create.php" class="btn btn-success pull-right"><i class="fa fa-plus"></i> Adicionar
                         Secretaria</a>
                 </div>
             </section>
         </header>
+
         <section>
-            <div>
+            <div class="table-responsive">
                 <?php
-                // Inclui arquivo de configuração
                 require_once "../config.php";
 
-                // Tenta selecionar a execução da consulta
                 $sql = "SELECT * FROM secretarias";
                 if ($result = mysqli_query($link, $sql)) {
                     if (mysqli_num_rows($result) > 0) {
-                        echo '<table id="userTable">';
+                        echo '<table id="userTable" class="table table-dark table-striped table-bordered">';
                         echo "<thead>";
                         echo "<tr>";
                         echo "<th>#</th>";
@@ -139,7 +122,6 @@ if ($adminarray['admin'] == "s") {
                         }
                         echo "</tbody>";
                         echo "</table>";
-                        // Libera conjunto de resultados
                         mysqli_free_result($result);
                     } else {
                         echo '<div class="alert alert-danger"><em>Não foram encontrados registros</em></div>';
@@ -148,15 +130,40 @@ if ($adminarray['admin'] == "s") {
                     echo "Oops! Algo saiu errado. Tente novamente mais tarde.";
                 }
 
-                // Fechar conexão
                 mysqli_close($link);
                 ?>
             </div>
         </section>
+
+        <!-- Scripts -->
+        <script src="../js/jquery-3.7.0.min.js"></script>
+        <script src="../js/datatables.min.js"></script>
+        <script>
+            $(document).ready(function () {
+                $('#userTable').DataTable({
+                    order: [[0, 'asc']],
+                    language: {
+                        "lengthMenu": "Mostrar _MENU_ registros por página",
+                        "zeroRecords": "Nada encontrado",
+                        "info": "Mostrando página _PAGE_ de _PAGES_",
+                        "infoEmpty": "Nenhum registro disponível",
+                        "infoFiltered": "(filtrado de _MAX_ registros no total)",
+                        "search": "Buscar:",
+                        "paginate": {
+                            "first": "Primeiro",
+                            "last": "Último",
+                            "next": "Próximo",
+                            "previous": "Anterior"
+                        }
+                    }
+                });
+            });
+        </script>
     </body>
 
     </html>
-<?php } else {
+    <?php
+} else {
     header("Location: /lista/index.php");
     exit;
 }

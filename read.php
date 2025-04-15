@@ -147,7 +147,7 @@ if (isset($_GET["id_lista"]) && !empty(trim($_GET["id_lista"]))) {
                                 <?php echo $row["secretaria"]; ?>
                             </b></p>
                     </div>
-                    <p><a href="index.php" class="btn btn-primary">Voltar</a></p>
+                    <p><a href="index.php" class="btn btn-secondary">← Voltar</a></p>
                 </div>
             </div>
         </div>

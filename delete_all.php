@@ -5,6 +5,11 @@ include('verifica_login.php');
 // Inclui arquivo de configuração
 require_once "config.php";
 
+//Verificação de IP (usado para inserção do IP no LOG)
+$ip = $_SERVER['HTTP_X_REAL_IP'];
+//$ipaddress = "172.16.0.10";
+$ipaddress = strstr($ip, ',', true);
+
 // Verificação de Admin
 $useradmin = @$_SESSION['usuario'];
 
@@ -30,6 +35,20 @@ if ($admin === "s") {
 
         if (mysqli_query($link, $sqlDelete)) {
             mysqli_query($link, $sqlResetAI);
+
+            // REGISTRA O LOG DE EXCLUSÃO
+            $acao = "Limpeza";
+            $ramal = "Todos";
+            $id_lista = 0;
+            $usuario = $_SESSION['usuario'];
+            $datahora = date('Y-m-d H:i:s');
+            $sql_log = "INSERT INTO log_alteracoes (acao, id_lista, ramal, usuario, ip, datahora) VALUES (?, ?, ?, ?, ?, ?)";
+            if ($stmt_log = mysqli_prepare($link, $sql_log)) {
+                mysqli_stmt_bind_param($stmt_log, "sissss", $acao, $id_lista, $ramal, $usuario, $ipaddress, $datahora);
+                mysqli_stmt_execute($stmt_log);
+                mysqli_stmt_close($stmt_log);
+            }
+
             header("Location: index.php");
             exit;
         } else {

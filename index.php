@@ -233,6 +233,9 @@ $bannerarray = ['banner' => $banner];
                 <p align="center">
                     <?php if (!empty($useradmin)) {
                         echo "<a href='exportar_csv.php' class='btn btn-primary pull-center'><i class='fa fa-download'></i> GERAR LISTA EM CSV</a>&nbsp;";
+                        if ($admin === "s") {
+                        echo "<a href='historico_alteracoes.php' class='btn btn-primary pull-center'><i class='fa fa-search'></i> LOG DE ALTERAÇÕES</a>&nbsp;";
+                        }
                     } else {
                         echo "<a href='gerapdf.php' class='btn btn-primary pull-center'><i class='fa fa-download'></i> GERAR LISTA EM PDF</a>";
                     } ?>

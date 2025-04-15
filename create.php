@@ -1,11 +1,13 @@
 <?php
-
-//Mecanismo de login
-//session_start();
+// Mecanismo de login
 include('verifica_login.php');
-
 // Inclui Arquivo de Configuração
 require_once "config.php";
+
+//Verificação de IP (usado para inserção do IP no LOG)
+$ip = $_SERVER['HTTP_X_REAL_IP'];
+//$ipaddress = "172.16.0.10";
+$ipaddress = strstr($ip, ',', true);
 
 // Definir variáveis e inicializar com valores vazios
 $nome = $ramal = $email = $setor = $secretaria = "";
@@ -17,7 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $input_nome = trim($_POST["nome"]);
     if (empty($input_nome)) {
         $nome_err = "Por favor entre um nome";
-    } elseif (!filter_var($input_nome, FILTER_VALIDATE_REGEXP, array("options" => array("regexp" => "/^[a-zA-Zà-úÀ-Ú\s]+$/")))) {
+    } elseif (!filter_var($input_nome, FILTER_VALIDATE_REGEXP, ["options" => ["regexp" => "/^[a-zA-Zà-úÀ-Ú\s]+$/"]])) {
         $nome_err = "Por favor entre um nome válido.";
     } else {
         $nome = $input_nome;
@@ -27,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $input_ramal = trim($_POST["ramal"]);
     if (empty($input_ramal)) {
         $ramal_err = "Por favor entre um ramal.";
-    } elseif (!filter_var($input_ramal, FILTER_VALIDATE_REGEXP, array("options" => array("regexp" => "/^([0-9]|-|\s)+$/")))) {
+    } elseif (!filter_var($input_ramal, FILTER_VALIDATE_REGEXP, ["options" => ["regexp" => "/^([0-9]|-|\s)+$/"]])) {
         $ramal_err = "Por favor entre ramal válido.";
     } else {
         $ramal = $input_ramal;
@@ -61,43 +63,53 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Verifica os erros de entrada antes de inserir no banco de dados
     if (empty($nome_err) && empty($ramal_err) && empty($email_err) && empty($setor_err) && empty($secretaria_err)) {
-        // Prepara uma instrução de inserção
+        // Prepara a instrução de inserção na tabela lista
         $sql = "INSERT INTO lista (nome, ramal, email, setor, secretaria) VALUES (?, ?, ?, ?, ?)";
 
         if ($stmt = mysqli_prepare($link, $sql)) {
-            // Vincula as variáveis à instrução preparada como parâmetros
             mysqli_stmt_bind_param($stmt, "sssss", $param_nome, $param_ramal, $param_email, $param_setor, $param_secretaria);
 
-            // Configura parametros
             $param_nome = $nome;
             $param_ramal = $ramal;
             $param_email = $email;
             $param_setor = $setor;
             $param_secretaria = $secretaria;
 
-            // Tentativa de executar a instrução preparada
             if (mysqli_stmt_execute($stmt)) {
-                // Registros criados com sucesso. Redirecionar para a página de destino
+                // Obtém o ID recém-inserido
+                $id_lista = mysqli_insert_id($link);
+
+                // Registro de log na tabela log_alteracoes
+                $usuario = $_SESSION['usuario'];
+                $acao = 'Inclusão';
+                $ramal_log = $ramal;
+                $datahora = date('Y-m-d H:i:s');
+
+                $sql_log = "INSERT INTO log_alteracoes (acao, id_lista, ramal, usuario, ip, datahora) VALUES (?, ?, ?, ?, ?, ?)";
+                if ($stmt_log = mysqli_prepare($link, $sql_log)) {
+                    mysqli_stmt_bind_param($stmt_log, "sissss", $acao, $id_lista, $ramal, $usuario, $ipaddress, $datahora);
+                    mysqli_stmt_execute($stmt_log);
+                    mysqli_stmt_close($stmt_log);
+                }
+
+                // Redireciona após inserção
                 header("location: index.php");
                 exit();
             } else {
                 echo "Oops! Algo saiu errado. Tente novamente mais tarde.";
             }
+            mysqli_stmt_close($stmt);
         }
-
-        // Fechar declaração
-        mysqli_stmt_close($stmt);
     }
 
     // Fechar conexão
-    if (!empty($nome_err) && !empty($ramal_err) && !empty($email_err) && !empty($setor_err) && !empty($secretaria_err)) {
     mysqli_close($link);
-    }
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="pt-br" class="dark" data-bs-theme="dark">
+
 <head>
     <meta charset="UTF-8">
     <title>Criar Ramal</title>
@@ -108,22 +120,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             width: 800px;
             margin: 0 auto;
         }
+
         body {
             background-color: #1C1C1C;
             color: white;
         }
+
         section {
             width: 150vh;
             margin: auto;
             padding: 10px;
         }
-        #userTable th, #userTable td {
+
+        #userTable th,
+        #userTable td {
             border: 1px solid #ccc;
             text-align: center;
         }
+
         #userTable thead {
             background: #4F4F4F;
         }
+
         .headcontainer {
             width: auto;
             height: auto;
@@ -131,90 +149,76 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             justify-content: center;
             align-items: center;
         }
+
         body {
             margin: 0px;
         }
+
         .h2 {
             text-align: center;
         }
     </style>
 </head>
+
 <body>
     <div class="wrapper">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
                     <h2 class="mt-5">Criar registro</h2>
-                    <p>Por favor preencha dos campos para adicionar um novo ramal a lista</p>
+                    <p>Por favor preencha os campos para adicionar um novo ramal à lista</p>
                     <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
                         <div class="form-group">
                             <label>Nome</label>
                             <input type="text" name="nome"
                                 class="form-control <?php echo (!empty($nome_err)) ? 'is-invalid' : ''; ?>"
                                 value="<?php echo $nome; ?>">
-                            <span class="invalid-feedback">
-                                <?php echo $nome_err; ?>
-                            </span>
+                            <span class="invalid-feedback"><?php echo $nome_err; ?></span>
                         </div>
                         <div class="form-group">
                             <label>Ramal</label>
                             <input type="text" name="ramal"
                                 class="form-control <?php echo (!empty($ramal_err)) ? 'is-invalid' : ''; ?>"
                                 value="<?php echo $ramal; ?>">
-                            <span class="invalid-feedback">
-                                <?php echo $ramal_err; ?>
-                            </span>
+                            <span class="invalid-feedback"><?php echo $ramal_err; ?></span>
                         </div>
                         <div class="form-group">
                             <label>E-mail</label>
                             <input type="text" name="e-mail"
                                 class="form-control <?php echo (!empty($email_err)) ? 'is-invalid' : ''; ?>"
                                 value="<?php echo $email; ?>">
-                            <span class="invalid-feedback">
-                                <?php echo $email_err; ?>
-                            </span>
+                            <span class="invalid-feedback"><?php echo $email_err; ?></span>
                         </div>
                         <div class="form-group">
                             <label>Setor</label>
                             <input type="text" name="setor"
                                 class="form-control <?php echo (!empty($setor_err)) ? 'is-invalid' : ''; ?>"
                                 value="<?php echo $setor; ?>">
-                            <span class="invalid-feedback">
-                                <?php echo $setor_err; ?>
-                            </span>
+                            <span class="invalid-feedback"><?php echo $setor_err; ?></span>
                         </div>
                         <?php
-                            // Preparando a consulta SQL para selecionar todas as secretarias
-                            $stmt_sec = $link->prepare("SELECT id_secretaria, secretaria FROM secretarias");
-                            // Executando a consulta
-                            $stmt_sec->execute();
-                            // Obtendo o resultado
-                            $result = $stmt_sec->get_result();
+                        $stmt_sec = $link->prepare("SELECT id_secretaria, secretaria FROM secretarias");
+                        $stmt_sec->execute();
+                        $result = $stmt_sec->get_result();
                         ?>
                         <div class="form-group">
                             <label for="secretaria">Secretaria</label>
-                            <select class="form-control <?php echo (!empty($setor_err)) ? 'is-invalid' : ''; ?>" name="secretaria" id="secretaria">
-                            <?php
+                            <select class="form-control <?php echo (!empty($secretaria_err)) ? 'is-invalid' : ''; ?>"
+                                name="secretaria" id="secretaria">
+                                <?php
                                 if ($result->num_rows > 0) {
-                                $first = true;
-                                // Loop pelos resultados e cria as opções do dropdown
-                                while($row = $result->fetch_assoc()) {
-                                // Verifica se é o primeiro item para marcá-lo como selecionado
-                                if ($first) {
-                                    echo '<option value="' . htmlspecialchars($row["id_secretaria"]) . '" selected>' . htmlspecialchars($row["secretaria"]) . '</option>';
-                                    $first = false; // Após o primeiro item, desabilita a seleção automática
-                                } else {
-                                    echo '<option value="' . htmlspecialchars($row["id_secretaria"]) . '">' . htmlspecialchars($row["secretaria"]) . '</option>';
-                                }
-                                }
+                                    $first = true;
+                                    while ($row = $result->fetch_assoc()) {
+                                        $selected = $first ? 'selected' : '';
+                                        echo '<option value="' . htmlspecialchars($row["id_secretaria"]) . '" ' . $selected . '>' . htmlspecialchars($row["secretaria"]) . '</option>';
+                                        $first = false;
+                                    }
                                 } else {
                                     echo '<option value="">Nenhuma secretaria encontrada</option>';
                                 }
-                            ?>
+                                ?>
                             </select>
-                            <span class="invalid-feedback">
-                                <?php echo $secretaria_err; ?>
-                            </span>
+                            <span class="invalid-feedback"><?php echo $secretaria_err; ?></span>
                         </div>
                         <input type="submit" class="btn btn-primary" value="Salvar">
                         <a href="index.php" class="btn btn-secondary ml-2">Cancelar</a>

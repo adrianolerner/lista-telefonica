@@ -25,6 +25,7 @@ if (!fnmatch("172.16.0.*", $ipaddress)) {
     <link rel="stylesheet" href="css/bulma.min.css" />
     <link rel="stylesheet" type="text/css" href="css/login.css">
     <link rel="stylesheet" href="css/font-awesome.min.css">
+    <script src="https://www.google.com/recaptcha/api.js"></script>
     <script src="https://www.google.com/recaptcha/api.js?render=COLOCAR_CODIGO_GOOGLE_RECAPCHA"></script>
     <script>
         grecaptcha.ready(function () {

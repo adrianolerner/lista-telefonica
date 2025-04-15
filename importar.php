@@ -6,19 +6,10 @@ require_once "config.php";
 $useradmin = @$_SESSION['usuario'];
 
 if ($stmt = mysqli_prepare($link, "SELECT admin FROM usuarios WHERE usuario = ?")) {
-    // Bind parameters
     mysqli_stmt_bind_param($stmt, "s", $useradmin);
-    
-    // Execute statement
     mysqli_stmt_execute($stmt);
-    
-    // Bind result variables
     mysqli_stmt_bind_result($stmt, $admin);
-    
-    // Fetch the result
     mysqli_stmt_fetch($stmt);
-    
-    // Close the statement
     mysqli_stmt_close($stmt);
 }
 
@@ -37,70 +28,75 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['arquivo_csv'])) {
     $handle = fopen($arquivo_tmp, 'r');
 
     if ($handle) {
-        $inseridos = 0;
-        $ignorados = 0;
-        $linha = 0;
+        $linha_teste = fgets($handle); // Lê a primeira linha como texto bruto
 
-        while (($dados = fgetcsv($handle, 1000, ",")) !== false) {
-            $linha++;
-            if ($linha === 1) continue; // Ignora cabeçalho
+        if (strpos($linha_teste, ";") !== false && strpos($linha_teste, ",") === false) {
+            // Parece estar usando ; como delimitador, mostra alerta e encerra
+            $mensagem = "Erro: O arquivo CSV está usando ponto e vírgula (;) como delimitador. Por favor, substitua por vírgula (,) conforme o modelo.";
+            fclose($handle);
+        } else {
+            rewind($handle); // Retorna o ponteiro para o início do arquivo
+            $inseridos = 0;
+            $ignorados = 0;
+            $linha = 0;
 
-            list($nome, $setor, $ramal, $email, $secretaria_nome) = $dados;
+            while (($dados = fgetcsv($handle, 1000, ",")) !== false) {
+                $linha++;
+                if ($linha === 1) continue; // Ignora cabeçalho
 
-            // Validações básicas
-            if (empty($nome) || empty($setor) || empty($ramal) || empty($email) || empty($secretaria_nome)) {
-                $ignorados++;
-                continue;
-            }
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL) || !is_numeric($ramal)) {
-                $ignorados++;
-                continue;
-            }
+                list($nome, $setor, $ramal, $email, $secretaria_nome) = $dados;
 
-            // Busca o id da secretaria pelo nome
-            $stmt = mysqli_prepare($link, "SELECT id_secretaria FROM secretarias WHERE secretaria = ?");
-            mysqli_stmt_bind_param($stmt, "s", $secretaria_nome);
-            mysqli_stmt_execute($stmt);
-            mysqli_stmt_bind_result($stmt, $id_secretaria);
-            if (!mysqli_stmt_fetch($stmt)) {
-                // Secretaria não encontrada
-                $ignorados++;
+                if (empty($nome) || empty($setor) || empty($ramal) || empty($email) || empty($secretaria_nome)) {
+                    $ignorados++;
+                    continue;
+                }
+                if (!filter_var($email, FILTER_VALIDATE_EMAIL) || !is_numeric($ramal)) {
+                    $ignorados++;
+                    continue;
+                }
+
+                $stmt = mysqli_prepare($link, "SELECT id_secretaria FROM secretarias WHERE secretaria = ?");
+                mysqli_stmt_bind_param($stmt, "s", $secretaria_nome);
+                mysqli_stmt_execute($stmt);
+                mysqli_stmt_bind_result($stmt, $id_secretaria);
+                if (!mysqli_stmt_fetch($stmt)) {
+                    $ignorados++;
+                    mysqli_stmt_close($stmt);
+                    continue;
+                }
                 mysqli_stmt_close($stmt);
-                continue;
-            }
-            mysqli_stmt_close($stmt);
 
-            // Verifica duplicidade por ramal ou e-mail
-            $stmt = mysqli_prepare($link, "SELECT id_lista FROM lista WHERE ramal = ? OR email = ?");
-            mysqli_stmt_bind_param($stmt, "is", $ramal, $email);
-            mysqli_stmt_execute($stmt);
-            mysqli_stmt_store_result($stmt);
-            if (mysqli_stmt_num_rows($stmt) > 0) {
-                $ignorados++;
+                $stmt = mysqli_prepare($link, "SELECT id_lista FROM lista WHERE ramal = ? OR email = ?");
+                mysqli_stmt_bind_param($stmt, "is", $ramal, $email);
+                mysqli_stmt_execute($stmt);
+                mysqli_stmt_store_result($stmt);
+                if (mysqli_stmt_num_rows($stmt) > 0) {
+                    $ignorados++;
+                    mysqli_stmt_close($stmt);
+                    continue;
+                }
                 mysqli_stmt_close($stmt);
-                continue;
+
+                $stmt = mysqli_prepare($link, "INSERT INTO lista (nome, setor, ramal, email, secretaria) VALUES (?, ?, ?, ?, ?)");
+                mysqli_stmt_bind_param($stmt, "ssisi", $nome, $setor, $ramal, $email, $id_secretaria);
+                if (mysqli_stmt_execute($stmt)) {
+                    $inseridos++;
+                } else {
+                    $ignorados++;
+                }
+                mysqli_stmt_close($stmt);
             }
+
+            fclose($handle);
+
+            $ipaddress = $_SERVER['REMOTE_ADDR'] ?? 'DESCONHECIDO';
+            $stmt = mysqli_prepare($link, "INSERT INTO log_importacoes (usuario, ip, inseridos, ignorados, data_hora) VALUES (?, ?, ?, ?, NOW())");
+            mysqli_stmt_bind_param($stmt, "ssii", $useradmin, $ipaddress, $inseridos, $ignorados);
+            mysqli_stmt_execute($stmt);
             mysqli_stmt_close($stmt);
 
-            // Insere no banco
-            $stmt = mysqli_prepare($link, "INSERT INTO lista (nome, setor, ramal, email, secretaria) VALUES (?, ?, ?, ?, ?)");
-            mysqli_stmt_bind_param($stmt, "ssisi", $nome, $setor, $ramal, $email, $id_secretaria);
-            if (mysqli_stmt_execute($stmt)) {
-                $inseridos++;
-            } else {
-                $ignorados++;
-            }
-            mysqli_stmt_close($stmt);
+            $mensagem = "Importação concluída: $inseridos registros inseridos, $ignorados ignorados.";
         }
-        fclose($handle);
-
-        // Salva no log
-        $stmt = mysqli_prepare($link, "INSERT INTO log_importacoes (usuario, ip, inseridos, ignorados, data_hora) VALUES (?, ?, ?, ?, NOW())");
-        mysqli_stmt_bind_param($stmt, "ssii", $useradmin, $ipaddress, $inseridos, $ignorados);
-        mysqli_stmt_execute($stmt);
-        mysqli_stmt_close($stmt);
-
-        $mensagem = "Importação concluída: $inseridos registros inseridos, $ignorados ignorados.";
     } else {
         $mensagem = "Erro ao ler o arquivo CSV.";
     }
@@ -125,13 +121,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['arquivo_csv'])) {
     <div class="mb-3">
         <a href="index.php" class="btn btn-secondary">← Voltar</a>
         <a href="modelo_importacao.csv" class="btn btn-info"><i class="fa fa-sign-in"></i> Baixar Modelo CSV</a>
-        <a href="historico_importacoes.php" class="btn btn-primary pull-right"><i class="fa fa-gear"></i> Históricos de importação</a>
+        <a href="historico_importacoes.php" class="btn btn-primary pull-right"><i class="fa fa-search"></i> Históricos de importação</a>
     </div>
     <div class="mb-3">
         <p>Atenção! Somente serão importados registros que tiverem o campo "Secretaria" iguais aos previamente cadastrados no menu "Gerenciar Secretarias".<br />Registros com este campo diferente dos cadastrados serão ignorados.</p>
     </div>
     <?php if ($mensagem): ?>
-        <div class="alert alert-info"><?php echo htmlspecialchars($mensagem); ?></div>
+        <div class="alert alert-<?php echo (strpos($mensagem, 'Erro') !== false) ? 'danger' : 'info'; ?>">
+            <?php echo htmlspecialchars($mensagem); ?>
+        </div>
     <?php endif; ?>
     <form method="POST" enctype="multipart/form-data">
         <div class="form-group mb-3">
