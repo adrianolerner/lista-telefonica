@@ -2,9 +2,9 @@
 session_start();
 
 //Verificação de IP
-//$ip = $_SERVER['HTTP_X_REAL_IP'];
-$ipaddress = "172.16.0.10";
-//$ipaddress = strstr($ip, ',', true);
+$ip = $_SERVER['HTTP_X_REAL_IP'];
+//$ipaddress = "172.16.0.10";
+$ipaddress = strstr($ip, ',', true);
 
 if (!fnmatch("172.16.0.*", $ipaddress)) {
     header('Location: index.php');
@@ -148,8 +148,8 @@ if (!fnmatch("172.16.0.*", $ipaddress)) {
                 <div style="text-align: center; margin-top: 1rem;">
                     <small>
                         Este site é protegido pelo reCAPTCHA e está sujeito à
-                    <a href="https://policies.google.com/privacy" target="_blank">Política de Privacidade</a> e aos
-                    <a href="https://policies.google.com/terms" target="_blank">Termos de Serviço</a> do Google.
+                        <a href="https://policies.google.com/privacy" target="_blank">Política de Privacidade</a> e aos
+                        <a href="https://policies.google.com/terms" target="_blank">Termos de Serviço</a> do Google.
                     </small>
                 </div>
             </div>
