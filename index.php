@@ -3,9 +3,9 @@
 session_start();
 
 //Verificação de IP
-//$ip = $_SERVER['HTTP_X_REAL_IP'];
-$ipaddress = "172.16.0.10";
-//$ipaddress = strstr($ip, ',', true);
+$ip = $_SERVER['HTTP_X_REAL_IP'];
+//$ipaddress = "172.16.0.10";
+$ipaddress = strstr($ip, ',', true);
 
 // Checagens de usuário
 include('config.php');
@@ -271,22 +271,22 @@ $bannerarray = ['banner' => $banner];
                 <?php if (fnmatch("172.16.0.*", $ipaddress)) { ?>
                     <?php if (!empty($useradmin)) { ?>
                         <div>
-                            <a href="logout.php" class="btn btn-secondary"><i class="fa fa-sign-out"></i> Sair</a>
-                            <a href="senha.php?user=<?php echo htmlspecialchars($useradmin); ?>" class="btn btn-primary"><i
+                            <a href="logout.php" class="btn btn-secondary" title='Sair do Sistema'><i class="fa fa-sign-out"></i> Sair</a>
+                            <a href="senha.php?user=<?php echo htmlspecialchars($useradmin); ?>" class="btn btn-primary" title='Alterar Senha'><i
                                     class="fa fa-lock"></i> Senha</a>
                             <?php if ($adminarray['admin'] == "s") { ?>
-                                <a href="usuarios/index.php" class="btn btn-primary"><i class="fa fa-users"></i> Usuários</a>
-                                <a href="secretarias/index.php" class="btn btn-primary"><i class="fa fa-home"></i> Secretarias</a>
-                                <a href="update_banner.php?id_banner=1" class="btn btn-primary"><i class="fa fa-info-circle"></i>
+                                <a href="usuarios/index.php" class="btn btn-primary"><i class="fa fa-users" title='Gerenciar Usuarios'></i> Usuários</a>
+                                <a href="secretarias/index.php" class="btn btn-primary"><i class="fa fa-home" title='Gerenciar Secretarias'></i> Secretarias</a>
+                                <a href="update_banner.php?id_banner=1" class="btn btn-primary"><i class="fa fa-info-circle" title='Trocar Banner'></i>
                                     Banner</a>
-                                <a href="delete_all.php" class="btn btn-danger"><i class="fa fa-exclamation-triangle"></i> Apagar
+                                <a href="delete_all.php" class="btn btn-danger"><i class="fa fa-exclamation-triangle" title='Limpar Lista'></i> Apagar
                                     Tudo</a>
-                                <a href="importar.php" class="btn btn-success"><i class="fa fa-upload"></i> Importar CSV</a>
+                                <a href="importar.php" class="btn btn-success"><i class="fa fa-upload" title='Importar Lista'></i> Importar CSV</a>
                             <?php } ?>
-                            <a href="create.php" class="btn btn-success"><i class="fa fa-plus"></i> Adicionar Ramal</a>
+                            <a href="create.php" class="btn btn-success"><i class="fa fa-plus" title='Incluir Ramal'></i> Adicionar Ramal</a>
                         </div>
                     <?php } else { ?>
-                        <a href="login.php" class="btn btn-primary"><i class="fa fa-sign-in"></i> LOGIN</a>
+                        <a href="login.php" class="btn btn-primary" title='Entrar no Sistema'><i class="fa fa-sign-in"></i> LOGIN</a>
                     <?php } ?>
                 <?php } ?>
             </div>
@@ -307,10 +307,10 @@ $bannerarray = ['banner' => $banner];
                 echo '<thead><tr><th><u>SECRETARIA</u></th><th><u>SETOR</u></th><th><u>NOME</u></th><th><u>RAMAL</u></th><th><u>E-MAIL</u></th><th><u>AÇÃO</u></th></tr></thead><tbody>';
                 while ($row = mysqli_fetch_array($result)) {
                     echo "<tr><td>" . htmlspecialchars($row['secretaria']) . "</td><td>" . htmlspecialchars($row['setor']) . "</td><td>" . htmlspecialchars($row['nome']) . "</td><td>" . htmlspecialchars($row['ramal']) . "</td><td>" . htmlspecialchars($row['email']) . "</td>";
-                    echo "<td><a href='read.php?id_lista=" . urlencode($row['id_lista']) . "'><span class='fa fa-eye'></span></a>&nbsp; ";
+                    echo "<td><a href='read.php?id_lista=" . urlencode($row['id_lista']) . "'><span class='fa fa-eye' title='Ver Item'></span></a>&nbsp; ";
                     if (!empty($useradmin)) {
-                        echo "<a href='update.php?id_lista=" . urlencode($row['id_lista']) . "'><span class='fa fa-pencil'></span></a>&nbsp; ";
-                        echo "<a href='delete.php?id_lista=" . urlencode($row['id_lista']) . "'><span class='fa fa-trash'></span></a></td>";
+                        echo "<a href='update.php?id_lista=" . urlencode($row['id_lista']) . "'><span class='fa fa-pencil' title='Editar Item'></span></a>&nbsp; ";
+                        echo "<a href='delete.php?id_lista=" . urlencode($row['id_lista']) . "'><span class='fa fa-trash' title='Excluir Item'></span></a></td>";
                     }
                     echo "</tr>";
                 }
@@ -330,11 +330,11 @@ $bannerarray = ['banner' => $banner];
             <div class="maincontainer text-center">
                 <br />
                 <?php if (!empty($useradmin)) {
-                    echo "<a href='exportar_csv.php' class='btn btn-primary'><i class='fa fa-download'></i> GERAR CSV</a> ";
+                    echo "<a href='exportar_csv.php' class='btn btn-primary' title='Exportar Lista Para CSV'><i class='fa fa-download'></i> GERAR CSV</a> ";
                     if ($admin === "s")
-                        echo "<a href='historico_alteracoes.php' class='btn btn-primary'><i class='fa fa-search'></i> LOG</a> ";
+                        echo "<a href='historico_alteracoes.php' class='btn btn-primary' title='Ver Logs Do Sistema'><i class='fa fa-search'></i> VER LOGS</a> ";
                 } else {
-                    echo "<a href='gerapdf.php' class='btn btn-primary'><i class='fa fa-download'></i> GERAR PDF</a>";
+                    echo "<a href='gerapdf.php' class='btn btn-primary' title='Gerar Lista em PDF'><i class='fa fa-download'></i> GERAR PDF</a>";
                 } ?>
                 <p><img src="img/logo2.png" /> <img src="img/logo3.png" /></p>
                 <p>IP: <?php echo htmlspecialchars($ipaddress); ?></p>
