@@ -2,7 +2,7 @@
 include('verifica_login.php');
 require_once "config.php";
 
-//Verificação de Admin
+// Verificação de Admin
 $useradmin = @$_SESSION['usuario'];
 
 if ($stmt = mysqli_prepare($link, "SELECT admin FROM usuarios WHERE usuario = ?")) {
@@ -44,17 +44,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['arquivo_csv'])) {
                 $linha++;
                 if ($linha === 1) continue; // Ignora cabeçalho
 
+                // Verifica se a linha tem todos os campos necessários
+                if (count($dados) < 5) {
+                    $ignorados++;
+                    continue;
+                }
+
                 list($nome, $setor, $ramal, $email, $secretaria_nome) = $dados;
 
-                if (empty($nome) || empty($setor) || empty($ramal) || empty($email) || empty($secretaria_nome)) {
-                    $ignorados++;
-                    continue;
+                // Tratamento dos campos
+                $nome = trim($nome);
+                $setor = trim($setor);
+                $ramal = trim($ramal);
+                $email = trim($email);
+                $secretaria_nome = trim($secretaria_nome);
+
+                // Se email estiver vazio, substitui por "-"
+                if (empty($email)) {
+                    $email = "-";
                 }
-                if (!filter_var($email, FILTER_VALIDATE_EMAIL) || !is_numeric($ramal)) {
+
+                // Validação dos campos obrigatórios
+                if (empty($nome) || empty($setor) || empty($ramal) || empty($secretaria_nome)) {
                     $ignorados++;
                     continue;
                 }
 
+                // Validação do email (deve ser válido ou "-")
+                if ($email !== "-" && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    $ignorados++;
+                    continue;
+                }
+
+                // Validação do ramal (deve conter apenas números, hífens ou espaços)
+                if (!preg_match('/^[\d\-\s]+$/', $ramal)) {
+                    $ignorados++;
+                    continue;
+                }
+
+                // Verifica se a secretaria existe
                 $stmt = mysqli_prepare($link, "SELECT id_secretaria FROM secretarias WHERE secretaria = ?");
                 mysqli_stmt_bind_param($stmt, "s", $secretaria_nome);
                 mysqli_stmt_execute($stmt);
@@ -66,8 +94,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['arquivo_csv'])) {
                 }
                 mysqli_stmt_close($stmt);
 
-                $stmt = mysqli_prepare($link, "SELECT id_lista FROM lista WHERE ramal = ? OR email = ?");
-                mysqli_stmt_bind_param($stmt, "is", $ramal, $email);
+                // Verifica se já existe um registro com o mesmo ramal E mesmo nome OU mesmo e-mail
+                $stmt = mysqli_prepare($link, "SELECT id_lista FROM lista WHERE ramal = ? AND nome = ?");
+                mysqli_stmt_bind_param($stmt, "ss", $ramal, $nome);
                 mysqli_stmt_execute($stmt);
                 mysqli_stmt_store_result($stmt);
                 if (mysqli_stmt_num_rows($stmt) > 0) {
@@ -77,12 +106,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['arquivo_csv'])) {
                 }
                 mysqli_stmt_close($stmt);
 
+                // Inserção do registro
                 $stmt = mysqli_prepare($link, "INSERT INTO lista (nome, setor, ramal, email, secretaria) VALUES (?, ?, ?, ?, ?)");
-                mysqli_stmt_bind_param($stmt, "ssisi", $nome, $setor, $ramal, $email, $id_secretaria);
+                mysqli_stmt_bind_param($stmt, "ssssi", $nome, $setor, $ramal, $email, $id_secretaria);
                 if (mysqli_stmt_execute($stmt)) {
                     $inseridos++;
                 } else {
                     $ignorados++;
+                    // Log de erro para depuração
+                    error_log("Erro ao inserir registro (Linha $linha): " . mysqli_error($link));
                 }
                 mysqli_stmt_close($stmt);
             }

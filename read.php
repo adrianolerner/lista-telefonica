@@ -2,7 +2,7 @@
 
 //Mecanismo de login
 //session_start();
-include('verifica_login.php');
+//include('verifica_login.php');
 
 // Verifique a existência do parâmetro id antes de processar mais
 if (isset($_GET["id_lista"]) && !empty(trim($_GET["id_lista"]))) {

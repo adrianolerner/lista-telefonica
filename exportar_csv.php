@@ -48,11 +48,11 @@ header('Content-Disposition: attachment; filename=lista_telefonica.csv');
 $output = fopen('php://output', 'w');
 
 // Cabeçalho no mesmo formato da importação
-fputcsv($output, array('nome', 'setor', 'ramal', 'email', 'secretaria'), ';');
+fputcsv($output, array('nome', 'setor', 'ramal', 'email', 'secretaria'), ',');
 
 // Escreve os dados no CSV
 while ($row = mysqli_fetch_assoc($result)) {
-    fputcsv($output, $row, ';');
+    fputcsv($output, $row, ',');
 }
 
 fclose($output);
