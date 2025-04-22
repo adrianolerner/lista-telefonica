@@ -383,7 +383,7 @@
     // Versão atual do seu aplicativo
     function getCurrentVersion()
     {
-        return '0.11.2';
+        return '0.12';
     }
 
     // Função para obter a última versão do GitHub
