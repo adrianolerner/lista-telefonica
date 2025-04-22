@@ -3,9 +3,12 @@
 session_start();
 
 //Verificação de IP
-$ip = $_SERVER['HTTP_X_REAL_IP'];
-//$ipaddress = "172.16.0.10";
-$ipaddress = strstr($ip, ',', true);
+//$ip = $_SERVER['HTTP_X_REAL_IP'];
+$ipaddress = "172.16.0.10";
+//$ipaddress = strstr($ip, ',', true);
+
+//Nome do órgão (alterar com seu orgão)
+$orgao = "DA PREFEITURA DE CASTRO";
 
 // Checagens de usuário
 include('config.php');
@@ -262,9 +265,9 @@ $bannerarray = ['banner' => $banner];
 <body>
     <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
     <header>
-        <section>
+	<section>
             <div class="headcontainer">
-                <h2 class="h2">LISTA TELEFÔNICA PREFEITURA DE CASTRO</h2>
+                <h2 class="h2">LISTA TELEFÔNICA <?php echo $orgao; ?></h2>
                 <p>Seja bem-vindo a lista telefônica <?php echo !empty($useradmin) ? $useradmin : "visitante"; ?></p>
                 <p><?php echo !empty($useradmin) ? "Use as opções abaixo para gerenciar a lista telefônica." : ""; ?>
                 </p>
@@ -336,10 +339,9 @@ $bannerarray = ['banner' => $banner];
                 } else {
                     echo "<a href='gerapdf.php' class='btn btn-primary' title='Gerar Lista em PDF'><i class='fa fa-download'></i> GERAR PDF</a>";
                 } ?>
-                <p><img src="img/logo2.png" /> <img src="img/logo3.png" /></p>
-                <p>IP: <?php echo htmlspecialchars($ipaddress); ?></p>
-                <p><a href="https://github.com/adrianolerner/lista-telefonica">©<?php echo date("Y"); ?> Prefeitura
-                        Municipal de Castro | Tecnologia | Adriano Lerner Biesek</a></p>
+		<p><br /><a href="https://castro.atende.net" title="Acessar o portal da Prefeitura"><img src="img/logo2.png" /></a></p>
+                <p><a href="sobre.php" title="Seu IP é: <?php echo htmlspecialchars($ipaddress); ?>">©<?php echo date("Y"); ?> Prefeitura
+                        Municipal de Castro | Adriano Lerner Biesek</a></p>
             </div>
         </section>
     </footer>
