@@ -69,6 +69,10 @@ seguintes linhas conforme necessário para validar pelo IP a exibição do botã
         //$ipaddress = "172.16.0.10";
         $ipaddress = strstr($ip, ',', true);
         ```
+         - No arquivo `index.php` alterar a variável abaixo com o nome do seu órgão ou entidade:
+      	```php
+         $orgao = "DA PRAFEITURA DE XXXX";
+       	```
          - Nos arquivos `acesso.php` e `index.php`, altere o IP  das
 seguintes linhas conforme necessário para validar pelo IP.
         ```php
@@ -175,18 +179,14 @@ Para configurar variáveis de ambiente no Ubuntu Server com Apache 2 e usá-las 
     - **Habilitar HTTPS**: Isso garante que as credenciais transmitidas entre o cliente e o servidor estejam criptografadas.
 
 6. **Alterar imagens/Titulos:**
-    - Altere o logo, na pagina principal:
-        ```png
-        logo.png
-        ```
-    - Altere o logo no footer do arquivo index.php, no cabeçalho da página gerapdf.php e no body da página acesso.php:
-        ```php/html
-        <img src="logoX,png" />
-        ```
-    - Os logos ficam na pasta "img" e podem ser trocados somente substituindo por seus logos e mantendo o nome. Cada arquivo represente o Logo em um local. 
-    - Altere os cabeçalhos e titulos das páginas para o nome do seu órgão/empresa.
+    - Altere os logos.
+    - Os logos ficam na pasta "img" e podem ser trocados somente substituindo por seus logos e mantendo o nome. Cada arquivo represente o Logo em um local.
+    - O logo.png, é o brasão exibido no cabeçalho da lista em PDF.
+    - O logo2.png, é o logo/brasão do órgão a ser exibido na pagina principal.
 
 7. **Caso seja necessário a atualização de versão anterior, por conta das mudaças no código e banco de dados, recomendamos que seja feito backup dos arquivos do projeto e do banco de dados, e seja criado novo banco, importando do exemplo disponibilizado, e importados os registros no sistema já atualizado, para evitar conflitos.**
+
+8. **Para Verificar novas versões desta ferramenta, acesse a página sobre da aplicação (a partir da versão 0.12). Em caso de nova versão, será exibido alerta com link para download.**
 
 ## Uso
 
