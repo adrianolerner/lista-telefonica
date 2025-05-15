@@ -1,3 +1,10 @@
+<?php
+    // Versão atual do seu aplicativo
+    function getCurrentVersion()
+    {
+        return '0.12.1';
+    }
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -380,12 +387,6 @@
     </div>
 
     <?php
-    // Versão atual do seu aplicativo
-    function getCurrentVersion()
-    {
-        return '0.12';
-    }
-
     // Função para obter a última versão do GitHub
     function getLatestVersion()
     {
