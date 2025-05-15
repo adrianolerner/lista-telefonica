@@ -41,6 +41,18 @@ if ($adminarray['admin'] == "s") {
     $banner = "";
     $banner_err = "";
 
+    //Carrega os dados do banner
+    if ($stmtBanner = mysqli_prepare($link, "SELECT banner FROM banner WHERE id_banner = ?")) {
+        $id_banner = 1;
+        mysqli_stmt_bind_param($stmtBanner, "i", $id_banner);
+        mysqli_stmt_execute($stmtBanner);
+        mysqli_stmt_bind_result($stmtBanner, $banner);
+        mysqli_stmt_fetch($stmtBanner);
+        mysqli_stmt_close($stmtBanner);
+    }
+
+    $bannerarray = ['banner' => $banner];
+
     // Processamento de dados do formulário quando o formulário é enviado
     if (isset($_POST["id_banner"]) && !empty($_POST["id_banner"])) {
         // Obtém o valor de entrada oculto
@@ -199,7 +211,7 @@ if ($adminarray['admin'] == "s") {
                                 <textarea name="banner"
                                     class="form-control <?php echo (!empty($banner_err)) ? 'is-invalid' : ''; ?>"
                                     value="<?php echo $banner; ?>" rows="5"
-                                    cols="33"> Digite o novo Banner aqui!!! </textarea>
+                                    cols="33"> <?php echo htmlspecialchars($bannerarray["banner"]); ?> </textarea>
                                 <span class="invalid-feedback">
                                     <?php echo $banner_err; ?>
                                 </span>
