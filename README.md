@@ -95,6 +95,7 @@ seguintes linhas conforme necessário para validar pelo IP.
     - Aterar codigo recaptcha nas referidas linhas nos arquivos login.php e acesso.php, sendo a
 chave privada em login.php e a publica em acesso.php.
     - Caso a variavel acima esteja como "false" e não seja indicado o código recaptcha nas paginas indicadas, a tela de login não funcionará.
+    - Alterar as linhas 32, 53, 54 e 164 do arquivo gerapdf.php conforme necessário, com as informações e nomes usados pelo órgão (apenas altere as informações destas linhas presentes dentro das '')
 
 5. **Inclusão de usuário e senha do banco de dados (mudança da versão 0.8 - passos obrigatórios para atualização)**
 Para configurar variáveis de ambiente no Ubuntu Server com Apache 2 e usá-las no seu código PHP, você pode seguir estas etapas:
