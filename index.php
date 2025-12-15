@@ -245,18 +245,62 @@ $bannerarray = ['banner' => $banner];
             z-index: 9999;
         }
 
+        /* --- MELHORIAS PARA DISPOSITIVOS MÓVEIS --- */
         @media screen and (max-width: 768px) {
+            
+            #userTable {
+                width: 100% !important;
+                /* 'fixed' é crucial para o text-overflow funcionar bem */
+                table-layout: fixed; 
+            }
 
             #userTable th,
             #userTable td {
                 font-size: 12px;
-                padding: 4px;
+                padding: 6px 3px;
+                /* As linhas abaixo garantem que a linha não quebre e mostre "..." */
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            /* Definição de larguras aproximadas para caber na tela */
+            
+            /* Secretaria e Setor */
+            #userTable th:nth-child(1), #userTable td:nth-child(1),
+            #userTable th:nth-child(2), #userTable td:nth-child(2) {
+                width: 20%;
+            }
+
+            /* Nome (Destaque) */
+            #userTable th:nth-child(3), #userTable td:nth-child(3) {
+                width: 25%;
+                font-weight: bold;
+            }
+
+            /* Ramal */
+            #userTable th:nth-child(4), #userTable td:nth-child(4) {
+                width: 15%;
+            }
+            
+            /* E-mail (Este campo costuma ser longo, ficará bem cortado ou pode ser ocultado com display:none) */
+            #userTable th:nth-child(5), #userTable td:nth-child(5) {
+                width: 10%;
+                opacity: 0.7; /* Visualmente menos importante */
+            }
+
+            /* Coluna de Ações (Última) - Não deve cortar os botões */
+            #userTable td:last-child {
+                width: auto;
+                overflow: visible; 
+                text-overflow: clip;
             }
 
             .btn {
-                display: block;
-                width: 100%;
-                margin-bottom: 5px;
+                display: inline-block; /* Mantém na mesma linha se possível */
+                padding: 3px 6px;
+                margin: 1px;
+                font-size: 11px; /* Botões menores */
             }
         }
     </style>
@@ -265,8 +309,9 @@ $bannerarray = ['banner' => $banner];
 <body>
     <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
     <header>
-	<section>
+    <section>
             <div class="headcontainer">
+                <br />
                 <h2 class="h2">LISTA TELEFÔNICA <?php echo $orgao; ?></h2>
                 <p>Seja bem-vindo a lista telefônica <?php echo !empty($useradmin) ? $useradmin : "visitante"; ?></p>
                 <p><?php echo !empty($useradmin) ? "Use as opções abaixo para gerenciar a lista telefônica." : ""; ?>
@@ -337,9 +382,9 @@ $bannerarray = ['banner' => $banner];
                     if ($admin === "s")
                         echo "<a href='historico_alteracoes.php' class='btn btn-primary' title='Ver Logs Do Sistema'><i class='fa fa-search'></i> VER LOGS</a> ";
                 } else {
-                    echo "<a href='gerapdf.php' class='btn btn-primary' title='Gerar Lista em PDF'><i class='fa fa-download'></i> GERAR PDF</a>";
+                    echo "<a href='gerapdf.php' class='btn btn-primary' title='Gerar Lista em PDF'><i class='fa fa-download'></i> GERAR PDF</a> | <a href='https://castro.pr.gov.br/pontos/' class='btn btn-primary' title='Acessar Mapa de Endereços'><i class='fa fa-download'></i> ENDEREÇOS</a>";
                 } ?>
-		<p><br /><a href="https://castro.atende.net" title="Acessar o portal da Prefeitura"><img src="img/logo2.png" /></a></p>
+        <p><br /><a href="https://castro.atende.net" title="Acessar o portal da Prefeitura"><img src="img/logo2.png" /></a></p>
                 <p><a href="sobre.php" title="Seu IP é: <?php echo htmlspecialchars($ipaddress); ?>">©<?php echo date("Y"); ?> Prefeitura
                         Municipal de Castro | Adriano Lerner Biesek</a></p>
             </div>
@@ -371,6 +416,25 @@ $bannerarray = ['banner' => $banner];
 
             // Aplicar tema quando o DataTables for inicializado
             applyDataTablesTheme();
+
+            // --- NOVO RECURSO PARA MOBILE ---
+            // Ao clicar em uma célula cortada no mobile, ela se expande
+            $('#userTable tbody').on('click', 'td', function () {
+                // Verifica se é tela pequena (mobile) e se NÃO é a última coluna (ações)
+                if (window.innerWidth <= 768 && !$(this).is(':last-child')) {
+                    var currentWhiteSpace = $(this).css('white-space');
+                    
+                    // Reseta todas as outras células da tabela para 'nowrap' (fecha as abertas)
+                    $('#userTable tbody td').not(':last-child').css('white-space', 'nowrap');
+                    
+                    // Alterna o estado da célula clicada
+                    if (currentWhiteSpace === 'nowrap') {
+                        $(this).css('white-space', 'normal'); // Mostra texto completo
+                    } else {
+                        $(this).css('white-space', 'nowrap'); // Corta o texto novamente
+                    }
+                }
+            });
         });
 
         function applyDataTablesTheme() {
