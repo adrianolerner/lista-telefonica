@@ -20,7 +20,7 @@ if (isset($_POST["id_lista"]) && !empty($_POST["id_lista"])) {
     $input_nome = trim($_POST["nome"]);
     if (empty($input_nome)) {
         $nome_err = "Por favor entre um nome.";
-    } elseif (!filter_var($input_nome, FILTER_VALIDATE_REGEXP, array("options" => array("regexp" => "/^[a-zA-Zà-úÀ-Ú\s]+$/")))) {
+    } elseif (!filter_var($input_nome, FILTER_VALIDATE_REGEXP, array("options" => array("regexp" => "/^[a-zA-Z0-9\s\-\(\)áàâãéèêíïóôõöúçñÁÀÂÃÉÈÊÍÏÓÔÕÖÚÇÑ]+$/u")))) {
         $nome_err = "Por favor entre um nome válido.";
     } else {
         $nome = $input_nome;
@@ -91,7 +91,6 @@ if (isset($_POST["id_lista"]) && !empty($_POST["id_lista"])) {
             }
         }
         mysqli_stmt_close($stmt);
-        mysqli_close($link);
     }
 } else {
     if (isset($_GET["id_lista"]) && !empty(trim($_GET["id_lista"]))) {
@@ -245,9 +244,16 @@ if (isset($_POST["id_lista"]) && !empty($_POST["id_lista"])) {
                                 if ($result->num_rows > 0) {
                                     // Iterando sobre os resultados e criando as opções do dropdown
                                     while ($row = $result->fetch_assoc()) {
-                                        // Verificando se o valor atual é o selecionado
-                                        $selected = $row["id_secretaria"] == $secretaria ? ' selected' : '';
-                                        echo '<option value="' . htmlspecialchars($row["id_secretaria"]) . '"' . $selected . '>' . htmlspecialchars($row["secretaria"]) . '</option>';
+                                        // Verifica se o ID desta linha é igual ao ID que foi enviado no POST ($secretaria)
+                                        // Se for vazio (primeiro carregamento), usa a lógica do $first
+                                        if (!empty($secretaria)) {
+                                            $selected = ($row["id_secretaria"] == $secretaria) ? 'selected' : '';
+                                        } else {
+                                            $selected = $first ? 'selected' : '';
+                                        }
+
+                                        echo '<option value="' . htmlspecialchars($row["id_secretaria"]) . '" ' . $selected . '>' . htmlspecialchars($row["secretaria"]) . '</option>';
+                                        $first = false;
                                     }
                                 } else {
                                     echo '<option value="">Nenhuma secretaria encontrada</option>';
@@ -269,3 +275,9 @@ if (isset($_POST["id_lista"]) && !empty($_POST["id_lista"])) {
 </body>
 
 </html>
+<?php
+// Fechar conexão no final de tudo
+if (isset($link)) {
+    mysqli_close($link);
+}
+?>

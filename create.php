@@ -19,7 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $input_nome = trim($_POST["nome"]);
     if (empty($input_nome)) {
         $nome_err = "Por favor entre um nome";
-    } elseif (!filter_var($input_nome, FILTER_VALIDATE_REGEXP, ["options" => ["regexp" => "/^[a-zA-Zà-úÀ-Ú\s]+$/"]])) {
+    } elseif (!filter_var($input_nome, FILTER_VALIDATE_REGEXP, ["options" => ["regexp" => "/^[a-zA-Z0-9\s\-\(\)áàâãéèêíïóôõöúçñÁÀÂÃÉÈÊÍÏÓÔÕÖÚÇÑ]+$/u"]])) {
         $nome_err = "Por favor entre um nome válido.";
     } else {
         $nome = $input_nome;
@@ -101,9 +101,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             mysqli_stmt_close($stmt);
         }
     }
-
-    // Fechar conexão
-    mysqli_close($link);
 }
 ?>
 
@@ -209,7 +206,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 if ($result->num_rows > 0) {
                                     $first = true;
                                     while ($row = $result->fetch_assoc()) {
-                                        $selected = $first ? 'selected' : '';
+                                        // Verifica se o ID desta linha é igual ao ID que foi enviado no POST ($secretaria)
+                                        // Se for vazio (primeiro carregamento), usa a lógica do $first
+                                        if (!empty($secretaria)) {
+                                            $selected = ($row["id_secretaria"] == $secretaria) ? 'selected' : '';
+                                        } else {
+                                            $selected = $first ? 'selected' : '';
+                                        }
+
                                         echo '<option value="' . htmlspecialchars($row["id_secretaria"]) . '" ' . $selected . '>' . htmlspecialchars($row["secretaria"]) . '</option>';
                                         $first = false;
                                     }
@@ -230,3 +234,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </body>
 
 </html>
+<?php
+// Fechar conexão no final de tudo
+if (isset($link)) {
+    mysqli_close($link);
+}
+?>
