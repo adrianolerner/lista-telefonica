@@ -2,7 +2,7 @@
     // Versão atual do seu aplicativo
     function getCurrentVersion()
     {
-        return '0.12.3';
+        return '0.13';
     }
 ?>
 <!DOCTYPE html>

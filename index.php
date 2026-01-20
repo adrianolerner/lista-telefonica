@@ -1,5 +1,7 @@
 <?php
-// Mecanismo de login
+// ---------------------------------------------------------
+// BLOCO PHP ORIGINAL (MANTIDO INTACTO)
+// ---------------------------------------------------------
 session_start();
 
 //Verificação de IP
@@ -8,7 +10,7 @@ $ipaddress = "172.16.0.10";
 //$ipaddress = strstr($ip, ',', true);
 
 //Nome do órgão (alterar com seu orgão)
-$orgao = "DA PREFEITURA DE CASTRO";
+$orgao = "PREFEITURA DE CASTRO";
 
 // Checagens de usuário
 include('config.php');
@@ -35,449 +37,353 @@ if ($stmtBanner = mysqli_prepare($link, "SELECT banner FROM banner WHERE id_bann
 }
 
 $bannerarray = ['banner' => $banner];
+// ---------------------------------------------------------
+// FIM DO BLOCO PHP ORIGINAL
+// ---------------------------------------------------------
 ?>
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-br" data-bs-theme="dark">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#576b37" />
-    <title>LISTA TELEFÔNICA PREFEITURA DE CASTRO</title>
-    <link href="css/datatables.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/font-awesome.min.css">
-    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <title>LISTA TELEFÔNICA - <?php echo $orgao; ?></title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
     <style>
-        :root {
-            --bg-light: #FFFFFF;
-            --bg-dark: #1C1C1C;
-            --text-light: #000000;
-            --text-dark: #FFFFFF;
-            --dt-bg-light: #f8f9fa;
-            --dt-bg-dark: #2d2d2d;
-            --dt-text-light: #495057;
-            --dt-text-dark: #e9ecef;
-            --dt-border-light: #dee2e6;
-            --dt-border-dark: #444;
-            --dt-hover-light: #e2e2e2;
-            --dt-hover-dark: #3a3a3a;
-            --dt-header-light: #f0f0f0;
-            --dt-header-dark: #4F4F4F;
-            --dt-paginate-bg-light: #ffffff;
-            --dt-paginate-bg-dark: #2d2d2d;
-            --dt-select-bg-light: #ffffff;
-            --dt-select-bg-dark: #2d2d2d;
-            --dt-select-text-light: #495057;
-            --dt-select-text-dark: #e9ecef;
-            --dt-dropdown-bg-light: #ffffff;
-            --dt-dropdown-bg-dark: #3a3a3a;
-        }
-
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-dark);
-            margin: 0;
-            font-family: Arial, sans-serif;
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        body.light-theme {
-            background-color: var(--bg-light);
-            color: var(--text-light);
-        }
-
-        section {
-            width: 100%;
-            max-width: 1200px;
-            margin: auto;
-            padding: 10px;
-        }
-
-        #userTable {
-            width: 100% !important;
-            table-layout: auto;
-        }
-
-        #userTable th,
-        #userTable td {
-            border: 1px solid var(--dt-border-dark);
-            text-align: center;
-            font-size: 14px;
-            word-break: break-word;
-            color: var(--dt-text-dark);
-            background-color: var(--bg-dark);
-        }
-
-        body.light-theme #userTable th,
-        body.light-theme #userTable td {
-            color: var(--dt-text-light);
-            background-color: var(--bg-light);
-            border-color: var(--dt-border-light);
-        }
-
-        #userTable thead th {
-            background-color: var(--dt-header-dark) !important;
-            color: var(--text-dark) !important;
-        }
-
-        body.light-theme #userTable thead th {
-            background-color: var(--dt-header-light) !important;
-            color: var(--text-light) !important;
-        }
-
-        #userTable tbody tr:hover {
-            background-color: var(--dt-hover-dark);
-            transition: background-color 0.3s ease;
-        }
-
-        body.light-theme #userTable tbody tr:hover {
-            background-color: var(--dt-hover-light);
-        }
-
-        /* DataTables Styles */
-        .dataTables_wrapper .dataTables_paginate .paginate_button {
-            color: var(--text-dark) !important;
-            background-color: var(--dt-paginate-bg-dark) !important;
-            border: 1px solid var(--dt-border-dark) !important;
-            padding: 0.3em 0.65em;
-            margin-left: 2px;
-            border-radius: 4px;
-        }
-
-        body.light-theme .dataTables_wrapper .dataTables_paginate .paginate_button {
-            color: var(--text-light) !important;
-            background-color: var(--dt-paginate-bg-light) !important;
-            border: 1px solid var(--dt-border-light) !important;
-        }
-
-        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-            background-color: var(--dt-hover-dark) !important;
-            color: var(--text-dark) !important;
-        }
-
-        body.light-theme .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-            background-color: var(--dt-hover-light) !important;
-            color: var(--text-light) !important;
-        }
-
-        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-            background-color: #576b37 !important;
-            color: white !important;
-            border: none !important;
-        }
-
-        /* Seletor de quantidade de registros - Corrigido para tema escuro */
-        .dataTables_wrapper .dt-input {
-            color: var(--dt-select-text-dark) !important;
-            background-color: var(--dt-select-bg-dark) !important;
-            border-color: var(--dt-border-dark) !important;
-        }
-
-        body.light-theme .dataTables_wrapper .dt-input {
-            color: var(--dt-select-text-light) !important;
-            background-color: var(--dt-select-bg-light) !important;
-            border-color: var(--dt-border-light) !important;
-        }
-
-        /* Estilo para as opções do dropdown no tema escuro */
-        .dataTables_wrapper .dt-input {
-            background-color: var(--dt-dropdown-bg-dark) !important;
-            color: var(--dt-select-text-dark) !important;
-        }
-
-        body.light-theme .dataTables_wrapper .dt-input {
-            background-color: var(--dt-dropdown-bg-light) !important;
-            color: var(--dt-select-text-light) !important;
-        }
-
-        .headcontainer {
-            text-align: center;
-            margin: 10px 0;
-        }
-
-        h2.h2 {
-            font-size: 1.5rem;
-        }
-
-        .scrolling-container {
-            width: 100%;
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bs-body-bg); }
+        .navbar-brand img { height: 40px; margin-right: 10px; }
+        
+        /* Banner Rolante */
+        .news-ticker-container {
+            background: var(--bs-tertiary-bg);
+            border-bottom: 1px solid var(--bs-border-color);
             overflow: hidden;
-        }
-
-        .scrolling-text {
-            display: inline-block;
             white-space: nowrap;
+            height: 40px;
+            display: flex;
+            align-items: center;
+        }
+        .news-ticker-text {
+            display: inline-block;
             padding-left: 100%;
-            animation: scroll 12s linear infinite;
+            animation: ticker 25s linear infinite;
+            font-weight: 500;
+            color: var(--bs-emphasis-color);
+        }
+        @keyframes ticker {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-100%, 0, 0); }
         }
 
-        @keyframes scroll {
-            from {
-                transform: translateX(0);
-            }
+        /* Ajustes da Tabela */
+        table.dataTable td, table.dataTable th { vertical-align: middle; }
+        [data-bs-theme="dark"] .table thead th {
+            background-color: #2b3035;
+            color: #fff;
+            border-bottom: 2px solid #495057;
+        }
+        td a { text-decoration: none; }
 
-            to {
-                transform: translateX(-100%);
-            }
+        /* Customização dos botões +/- minimalistas */
+        table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control:before, 
+        table.dataTable.dtr-inline.collapsed > tbody > tr > th.dtr-control:before {
+            content: "+";
+            font-family: "Courier New", Courier, monospace;
+            font-weight: 900;
+            font-size: 18px;
+            background-color: transparent !important;
+            border: 2px solid var(--bs-success);
+            color: var(--bs-success);
+            border-radius: 4px;
+            box-shadow: none !important;
+            width: 20px;
+            height: 20px;
+            line-height: 16px;
+            text-align: center;
+            top: 50%;
+            transform: translateY(-50%);
+            margin-right: 10px;
+        }
+        table.dataTable.dtr-inline.collapsed > tbody > tr.parent > td.dtr-control:before, 
+        table.dataTable.dtr-inline.collapsed > tbody > tr.parent > th.dtr-control:before {
+            content: "-";
+            border-color: var(--bs-secondary);
+            color: var(--bs-secondary);
+            line-height: 14px;
         }
 
-        .btn {
-            margin: 5px 2px;
-            font-size: 0.9rem;
+        /* --- ESTILOS DA BARRA DE PESQUISA MODERNA --- */
+        .modern-search-wrapper {
+            transition: all 0.3s ease;
         }
-
-        footer img {
-            max-width: 100px;
-            height: auto;
-            margin: 5px;
+        .modern-search-wrapper:focus-within {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
         }
-
-        .theme-toggle {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background-color: #666;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            z-index: 9999;
+        .search-icon-box {
+            background-color: var(--bs-body-bg); /* Se adapta ao dark mode */
+            border-color: var(--bs-border-color);
         }
-
-        /* --- MELHORIAS PARA DISPOSITIVOS MÓVEIS --- */
-        @media screen and (max-width: 768px) {
-            
-            #userTable {
-                width: 100% !important;
-                /* 'fixed' é crucial para o text-overflow funcionar bem */
-                table-layout: fixed; 
-            }
-
-            #userTable th,
-            #userTable td {
-                font-size: 12px;
-                padding: 6px 3px;
-                /* As linhas abaixo garantem que a linha não quebre e mostre "..." */
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-
-            /* Definição de larguras aproximadas para caber na tela */
-            
-            /* Secretaria e Setor */
-            #userTable th:nth-child(1), #userTable td:nth-child(1),
-            #userTable th:nth-child(2), #userTable td:nth-child(2) {
-                width: 20%;
-            }
-
-            /* Nome (Destaque) */
-            #userTable th:nth-child(3), #userTable td:nth-child(3) {
-                width: 25%;
-                font-weight: bold;
-            }
-
-            /* Ramal */
-            #userTable th:nth-child(4), #userTable td:nth-child(4) {
-                width: 15%;
-            }
-            
-            /* E-mail (Este campo costuma ser longo, ficará bem cortado ou pode ser ocultado com display:none) */
-            #userTable th:nth-child(5), #userTable td:nth-child(5) {
-                width: 10%;
-                opacity: 0.7; /* Visualmente menos importante */
-            }
-
-            /* Coluna de Ações (Última) - Não deve cortar os botões */
-            #userTable td:last-child {
-                width: auto;
-                overflow: visible; 
-                text-overflow: clip;
-            }
-
-            .btn {
-                display: inline-block; /* Mantém na mesma linha se possível */
-                padding: 3px 6px;
-                margin: 1px;
-                font-size: 11px; /* Botões menores */
-            }
+        #customSearchBox {
+            background-color: var(--bs-body-bg);
+            border-color: var(--bs-border-color);
+            font-size: 1.1rem; /* Texto levemente maior */
+        }
+        #customSearchBox:focus {
+            box-shadow: none; /* Remove o glow padrão do bootstrap */
+            border-color: var(--bs-border-color);
         }
     </style>
 </head>
 
 <body>
-    <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
-    <header>
-    <section>
-            <div class="headcontainer">
-                <br />
-                <h2 class="h2">LISTA TELEFÔNICA <?php echo $orgao; ?></h2>
-                <p>Seja bem-vindo a lista telefônica <?php echo !empty($useradmin) ? $useradmin : "visitante"; ?></p>
-                <p><?php echo !empty($useradmin) ? "Use as opções abaixo para gerenciar a lista telefônica." : ""; ?>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success shadow-sm mb-0">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">
+                <i class="fa fa-phone-square me-2"></i> LISTA TELEFÔNICA
+            </a>
+            <div class="d-flex align-items-center">
+                <button class="btn btn-outline-light btn-sm me-2" id="themeToggle" title="Alternar Tema">
+                    <i class="fa fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <?php if(!empty($bannerarray["banner"])): ?>
+    <div class="news-ticker-container">
+        <div class="container-fluid">
+            <div class="news-ticker-text">
+                <i class="fa fa-bullhorn me-2 text-warning"></i> <?php echo htmlspecialchars($bannerarray["banner"]); ?>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+
+    <div class="container my-4">
+        
+        <div class="row mb-4 align-items-center">
+            <div class="col-md-8">
+                <h2 class="fw-light text-uppercase mb-0 fs-4"><?php echo $orgao; ?></h2>
+                <p class="text-muted mb-0 small">
+                    Olá, <strong><?php echo !empty($useradmin) ? htmlspecialchars($useradmin) : "Visitante"; ?></strong>.
                 </p>
-                <?php if (fnmatch("172.16.0.*", $ipaddress)) { ?>
-                    <?php if (!empty($useradmin)) { ?>
-                        <div>
-                            <a href="logout.php" class="btn btn-secondary" title='Sair do Sistema'><i class="fa fa-sign-out"></i> Sair</a>
-                            <a href="senha.php?user=<?php echo htmlspecialchars($useradmin); ?>" class="btn btn-primary" title='Alterar Senha'><i
-                                    class="fa fa-lock"></i> Senha</a>
-                            <?php if ($adminarray['admin'] == "s") { ?>
-                                <a href="usuarios/index.php" class="btn btn-primary"><i class="fa fa-users" title='Gerenciar Usuarios'></i> Usuários</a>
-                                <a href="secretarias/index.php" class="btn btn-primary"><i class="fa fa-home" title='Gerenciar Secretarias'></i> Secretarias</a>
-                                <a href="update_banner.php?id_banner=1" class="btn btn-primary"><i class="fa fa-info-circle" title='Trocar Banner'></i>
-                                    Banner</a>
-                                <a href="delete_all.php" class="btn btn-danger"><i class="fa fa-exclamation-triangle" title='Limpar Lista'></i> Apagar
-                                    Tudo</a>
-                                <a href="importar.php" class="btn btn-success"><i class="fa fa-upload" title='Importar Lista'></i> Importar CSV</a>
-                            <?php } ?>
-                            <a href="create.php" class="btn btn-success"><i class="fa fa-plus" title='Incluir Ramal'></i> Adicionar Ramal</a>
-                        </div>
-                    <?php } else { ?>
-                        <a href="login.php" class="btn btn-primary" title='Entrar no Sistema'><i class="fa fa-sign-in"></i> LOGIN</a>
-                    <?php } ?>
+            </div>
+            <div class="col-md-4 text-md-end mt-2 mt-md-0">
+                <?php if (fnmatch("172.16.0.*", $ipaddress) && empty($useradmin)) { ?>
+                    <a href="login.php" class="btn btn-primary btn-sm"><i class="fa fa-sign-in-alt me-1"></i> Login Administrativo</a>
                 <?php } ?>
             </div>
-        </section>
-    </header>
-    <section>
-        <div class="scrolling-container">
-            <div class="scrolling-text"><?php echo htmlspecialchars($bannerarray["banner"]); ?></div>
         </div>
-    </section>
-    <section>
-        <?php
-        require_once "config.php";
-        $sql = "SELECT l.id_lista, l.nome, l.ramal, l.email, l.setor, s.secretaria FROM lista l JOIN secretarias s ON l.secretaria = s.id_secretaria";
-        if ($result = mysqli_query($link, $sql)) {
-            if (mysqli_num_rows($result) > 0) {
-                echo '<div class="table-responsive"><table id="userTable" class="table table-bordered dt-input">';
-                echo '<thead><tr><th><u>SECRETARIA</u></th><th><u>SETOR</u></th><th><u>NOME</u></th><th><u>RAMAL</u></th><th><u>E-MAIL</u></th><th><u>AÇÃO</u></th></tr></thead><tbody>';
-                while ($row = mysqli_fetch_array($result)) {
-                    echo "<tr><td>" . htmlspecialchars($row['secretaria']) . "</td><td>" . htmlspecialchars($row['setor']) . "</td><td>" . htmlspecialchars($row['nome']) . "</td><td>" . htmlspecialchars($row['ramal']) . "</td><td>" . htmlspecialchars($row['email']) . "</td>";
-                    echo "<td><a href='read.php?id_lista=" . urlencode($row['id_lista']) . "'><span class='fa fa-eye' title='Ver Item'></span></a>&nbsp; ";
-                    if (!empty($useradmin)) {
-                        echo "<a href='update.php?id_lista=" . urlencode($row['id_lista']) . "'><span class='fa fa-pencil' title='Editar Item'></span></a>&nbsp; ";
-                        echo "<a href='delete.php?id_lista=" . urlencode($row['id_lista']) . "'><span class='fa fa-trash' title='Excluir Item'></span></a></td>";
-                    }
-                    echo "</tr>";
-                }
-                echo "</tbody></table></div>";
-                mysqli_free_result($result);
-            } else {
-                echo '<div class="alert alert-danger"><em>Não foram encontrados registros.</em></div>';
-            }
-        } else {
-            echo "Oops! Algo saiu errado. Tente novamente mais tarde.";
-        }
-        mysqli_close($link);
-        ?>
-    </section>
-    <footer>
-        <section>
-            <div class="maincontainer text-center">
-                <br />
-                <?php if (!empty($useradmin)) {
-                    echo "<a href='exportar_csv.php' class='btn btn-primary' title='Exportar Lista Para CSV'><i class='fa fa-download'></i> GERAR CSV</a> ";
-                    if ($admin === "s")
-                        echo "<a href='historico_alteracoes.php' class='btn btn-primary' title='Ver Logs Do Sistema'><i class='fa fa-search'></i> VER LOGS</a> ";
-                } else {
-                    echo "<a href='gerapdf.php' class='btn btn-primary' title='Gerar Lista em PDF'><i class='fa fa-download'></i> GERAR PDF</a> | <a href='https://castro.pr.gov.br/pontos/' class='btn btn-primary' title='Acessar Mapa de Endereços'><i class='fa fa-download'></i> ENDEREÇOS</a>";
-                } ?>
-        <p><br /><a href="https://castro.atende.net" title="Acessar o portal da Prefeitura"><img src="img/logo2.png" /></a></p>
-                <p><a href="sobre.php" title="Seu IP é: <?php echo htmlspecialchars($ipaddress); ?>">©<?php echo date("Y"); ?> Prefeitura
-                        Municipal de Castro | Adriano Lerner Biesek</a></p>
+
+        <?php if (fnmatch("172.16.0.*", $ipaddress) && !empty($useradmin)) { ?>
+            <div class="card mb-4 border-primary border-opacity-25 bg-primary bg-opacity-10">
+                <div class="card-body py-3">
+                    <div class="d-flex flex-wrap gap-2 justify-content-center justify-content-md-start align-items-center">
+                        <span class="badge bg-primary me-2 p-2"><i class="fa fa-cogs"></i> Painel</span>
+                        <a href="create.php" class="btn btn-success btn-sm"><i class="fa fa-plus me-1"></i> Novo Ramal</a>
+                        <?php if ($adminarray['admin'] == "s") { ?>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <a href="usuarios/index.php" class="btn btn-outline-primary"><i class="fa fa-users"></i> Users</a>
+                                <a href="secretarias/index.php" class="btn btn-outline-primary"><i class="fa fa-building"></i> Secretarias</a>
+                                <a href="update_banner.php?id_banner=1" class="btn btn-outline-primary"><i class="fa fa-bullhorn"></i> Banner</a>
+                            </div>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <a href="importar.php" class="btn btn-outline-secondary"><i class="fa fa-file-upload"></i></a>
+                                <a href="exportar_csv.php" class="btn btn-outline-secondary"><i class="fa fa-file-download"></i></a>
+                                <a href="historico_alteracoes.php" class="btn btn-outline-secondary"><i class="fa fa-history"></i></a>
+                            </div>
+                            <a href="delete_all.php" class="btn btn-danger btn-sm" onclick="return confirm('Apagar TUDO?');"><i class="fa fa-trash-alt"></i></a>
+                        <?php } ?>
+                        <div class="ms-auto border-start ps-2">
+                            <a href="senha.php?user=<?php echo htmlspecialchars($useradmin); ?>" class="btn btn-warning btn-sm text-dark"><i class="fa fa-key"></i></a>
+                            <a href="logout.php" class="btn btn-secondary btn-sm"><i class="fa fa-sign-out-alt"></i> Sair</a>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </section>
+        <?php } ?>
+
+        <div class="row justify-content-center mb-4 mt-2">
+            <div class="col-md-8 col-lg-7">
+                <div class="input-group input-group-lg shadow-sm rounded-pill overflow-hidden modern-search-wrapper border">
+                    <span class="input-group-text border-0 ps-4 search-icon-box">
+                        <i class="fa fa-search text-secondary"></i>
+                    </span>
+                    <input type="text" id="customSearchBox" class="form-control border-0 py-3" 
+                           placeholder="Pesquise por nome, setor ou ramal..." aria-label="Pesquisar">
+                    <span class="input-group-text border-0 pe-4 search-icon-box">
+                        <i class="fa fa-filter text-muted opacity-50" style="font-size: 0.8em;"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-0">
+                <?php
+                $sql = "SELECT l.id_lista, l.nome, l.ramal, l.email, l.setor, s.secretaria FROM lista l JOIN secretarias s ON l.secretaria = s.id_secretaria";
+                
+                if ($result = mysqli_query($link, $sql)) {
+                    if (mysqli_num_rows($result) > 0) {
+                ?>
+                    <div class="p-3">
+                        <table id="userTable" class="table table-hover align-middle w-100 border-bottom nowrap">
+                            <thead>
+                                <tr>
+                                    <th data-priority="4">SECRETARIA</th>
+                                    <th data-priority="5">SETOR</th>
+                                    <th data-priority="1">NOME</th>
+                                    <th data-priority="2">RAMAL</th>
+                                    <th data-priority="6">E-MAIL</th>
+                                    <th data-priority="3" class="text-end">AÇÃO</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php
+                                while ($row = mysqli_fetch_array($result)) {
+                                    echo "<tr>";
+                                    echo "<td class='fw-semibold small'>" . htmlspecialchars($row['secretaria']) . "</td>";
+                                    echo "<td><span class='badge bg-secondary bg-opacity-25 text-body border'>" . htmlspecialchars($row['setor']) . "</span></td>";
+                                    echo "<td class='fw-bold'>" . htmlspecialchars($row['nome']) . "</td>";
+                                    echo "<td class='text-primary fw-bold'>" . htmlspecialchars($row['ramal']) . "</td>";
+                                    echo "<td class='small text-muted'>" . htmlspecialchars($row['email']) . "</td>";
+                                    
+                                    echo "<td class='text-end text-nowrap'>";
+                                    echo "<a href='read.php?id_lista=" . urlencode($row['id_lista']) . "' class='btn btn-sm btn-info text-white me-1' title='Ver detalhes...'><i class='fa fa-eye'></i></a>";
+                                    
+                                    if (!empty($useradmin)) {
+                                        echo "<a href='update.php?id_lista=" . urlencode($row['id_lista']) . "' class='btn btn-sm btn-warning text-dark me-1'><i class='fa fa-pen'></i></a>";
+                                        echo "<a href='delete.php?id_lista=" . urlencode($row['id_lista']) . "' class='btn btn-sm btn-danger'><i class='fa fa-trash'></i></a>";
+                                    }
+                                    echo "</td>";
+                                    echo "</tr>";
+                                }
+                                ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php
+                    mysqli_free_result($result);
+                    } else {
+                        echo '<div class="alert alert-info m-3">Nenhum registro encontrado.</div>';
+                    }
+                } else {
+                    echo '<div class="alert alert-danger m-3">Erro ao conectar com o banco de dados.</div>';
+                }
+                mysqli_close($link);
+                ?>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-body-tertiary text-center text-lg-start mt-5 border-top">
+        <div class="container p-4">
+            <div class="row align-items-center">
+                <div class="col-lg-6 col-md-12 mb-4 mb-md-0 text-center text-lg-start">
+                    <h6 class="text-uppercase fw-bold mb-2">Links Úteis</h6>
+                    <div class="d-flex gap-2 flex-wrap justify-content-center justify-content-lg-start">
+                        <?php if (empty($useradmin)) { ?>
+                            <a href="gerapdf.php" class="btn btn-outline-secondary btn-sm"><i class="fa fa-file-pdf me-1"></i> Gerar PDF</a>
+                            <a href="https://castro.pr.gov.br/pontos/" target="_blank" class="btn btn-outline-secondary btn-sm"><i class="fa fa-map-marked-alt me-1"></i> Mapa</a>
+                        <?php } ?>
+                        <a href="https://castro.atende.net" target="_blank" class="btn btn-outline-primary btn-sm"><i class="fa fa-external-link-alt me-1"></i> Portal</a>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-12 mb-4 mb-md-0 text-center text-lg-end">
+                    <img src="img/logo2.png" alt="Logo Prefeitura" style="max-height: 50px; opacity: 0.8;">
+                    <p class="small text-muted mt-2 mb-0">
+                        &copy; <?php echo date("Y"); ?> Prefeitura Municipal de Castro<br>
+                        <span class="text-opacity-50">SMCTI - Adriano Lerner Biesek</span>
+                    </p>
+                    <small class="text-muted" style="font-size: 0.7em;">IP: <?php echo htmlspecialchars($ipaddress); ?></small>
+                </div>
+            </div>
+        </div>
     </footer>
-    <script src="js/jquery-3.7.0.min.js"></script>
-    <script src="js/datatables.min.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+
     <script>
         $(document).ready(function () {
-            // Inicializar DataTables
-            $('#userTable').DataTable({
+            // Inicializar a tabela
+            var table = $('#userTable').DataTable({
                 responsive: true,
+                order: [[2, 'asc']],
+                columnDefs: [
+                    { responsivePriority: 1, targets: 2 },
+                    { responsivePriority: 2, targets: 3 },
+                    { responsivePriority: 3, targets: -1 }
+                ],
                 language: {
-                    "emptyTable": "Sem dados disponíveis",
-                    "info": "Mostrando _START_ até _END_ de _TOTAL_ registros",
-                    "infoEmpty": "Mostrando 0 até 0 de 0 registros",
-                    "lengthMenu": "Mostrando _MENU_ registros",
-                    "loadingRecords": "Carregando...",
-                    "search": "Procurar:",
-                    "zeroRecords": "Nenhum registro encontrado",
-                    "paginate": {
-                        "first": "Primeiro",
-                        "last": "Último",
-                        "next": "Próximo",
-                        "previous": "Anterior"
-                    }
-                }
+                    "sEmptyTable":   "Nenhum registro encontrado",
+                    "sInfo":         "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                    "sInfoEmpty":    "Mostrando 0 até 0 de 0 registros",
+                    "sInfoFiltered": "(Filtrados de _MAX_ registros)",
+                    "sInfoPostFix":  "",
+                    "sInfoThousands": ".",
+                    "sLengthMenu":   "_MENU_ resultados por página",
+                    "sLoadingRecords": "Carregando...",
+                    "sProcessing":   "Processando...",
+                    "sZeroRecords":  "Nenhum registro encontrado",
+                    // IMPORTANTE: Removemos os textos internos de busca padrão, pois usamos a busca externa
+                    "oPaginate": { "sNext": "Próximo", "sPrevious": "Anterior", "sFirst": "Primeiro", "sLast": "Último" }
+                },
+                // ALTERAÇÃO DO DOM:
+                // Removemos o 'f' (filter) padrão da estrutura, mantendo o 'l' (length/quantidade) e a paginação 'p'
+                // l = length changing input control
+                // t = table
+                // i = table information summary
+                // p = pagination control
+                dom: "<'row'<'col-sm-12'l>>" +
+                     "<'row'<'col-sm-12'tr>>" +
+                     "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
             });
 
-            // Aplicar tema quando o DataTables for inicializado
-            applyDataTablesTheme();
-
-            // --- NOVO RECURSO PARA MOBILE ---
-            // Ao clicar em uma célula cortada no mobile, ela se expande
-            $('#userTable tbody').on('click', 'td', function () {
-                // Verifica se é tela pequena (mobile) e se NÃO é a última coluna (ações)
-                if (window.innerWidth <= 768 && !$(this).is(':last-child')) {
-                    var currentWhiteSpace = $(this).css('white-space');
-                    
-                    // Reseta todas as outras células da tabela para 'nowrap' (fecha as abertas)
-                    $('#userTable tbody td').not(':last-child').css('white-space', 'nowrap');
-                    
-                    // Alterna o estado da célula clicada
-                    if (currentWhiteSpace === 'nowrap') {
-                        $(this).css('white-space', 'normal'); // Mostra texto completo
-                    } else {
-                        $(this).css('white-space', 'nowrap'); // Corta o texto novamente
-                    }
-                }
+            // VINCULAR O CAMPO DE PESQUISA EXTERNO AO DATATABLES
+            $('#customSearchBox').on('keyup', function () {
+                table.search(this.value).draw();
             });
         });
 
-        function applyDataTablesTheme() {
-            const isLightTheme = document.body.classList.contains('light-theme');
+        // Dark Mode Script
+        const themeToggle = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement;
+        const icon = themeToggle.querySelector('i');
 
-            // Forçar a atualização do select
-            $('.dt-input').each(function () {
-                const temp = this.style.display;
-                this.style.display = 'none';
-                setTimeout(() => {
-                    this.style.display = temp;
-                }, 10);
-            });
-        }
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        htmlElement.setAttribute('data-bs-theme', savedTheme);
+        updateIcon(savedTheme);
 
-        function toggleTheme() {
-            const body = document.body;
-            const toggleBtn = document.querySelector('.theme-toggle');
-            body.classList.toggle('light-theme');
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = htmlElement.getAttribute('data-bs-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            htmlElement.setAttribute('data-bs-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateIcon(newTheme);
+        });
 
-            if (body.classList.contains('light-theme')) {
-                toggleBtn.textContent = '🌞';
-                localStorage.setItem('theme', 'light');
+        function updateIcon(theme) {
+            if (theme === 'dark') {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
             } else {
-                toggleBtn.textContent = '🌙';
-                localStorage.setItem('theme', 'dark');
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
             }
-
-            // Reaplicar tema do DataTables
-            applyDataTablesTheme();
         }
-
-        // Carregar tema salvo
-        document.addEventListener('DOMContentLoaded', function () {
-            const savedTheme = localStorage.getItem('theme');
-            const toggleBtn = document.querySelector('.theme-toggle');
-
-            if (savedTheme === 'light') {
-                document.body.classList.add('light-theme');
-                toggleBtn.textContent = '🌞';
-            }
-        });
     </script>
 </body>
-
 </html>
