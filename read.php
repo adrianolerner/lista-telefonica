@@ -161,7 +161,7 @@ if (isset($_GET["id_lista"]) && !empty(trim($_GET["id_lista"]))) {
                                     </div>
                                     <div>
                                         <div class="detail-label">Ramal</div>
-                                        <div class="detail-value text-primary fs-4"><?php echo htmlspecialchars($ramal); ?></div>
+                                        <div class="detail-value text-primary fs-4"><i class="far fa-copy" style="cursor:pointer; margin-right:8px; font-size: 0.8em;" onclick="copyToClipboard('<?php echo htmlspecialchars(preg_replace('/\D/', '', $row['ramal'])) ?>')" title="Copiar ramal"></i><a href="tel:<?php echo htmlspecialchars(preg_replace('/\D/', '', $row['ramal'])) ?>"><?php echo htmlspecialchars($ramal); ?></a></div>
                                     </div>
                                 </div>
                             </div>
@@ -173,7 +173,7 @@ if (isset($_GET["id_lista"]) && !empty(trim($_GET["id_lista"]))) {
                                     </div>
                                     <div class="overflow-hidden">
                                         <div class="detail-label">E-mail</div>
-                                        <div class="detail-value text-break"><?php echo htmlspecialchars($email); ?></div>
+                                        <div class="detail-value text-primary fs-4"><i class="far fa-copy" style="cursor:pointer; margin-right:8px;" onclick="copyToClipboard('<?php echo htmlspecialchars($email); ?>')" title="Copiar e-mail"></i><a href="mailto:<?php echo htmlspecialchars($email); ?>"><?php echo htmlspecialchars($email); ?></a></div>
                                     </div>
                                 </div>
                             </div>
@@ -244,6 +244,13 @@ if (isset($_GET["id_lista"]) && !empty(trim($_GET["id_lista"]))) {
                 icon.classList.remove('fa-sun');
                 icon.classList.add('fa-moon');
             }
+        }
+		function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert("Copiado para a área de transferência: " + text);
+            }).catch(err => {
+                console.error('Erro ao copiar: ', err);
+            });
         }
     </script>
 </body>

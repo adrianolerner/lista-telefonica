@@ -267,10 +267,10 @@ $bannerarray = ['banner' => $banner];
                                     echo "<div class='text-clamp-2' title='$nome'>$nome</div>";
                                     echo "</td>";
                                     
-                                    echo "<td class='text-primary fw-bold text-nowrap'><a href='tel:" . htmlspecialchars(preg_replace('/\D/', '', $row['ramal'])) . "'>" . htmlspecialchars($row['ramal']) . "</a></td>";
+                                    echo "<td class='text-primary fw-bold text-nowrap'><i class='far fa-copy' style='cursor:pointer; margin-right:5px;' onclick='copyToClipboard(\"" . htmlspecialchars(preg_replace('/\D/', '', $row['ramal'])) . "\")' title='Copiar número'></i> <a href='tel:" . htmlspecialchars(preg_replace('/\D/', '', $row['ramal'])) . "'>" . htmlspecialchars($row['ramal']) . "</a> </td>";
                                     
-                                    echo "<td class='small text-muted'>";
-                                    echo "<div class='text-clamp-2' title='$email'><a href='mailto:$email'>$email</div>";
+                                    echo "<td class='text-primary fw-bold'>";
+                                    echo "<div class='text-clamp-2' title='" . htmlspecialchars($email) . "'><i class='far fa-copy' style='cursor:pointer; margin-right:5px;' onclick='copyToClipboard(\"" . htmlspecialchars($email) . "\")' title='Copiar e-mail'></i><a href='mailto:" . htmlspecialchars($email) . "'>" . htmlspecialchars($email) . "</a></div>";
                                     echo "</td>";
                                     
                                     echo "<td class='text-end text-nowrap'>";
@@ -402,6 +402,13 @@ $bannerarray = ['banner' => $banner];
                 icon.classList.remove('fa-sun');
                 icon.classList.add('fa-moon');
             }
+        }
+		function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert("Copiado para a área de transferência: " + text);
+            }).catch(err => {
+                console.error('Erro ao copiar: ', err);
+            });
         }
     </script>
 </body>
