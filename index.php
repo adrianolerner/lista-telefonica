@@ -175,7 +175,7 @@ $bannerarray = ['banner' => $banner];
             </div>
             <div class="col-md-4 text-md-end mt-2 mt-md-0">
                 <?php if (fnmatch("172.16.0.*", $ipaddress) && empty($useradmin)) { ?>
-                    <a href="login.php" class="btn btn-primary btn-sm"><i class="fa fa-sign-in-alt me-1"></i> Login Administrativo</a>
+                    <a href="login.php" class="btn btn-primary btn-sm" title="Acesso para ajustes na lista"><i class="fa fa-sign-in-alt me-1"></i> Login Administrativo</a>
                 <?php } ?>
             </div>
         </div>
@@ -185,23 +185,23 @@ $bannerarray = ['banner' => $banner];
                 <div class="card-body py-3">
                     <div class="d-flex flex-wrap gap-2 justify-content-center justify-content-md-start align-items-center">
                         <span class="badge bg-primary me-2 p-2"><i class="fa fa-cogs"></i> Painel</span>
-                        <a href="create.php" class="btn btn-success btn-sm"><i class="fa fa-plus me-1"></i> Novo Ramal</a>
+                        <a href="create.php" class="btn btn-success btn-sm" title="Adicionar novo ramal à lista"><i class="fa fa-plus me-1"></i> Novo Ramal</a>
                         <?php if ($adminarray['admin'] == "s") { ?>
                             <div class="btn-group btn-group-sm" role="group">
-                                <a href="usuarios/index.php" class="btn btn-outline-primary"><i class="fa fa-users"></i> Users</a>
-                                <a href="secretarias/index.php" class="btn btn-outline-primary"><i class="fa fa-building"></i> Secretarias</a>
-                                <a href="update_banner.php?id_banner=1" class="btn btn-outline-primary"><i class="fa fa-bullhorn"></i> Banner</a>
+                                <a href="usuarios/index.php" class="btn btn-outline-primary" title="Gerenciar usuários do sistema"><i class="fa fa-users"></i> Usuários</a>
+                                <a href="secretarias/index.php" class="btn btn-outline-primary" title="Gerenciar secretarias cadastradas"><i class="fa fa-building"></i> Secretarias</a>
+                                <a href="update_banner.php?id_banner=1" class="btn btn-outline-primary" title="Gerenciar banner cadastrado"><i class="fa fa-bullhorn"></i> Banner</a>
                             </div>
                             <div class="btn-group btn-group-sm" role="group">
-                                <a href="importar.php" class="btn btn-outline-secondary"><i class="fa fa-file-upload"></i></a>
-                                <a href="exportar_csv.php" class="btn btn-outline-secondary"><i class="fa fa-file-download"></i></a>
-                                <a href="historico_alteracoes.php" class="btn btn-outline-secondary"><i class="fa fa-history"></i></a>
+                                <a href="importar.php" class="btn btn-outline-secondary" title="Importar lista de ramais em CSV"><i class="fa fa-file-upload"></i></a>
+                                <a href="exportar_csv.php" class="btn btn-outline-secondary" title="Exportar lista de ramais para CSV"><i class="fa fa-file-download"></i></a>
+                                <a href="historico_alteracoes.php" class="btn btn-outline-secondary" title="Exibir histórico de alterações em ramais"><i class="fa fa-history"></i></a>
                             </div>
-                            <a href="delete_all.php" class="btn btn-danger btn-sm" onclick="return confirm('Apagar TUDO?');"><i class="fa fa-trash-alt"></i></a>
+                            <a href="delete_all.php" class="btn btn-danger btn-sm" onclick="return confirm('Apagar TUDO?');" title="Apagar todos os registros da lista (Cuidado!)"><i class="fa fa-trash-alt"></i></a>
                         <?php } ?>
                         <div class="ms-auto border-start ps-2">
-                            <a href="senha.php?user=<?php echo htmlspecialchars($useradmin); ?>" class="btn btn-warning btn-sm text-dark"><i class="fa fa-key"></i></a>
-                            <a href="logout.php" class="btn btn-secondary btn-sm"><i class="fa fa-sign-out-alt"></i> Sair</a>
+                            <a href="senha.php?user=<?php echo htmlspecialchars($useradmin); ?>" class="btn btn-warning btn-sm text-dark" title="Alterar senha do usuário"><i class="fa fa-key"></i></a>
+                            <a href="logout.php" class="btn btn-secondary btn-sm" title="Sair do sistema"><i class="fa fa-sign-out-alt"></i> Sair</a>
                         </div>
                     </div>
                 </div>
@@ -215,7 +215,7 @@ $bannerarray = ['banner' => $banner];
                         <i class="fa fa-search text-secondary"></i>
                     </span>
                     <input type="text" id="customSearchBox" class="form-control border-0 py-3" 
-                           placeholder="Pesquise por nome, setor ou ramal..." aria-label="Pesquisar">
+                           placeholder="Pesquise por nome, setor ou ramal..." aria-label="Pesquisar" title="Pesquisar informações da lista">
                     <span class="input-group-text border-0 pe-4 search-icon-box">
                         <i class="fa fa-filter text-muted opacity-50" style="font-size: 0.8em;"></i>
                     </span>
@@ -267,18 +267,18 @@ $bannerarray = ['banner' => $banner];
                                     echo "<div class='text-clamp-2' title='$nome'>$nome</div>";
                                     echo "</td>";
                                     
-                                    echo "<td class='text-primary fw-bold text-nowrap'>" . htmlspecialchars($row['ramal']) . "</td>";
+                                    echo "<td class='text-primary fw-bold text-nowrap'><a href='tel:" . htmlspecialchars(preg_replace('/\D/', '', $row['ramal'])) . "'>" . htmlspecialchars($row['ramal']) . "</a></td>";
                                     
                                     echo "<td class='small text-muted'>";
-                                    echo "<div class='text-clamp-2' title='$email'>$email</div>";
+                                    echo "<div class='text-clamp-2' title='$email'><a href='mailto:$email'>$email</div>";
                                     echo "</td>";
                                     
                                     echo "<td class='text-end text-nowrap'>";
-                                    echo "<a href='read.php?id_lista=" . urlencode($row['id_lista']) . "' class='btn btn-sm btn-info text-white me-1' title='Ver detalhes...'><i class='fa fa-eye'></i></a>";
+                                    echo "<a href='read.php?id_lista=" . urlencode($row['id_lista']) . "' class='btn btn-sm btn-info text-white me-1' title='Ver detalhes deste ramal'><i class='fa fa-eye'></i></a>";
                                     
                                     if (!empty($useradmin)) {
-                                        echo "<a href='update.php?id_lista=" . urlencode($row['id_lista']) . "' class='btn btn-sm btn-warning text-dark me-1'><i class='fa fa-pen'></i></a>";
-                                        echo "<a href='delete.php?id_lista=" . urlencode($row['id_lista']) . "' class='btn btn-sm btn-danger'><i class='fa fa-trash'></i></a>";
+                                        echo "<a href='update.php?id_lista=" . urlencode($row['id_lista']) . "' class='btn btn-sm btn-warning text-dark me-1' title='Atualizar informações deste ramal'><i class='fa fa-pen'></i></a>";
+                                        echo "<a href='delete.php?id_lista=" . urlencode($row['id_lista']) . "' class='btn btn-sm btn-danger' title='Apagar este ramal'><i class='fa fa-trash'></i></a>";
                                     }
                                     echo "</td>";
                                     echo "</tr>";
@@ -361,7 +361,17 @@ $bannerarray = ['banner' => $banner];
                      "<'row'<'col-sm-12'tr>>" +
                      "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
             });
-
+            // Evento disparado ao trocar de página
+            table.on('page.dt', function () {
+                // Verifica se a quantidade de registros por página é maior que 10
+                var pageLength = table.page.len();
+                
+                if (pageLength > 10) {
+                    $('html, body').animate({
+                        scrollTop: $(".card").offset().top - 20
+                    }, 'fast'); // 'fast' para uma subida suave, ou 0 para instantâneo
+                }
+            });
             $('#customSearchBox').on('keyup', function () {
                 table.search(this.value).draw();
             });
