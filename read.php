@@ -1,9 +1,4 @@
 <?php
-
-//Mecanismo de login
-//session_start();
-//include('verifica_login.php');
-
 // Verifique a existência do parâmetro id antes de processar mais
 if (isset($_GET["id_lista"]) && !empty(trim($_GET["id_lista"]))) {
     // Inclui config file
@@ -34,8 +29,6 @@ if (isset($_GET["id_lista"]) && !empty(trim($_GET["id_lista"]))) {
             $result = mysqli_stmt_get_result($stmt);
 
             if (mysqli_num_rows($result) == 1) {
-                /* Busca a linha do resultado como um array associativo. Como o conjunto de resultados
-                 contém apenas uma linha */
                 $row = mysqli_fetch_array($result, MYSQLI_ASSOC);
 
                 // Recupera o valor do campo individual
@@ -45,7 +38,7 @@ if (isset($_GET["id_lista"]) && !empty(trim($_GET["id_lista"]))) {
                 $setor = $row["setor"];
                 $secretaria = $row["secretaria"];
             } else {
-                // URL não contém parâmetro id válido. Redirecionar para a página de erro
+                // URL não contém parâmetro id válido
                 header("location: error.php");
                 exit();
             }
@@ -61,97 +54,197 @@ if (isset($_GET["id_lista"]) && !empty(trim($_GET["id_lista"]))) {
     // Fecha conexão
     mysqli_close($link);
 } else {
-    // URL não contém o parâmetro id. Redirecionar para a página de erro
+    // URL não contém o parâmetro id
     header("location: error.php");
     exit();
 }
+// ---------------------------------------------------------
+// FIM DO BLOCO PHP
+// ---------------------------------------------------------
 ?>
 
 <!DOCTYPE html>
-<html lang="pt-br" class="dark" data-bs-theme="dark">
+<html lang="pt-br" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <title>Ver registro</title>
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes do Registro - <?php echo htmlspecialchars($nome); ?></title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
     <style>
-        .wrapper {
-            width: 800px;
-            margin: 0 auto;
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bs-body-bg); }
+        
+        .navbar-brand img { height: 40px; margin-right: 10px; }
+        
+        /* Cartão de Detalhes */
+        .card-details {
+            border: none;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
         }
-        body {
-            background-color: #1C1C1C;
-            color: white;
-        }
-        section {
-            width: 150vh;
-            margin: auto;
-            padding: 10px;
-        }
-        #userTable th, #userTable td {
-            border: 1px solid #ccc;
-            text-align: center;
-        }
-        #userTable thead {
-            background: #4F4F4F;
-        }
-        .headcontainer {
-            width: auto;
-            height: auto;
+        
+        /* Destaque para os ícones */
+        .icon-box {
+            width: 40px;
+            height: 40px;
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: var(--bs-success);
+            color: white;
+            margin-right: 15px;
         }
-        body {
-            margin: 0px;
+        
+        .detail-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--bs-secondary-color);
+            margin-bottom: 2px;
         }
-        .h2 {
-            text-align: center;
+        
+        .detail-value {
+            font-size: 1.1rem;
+            font-weight: 600;
         }
     </style>
 </head>
 
 <body>
-    <div class="wrapper">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-12">
-                    <h1 class="mt-5 mb-3">Ver Registro</h1>
-                    <div class="form-group">
-                        <label>Nome</label>
-                        <p><b>
-                                <?php echo $row["nome"]; ?>
-                            </b></p>
+    
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success shadow-sm mb-5">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="index.php">
+                <i class="fa fa-phone-square me-2"></i> LISTA TELEFÔNICA
+            </a>
+            <div class="d-flex align-items-center">
+                <button class="btn btn-outline-light btn-sm" id="themeToggle" title="Alternar Tema">
+                    <i class="fa fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-10">
+                
+                <div class="card card-details overflow-hidden">
+                    <div class="card-header bg-success bg-opacity-10 border-bottom border-success border-opacity-25 py-3">
+                        <div class="d-flex align-items-center">
+                            <i class="fa fa-id-card fa-2x text-success me-3"></i>
+                            <div>
+                                <h4 class="mb-0 fw-bold text-success-emphasis">Detalhes do Contato</h4>
+                                <small class="text-muted">Visualizando informações do registro #<?php echo $_GET["id_lista"]; ?></small>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Ramal</label>
-                        <p><b>
-                                <?php echo $row["ramal"]; ?>
-                            </b></p>
+                    
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-4 p-3 rounded bg-body-tertiary">
+                            <div class="icon-box">
+                                <i class="fa fa-user"></i>
+                            </div>
+                            <div>
+                                <div class="detail-label">Nome Completo</div>
+                                <div class="detail-value"><?php echo htmlspecialchars($nome); ?></div>
+                            </div>
+                        </div>
+
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <div class="icon-box bg-primary">
+                                        <i class="fa fa-phone"></i>
+                                    </div>
+                                    <div>
+                                        <div class="detail-label">Ramal</div>
+                                        <div class="detail-value text-primary fs-4"><?php echo htmlspecialchars($ramal); ?></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <div class="icon-box bg-info text-white">
+                                        <i class="fa fa-envelope"></i>
+                                    </div>
+                                    <div class="overflow-hidden">
+                                        <div class="detail-label">E-mail</div>
+                                        <div class="detail-value text-break"><?php echo htmlspecialchars($email); ?></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12"><hr class="opacity-25"></div>
+
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <div class="icon-box bg-secondary">
+                                        <i class="fa fa-building"></i>
+                                    </div>
+                                    <div>
+                                        <div class="detail-label">Secretaria</div>
+                                        <div class="detail-value"><?php echo htmlspecialchars($secretaria); ?></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <div class="icon-box bg-secondary">
+                                        <i class="fa fa-sitemap"></i>
+                                    </div>
+                                    <div>
+                                        <div class="detail-label">Setor</div>
+                                        <div class="detail-value"><?php echo htmlspecialchars($setor); ?></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>E-mail</label>
-                        <p><b>
-                                <?php echo $row["email"]; ?>
-                            </b></p>
-                    </div>
-                    <div class="form-group">
-                        <label>Setor</label>
-                        <p><b>
-                                <?php echo $row["setor"]; ?>
-                            </b></p>
-                    </div>
-                    <div class="form-group">
-                        <label>Secretaria</label>
-                        <p><b>
-                                <?php echo $row["secretaria"]; ?>
-                            </b></p>
-                    </div>
-                    <p><a href="index.php" class="btn btn-secondary">← Voltar</a></p>
+
+                    <div class="card-footer bg-body-tertiary p-3 d-flex justify-content-between align-items-center">
+                        <a href="index.php" class="btn btn-outline-secondary">
+                            <i class="fa fa-arrow-left me-2"></i> Voltar para a lista
+                        </a>
+                        </div>
                 </div>
+
             </div>
         </div>
     </div>
-</body>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Script de Dark Mode (Idêntico ao index.php para manter a persistência)
+        const themeToggle = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement;
+        const icon = themeToggle.querySelector('i');
+
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        htmlElement.setAttribute('data-bs-theme', savedTheme);
+        updateIcon(savedTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = htmlElement.getAttribute('data-bs-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            htmlElement.setAttribute('data-bs-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateIcon(newTheme);
+        });
+
+        function updateIcon(theme) {
+            if (theme === 'dark') {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            } else {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            }
+        }
+    </script>
+</body>
 </html>

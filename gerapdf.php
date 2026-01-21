@@ -2,6 +2,24 @@
 require('fpdf.php');
 include('config.php');
 
+// =======================================================================
+// CONFIGURAÇÕES DO DOCUMENTO (EDITE AQUI)
+// =======================================================================
+
+// Título que aparece no topo da página
+$cfg_titulo = "Lista Telefônica da Prefeitura de Castro";
+
+// Linha 1 do Rodapé (Endereço, Telefone, etc)
+$cfg_endereco = "Prefeitura Municipal de Castro - Endereço: Praça Pedro Kaled, 22 - Castro - CEP: 84165-540 - Telefone: (42) 2122-5000";
+
+// Linha 2 do Rodapé (Créditos/Departamento - O ano é gerado automaticamente)
+$cfg_creditos = "Prefeitura Municipal de Castro | SMCTI | Adriano Lerner Biesek";
+
+// Caminho da Logo
+$cfg_logo = "img/logo.png";
+
+// =======================================================================
+
 // Preparar consulta SQL usando prepared statements
 $querypdf = "SELECT l.id_lista, l.nome, l.ramal, l.email, l.setor, s.secretaria 
              FROM lista l 
@@ -20,18 +38,28 @@ if ($stmt) {
 
 class PDF extends FPDF
 {
+    // Propriedades para receber as variáveis externas
+    public $reportTitle;
+    public $reportAddress;
+    public $reportCredits;
+    public $reportLogo;
+
     function Header()
     {
-        // Logo
-        $this->Image('img/logo.png',10,6,20);
+        // Logo (usa a variável da classe)
+        if(file_exists($this->reportLogo)) {
+            $this->Image($this->reportLogo, 10, 6, 20);
+        }
+        
         // Fonte Helvetica em negrito 15
         $this->SetFont('Helvetica','B',15);
         // Mover para a direita
         $this->Cell(80);
-        // Título
-        $this->Cell(30,10,$this->convertText('Lista Telefônica da Prefeitura de Castro'),0,1,'C');
+        // Título (usa a variável da classe)
+        $this->Cell(30,10,$this->convertText($this->reportTitle),0,1,'C');
         // Linha de quebra
         $this->Ln(20);
+        
         // Cabeçalho da tabela
         $this->SetFont('Helvetica','B',12);
         $this->Cell(40,10,$this->convertText('Secretaria'),1, 0, 'C');
@@ -49,9 +77,11 @@ class PDF extends FPDF
         $this->SetY(-25);
         // Fonte Helvetica itálico 8
         $this->SetFont('Helvetica','I',8);
-        // Dados da empresa
-        $this->Cell(0,10,$this->convertText('Prefeitura Municipal de Castro - Endereço: Praça Pedro Kaled, 22 - Castro - CEP: 84165-540 - Telefone: (42) 2122-5000'),0,1,'C');
-        $this->Cell(0,5,$this->convertText('©'.$ano.' Prefeitura Municipal de Castro | Departamento de Tecnologia | Adriano Lerner Biesek'),0,1,'C');
+        
+        // Dados da empresa (usa a variável da classe)
+        $this->Cell(0,10,$this->convertText($this->reportAddress),0,1,'C');
+        $this->Cell(0,5,$this->convertText('©'.$ano.' '.$this->reportCredits),0,1,'C');
+        
         // Número da página
         $this->Cell(0,10,$this->convertText('Página ').$this->PageNo().'/{nb}',0,0,'C');
     }
@@ -142,7 +172,16 @@ class PDF extends FPDF
     }
 }
 
+// Instancia a classe
 $pdf = new PDF();
+
+// --- INJEÇÃO DAS CONFIGURAÇÕES NA CLASSE ---
+$pdf->reportTitle   = $cfg_titulo;
+$pdf->reportAddress = $cfg_endereco;
+$pdf->reportCredits = $cfg_creditos;
+$pdf->reportLogo    = $cfg_logo;
+// -------------------------------------------
+
 $pdf->AliasNbPages();
 $pdf->AddPage();
 
@@ -150,10 +189,10 @@ if ($resultpdf->num_rows > 0) {
     while($row = $resultpdf->fetch_assoc()) {
         // Sanitização dos dados antes de exibir
         $secretaria = htmlspecialchars($row['secretaria'], ENT_QUOTES, 'UTF-8');
-        $setor = htmlspecialchars($row['setor'], ENT_QUOTES, 'UTF-8');
-        $nome = htmlspecialchars($row['nome'], ENT_QUOTES, 'UTF-8');
-        $ramal = htmlspecialchars($row['ramal'], ENT_QUOTES, 'UTF-8');
-        $email = htmlspecialchars($row['email'], ENT_QUOTES, 'UTF-8');
+        $setor      = htmlspecialchars($row['setor'], ENT_QUOTES, 'UTF-8');
+        $nome       = htmlspecialchars($row['nome'], ENT_QUOTES, 'UTF-8');
+        $ramal      = htmlspecialchars($row['ramal'], ENT_QUOTES, 'UTF-8');
+        $email      = htmlspecialchars($row['email'], ENT_QUOTES, 'UTF-8');
 
         $pdf->Row([$secretaria, $setor, $nome, $ramal, $email]);
     }

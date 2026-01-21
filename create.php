@@ -1,7 +1,5 @@
 <?php
-// Mecanismo de login
 include('verifica_login.php');
-// Inclui Arquivo de Configuração
 require_once "config.php";
 
 //Verificação de IP (usado para inserção do IP no LOG)
@@ -105,134 +103,185 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 ?>
 
 <!DOCTYPE html>
-<html lang="pt-br" class="dark" data-bs-theme="dark">
+<html lang="pt-br" data-bs-theme="dark">
 
 <head>
     <meta charset="UTF-8">
-    <title>Criar Ramal</title>
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Novo Registro</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
     <style>
-        .wrapper {
-            width: 800px;
-            margin: 0 auto;
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bs-body-bg); }
+        .navbar-brand img { height: 40px; margin-right: 10px; }
+        
+        /* Ajuste para inputs com ícones */
+        .input-group-text {
+            background-color: var(--bs-tertiary-bg);
+            border-color: var(--bs-border-color);
+            color: var(--bs-secondary-color);
         }
-
-        body {
-            background-color: #1C1C1C;
-            color: white;
-        }
-
-        section {
-            width: 150vh;
-            margin: auto;
-            padding: 10px;
-        }
-
-        #userTable th,
-        #userTable td {
-            border: 1px solid #ccc;
-            text-align: center;
-        }
-
-        #userTable thead {
-            background: #4F4F4F;
-        }
-
-        .headcontainer {
-            width: auto;
-            height: auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        body {
-            margin: 0px;
-        }
-
-        .h2 {
-            text-align: center;
+        .form-control:focus, .form-select:focus {
+            border-color: #198754; /* Verde sucesso */
+            box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
         }
     </style>
 </head>
 
 <body>
-    <div class="wrapper">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-12">
-                    <h2 class="mt-5">Criar registro</h2>
-                    <p>Por favor preencha os campos para adicionar um novo ramal à lista</p>
-                    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-                        <div class="form-group">
-                            <label>Nome</label>
-                            <input type="text" name="nome"
-                                class="form-control <?php echo (!empty($nome_err)) ? 'is-invalid' : ''; ?>"
-                                value="<?php echo $nome; ?>">
-                            <span class="invalid-feedback"><?php echo $nome_err; ?></span>
-                        </div>
-                        <div class="form-group">
-                            <label>Ramal</label>
-                            <input type="text" name="ramal"
-                                class="form-control <?php echo (!empty($ramal_err)) ? 'is-invalid' : ''; ?>"
-                                value="<?php echo $ramal; ?>">
-                            <span class="invalid-feedback"><?php echo $ramal_err; ?></span>
-                        </div>
-                        <div class="form-group">
-                            <label>E-mail</label>
-                            <input type="text" name="e-mail"
-                                class="form-control <?php echo (!empty($email_err)) ? 'is-invalid' : ''; ?>"
-                                value="<?php echo $email; ?>">
-                            <span class="invalid-feedback"><?php echo $email_err; ?></span>
-                        </div>
-                        <div class="form-group">
-                            <label>Setor</label>
-                            <input type="text" name="setor"
-                                class="form-control <?php echo (!empty($setor_err)) ? 'is-invalid' : ''; ?>"
-                                value="<?php echo $setor; ?>">
-                            <span class="invalid-feedback"><?php echo $setor_err; ?></span>
-                        </div>
-                        <?php
-                        $stmt_sec = $link->prepare("SELECT id_secretaria, secretaria FROM secretarias");
-                        $stmt_sec->execute();
-                        $result = $stmt_sec->get_result();
-                        ?>
-                        <div class="form-group">
-                            <label for="secretaria">Secretaria</label>
-                            <select class="form-control <?php echo (!empty($secretaria_err)) ? 'is-invalid' : ''; ?>"
-                                name="secretaria" id="secretaria">
-                                <?php
-                                if ($result->num_rows > 0) {
-                                    $first = true;
-                                    while ($row = $result->fetch_assoc()) {
-                                        // Verifica se o ID desta linha é igual ao ID que foi enviado no POST ($secretaria)
-                                        // Se for vazio (primeiro carregamento), usa a lógica do $first
-                                        if (!empty($secretaria)) {
-                                            $selected = ($row["id_secretaria"] == $secretaria) ? 'selected' : '';
-                                        } else {
-                                            $selected = $first ? 'selected' : '';
-                                        }
+    
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success shadow-sm mb-5">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="index.php">
+                <i class="fa fa-phone-square me-2"></i> LISTA TELEFÔNICA
+            </a>
+            <div class="d-flex align-items-center">
+                <button class="btn btn-outline-light btn-sm" id="themeToggle" title="Alternar Tema">
+                    <i class="fa fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
 
-                                        echo '<option value="' . htmlspecialchars($row["id_secretaria"]) . '" ' . $selected . '>' . htmlspecialchars($row["secretaria"]) . '</option>';
-                                        $first = false;
-                                    }
-                                } else {
-                                    echo '<option value="">Nenhuma secretaria encontrada</option>';
-                                }
-                                ?>
-                            </select>
-                            <span class="invalid-feedback"><?php echo $secretaria_err; ?></span>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8">
+                
+                <div class="card shadow border-0">
+                    <div class="card-header bg-success bg-opacity-10 border-bottom border-success border-opacity-25 py-3">
+                        <div class="d-flex align-items-center">
+                            <i class="fa fa-plus-circle fa-2x text-success me-3"></i>
+                            <div>
+                                <h4 class="mb-0 fw-bold text-success-emphasis">Novo Registro</h4>
+                                <small class="text-muted">Preencha os dados para adicionar à lista.</small>
+                            </div>
                         </div>
-                        <input type="submit" class="btn btn-primary" value="Salvar">
-                        <a href="index.php" class="btn btn-secondary ml-2">Cancelar</a>
-                    </form>
+                    </div>
+
+                    <div class="card-body p-4">
+                        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Nome Completo</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fa fa-user"></i></span>
+                                    <input type="text" name="nome" class="form-control <?php echo (!empty($nome_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $nome; ?>" placeholder="Ex: João da Silva">
+                                    <span class="invalid-feedback"><?php echo $nome_err; ?></span>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-semibold">Ramal</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa fa-phone"></i></span>
+                                        <input type="text" name="ramal" class="form-control <?php echo (!empty($ramal_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $ramal; ?>" placeholder="Ex: 1234">
+                                        <span class="invalid-feedback"><?php echo $ramal_err; ?></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-semibold">E-mail</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+                                        <input type="text" name="e-mail" class="form-control <?php echo (!empty($email_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $email; ?>" placeholder="email@castro.pr.gov.br">
+                                        <span class="invalid-feedback"><?php echo $email_err; ?></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Setor</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fa fa-sitemap"></i></span>
+                                    <input type="text" name="setor" class="form-control <?php echo (!empty($setor_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $setor; ?>" placeholder="Ex: RH - Recursos Humanos">
+                                    <span class="invalid-feedback"><?php echo $setor_err; ?></span>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="secretaria" class="form-label fw-semibold">Secretaria</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fa fa-building"></i></span>
+                                    <?php
+                                    // Preparando a consulta SQL para selecionar todas as secretarias
+                                    $stmt_sec = $link->prepare("SELECT id_secretaria, secretaria FROM secretarias");
+                                    $stmt_sec->execute();
+                                    $result_sec = $stmt_sec->get_result();
+                                    ?>
+                                    <select class="form-select <?php echo (!empty($secretaria_err)) ? 'is-invalid' : ''; ?>" name="secretaria" id="secretaria">
+                                        <?php
+                                        if ($result_sec->num_rows > 0) {
+                                            $first = true;
+                                            while ($row = $result_sec->fetch_assoc()) {
+                                                // Lógica original mantida para seleção (caso ocorra erro e a página recarregue)
+                                                if (!empty($secretaria)) {
+                                                    $selected = ($row["id_secretaria"] == $secretaria) ? 'selected' : '';
+                                                } else {
+                                                    $selected = $first ? 'selected' : '';
+                                                }
+                                                
+                                                echo '<option value="' . htmlspecialchars($row["id_secretaria"]) . '" ' . $selected . '>' . htmlspecialchars($row["secretaria"]) . '</option>';
+                                                $first = false;
+                                            }
+                                        } else {
+                                            echo '<option value="">Nenhuma secretaria encontrada</option>';
+                                        }
+                                        ?>
+                                    </select>
+                                    <span class="invalid-feedback"><?php echo $secretaria_err; ?></span>
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a href="index.php" class="btn btn-outline-secondary me-md-2">
+                                    <i class="fa fa-times me-1"></i> Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fa fa-save me-1"></i> Criar Registro
+                                </button>
+                            </div>
+
+                        </form>
+                    </div>
                 </div>
+
             </div>
         </div>
     </div>
-</body>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Script de Dark Mode (Persistente)
+        const themeToggle = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement;
+        const icon = themeToggle.querySelector('i');
+
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        htmlElement.setAttribute('data-bs-theme', savedTheme);
+        updateIcon(savedTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = htmlElement.getAttribute('data-bs-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            htmlElement.setAttribute('data-bs-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateIcon(newTheme);
+        });
+
+        function updateIcon(theme) {
+            if (theme === 'dark') {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            } else {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            }
+        }
+    </script>
+</body>
 </html>
 <?php
 // Fechar conexão no final de tudo

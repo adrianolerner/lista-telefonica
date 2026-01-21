@@ -1,5 +1,4 @@
 <?php
-
 // Mecanismo de login
 include('verifica_login.php');
 
@@ -71,78 +70,109 @@ if (isset($_POST["id_lista"]) && !empty($_POST["id_lista"])) {
 ?>
 
 <!DOCTYPE html>
-<html lang="pt-br" class="dark" data-bs-theme="dark">
+<html lang="pt-br" data-bs-theme="dark">
 
 <head>
     <meta charset="UTF-8">
-    <title>Apagar registro</title>
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apagar Registro</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
     <style>
-        .wrapper {
-            width: 800px;
-            margin: 0 auto;
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bs-body-bg); }
+        .navbar-brand img { height: 40px; margin-right: 10px; }
+        
+        /* Animação suave para o ícone de alerta */
+        .pulse-icon {
+            animation: pulse 2s infinite;
         }
-
-        body {
-            background-color: #1C1C1C;
-            color: white;
-        }
-
-        section {
-            width: 150vh;
-            margin: auto;
-            padding: 10px;
-        }
-
-        #userTable th,
-        #userTable td {
-            border: 1px solid #ccc;
-            text-align: center;
-        }
-
-        #userTable thead {
-            background: #4F4F4F;
-        }
-
-        .headcontainer {
-            width: auto;
-            height: auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        body {
-            margin: 0px;
-        }
-
-        .h2 {
-            text-align: center;
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
         }
     </style>
 </head>
 
 <body>
-    <div class="wrapper">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-12">
-                    <h2 class="mt-5 mb-3">Apagar registro</h2>
-                    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-                        <div class="alert alert-danger">
-                            <input type="hidden" name="id_lista" value="<?php echo trim($_GET["id_lista"]); ?>" />
-                            <p>Tem certeza que deseja apagar este registro da lista?</p>
-                            <p>
-                                <input type="submit" value="Sim" class="btn btn-danger">
-                                <a href="index.php" class="btn btn-secondary">Não</a>
-                            </p>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success shadow-sm mb-5">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="index.php">
+                <i class="fa fa-phone-square me-2"></i> LISTA TELEFÔNICA
+            </a>
+            <div class="d-flex align-items-center">
+                <button class="btn btn-outline-light btn-sm" id="themeToggle" title="Alternar Tema">
+                    <i class="fa fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                
+                <div class="card border-danger shadow text-center">
+                    <div class="card-header bg-danger text-white py-3">
+                        <h4 class="mb-0 fw-bold"><i class="fa fa-trash-alt me-2"></i> Confirmar Exclusão</h4>
+                    </div>
+                    
+                    <div class="card-body p-5">
+                        <div class="mb-4 text-danger pulse-icon">
+                            <i class="fa fa-exclamation-triangle fa-5x"></i>
                         </div>
-                    </form>
+                        
+                        <h5 class="card-title mb-3">Tem certeza que deseja apagar?</h5>
+                        <p class="card-text text-muted mb-4">
+                            Esta ação removerá permanentemente este registro da lista telefônica. Esta ação <strong>não pode</strong> ser desfeita.
+                        </p>
+
+                        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+                            <input type="hidden" name="id_lista" value="<?php echo trim($_GET["id_lista"]); ?>" />
+                            
+                            <div class="d-grid gap-2">
+                                <input type="submit" value="Sim, Apagar Registro" class="btn btn-danger btn-lg">
+                                <a href="index.php" class="btn btn-outline-secondary">Cancelar</a>
+                            </div>
+                        </form>
+                    </div>
                 </div>
+
             </div>
         </div>
     </div>
-</body>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Script de Dark Mode (Persistente)
+        const themeToggle = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement;
+        const icon = themeToggle.querySelector('i');
+
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        htmlElement.setAttribute('data-bs-theme', savedTheme);
+        updateIcon(savedTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = htmlElement.getAttribute('data-bs-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            htmlElement.setAttribute('data-bs-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateIcon(newTheme);
+        });
+
+        function updateIcon(theme) {
+            if (theme === 'dark') {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            } else {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            }
+        }
+    </script>
+</body>
 </html>

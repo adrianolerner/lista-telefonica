@@ -1,34 +1,25 @@
 <?php
-
-//Mecanismo de login
+// ---------------------------------------------------------
+// LÓGICA PHP ORIGINAL (MANTIDA)
+// ---------------------------------------------------------
 include('../verifica_login.php');
-// Inclui arquivo de configuração
 require_once "../config.php";
 
-//Verificação de Admin
+// Verificação de Admin
 $useradmin = @$_SESSION['usuario'];
 
 if ($stmt = mysqli_prepare($link, "SELECT admin FROM usuarios WHERE usuario = ?")) {
-    // Bind parameters
     mysqli_stmt_bind_param($stmt, "s", $useradmin);
-
-    // Execute statement
     mysqli_stmt_execute($stmt);
-
-    // Bind result variables
     mysqli_stmt_bind_result($stmt, $admin);
-
-    // Fetch the result
     mysqli_stmt_fetch($stmt);
-
-    // Close the statement
     mysqli_stmt_close($stmt);
 }
 
 $adminarray = ['admin' => $admin];
 
 if (!$useradmin) {
-    header("Location: login.php");
+    header("Location: ../login.php"); // Caminho ajustado
     exit;
 }
 
@@ -37,119 +28,141 @@ if ($adminarray['admin'] == "s") {
     // Processa a operação de exclusão após a confirmação
     if (isset($_POST["id_secretaria"]) && !empty($_POST["id_secretaria"])) {
 
-        // Prepara uma declaração de exclusão
         $sql = "DELETE FROM secretarias WHERE id_secretaria = ?";
 
         if ($stmt = mysqli_prepare($link, $sql)) {
-            // Vincula as variáveis à instrução preparada como parâmetros
             mysqli_stmt_bind_param($stmt, "i", $param_id);
-
-            // Definir parâmetros
             $param_id = trim($_POST["id_secretaria"]);
 
-            // Tentativa de executar a instrução preparada
             if (mysqli_stmt_execute($stmt)) {
-                // Registros deletados com sucesso. Redirecionar para a página de destino
                 header("location: index.php");
                 exit();
             } else {
                 echo "Oops! Algo saiu errado, tente novamente.";
             }
         }
-
-        // Fecha declaração
         mysqli_stmt_close($stmt);
-
-        // Fecha conexão
         mysqli_close($link);
     } else {
         // Verifica a existência do parâmetro id
         if (empty(trim($_GET["id_secretaria"]))) {
-            // URL não contém o parâmetro id. Redirecionar para a página de erro
-            header("location: error.php");
+            header("location: ../error.php"); // Caminho ajustado
             exit();
         }
     }
-    ?>
+?>
 
-    <!DOCTYPE html>
-    <html lang="pt-br" class="dark" data-bs-theme="dark">
+<!DOCTYPE html>
+<html lang="pt-br" data-bs-theme="dark">
 
-    <head>
-        <meta charset="UTF-8">
-        <title>Apagar registro</title>
-        <link rel="stylesheet" href="../css/bootstrap.min.css">
-        <style>
-            .wrapper {
-                width: 800px;
-                margin: 0 auto;
-            }
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apagar Secretaria</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
-            body {
-                background-color: #1C1C1C;
-                color: white;
-            }
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bs-body-bg); }
+        .navbar-brand img { height: 40px; margin-right: 10px; }
+        
+        /* Animação suave para o ícone de alerta */
+        .pulse-icon {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
 
-            section {
-                width: 150vh;
-                margin: auto;
-                padding: 10px;
-            }
+<body>
 
-            #userTable th,
-            #userTable td {
-                border: 1px solid #ccc;
-                text-align: center;
-            }
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success shadow-sm mb-5">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="../index.php">
+                <i class="fa fa-phone-square me-2"></i> LISTA TELEFÔNICA
+            </a>
+            <div class="d-flex align-items-center">
+                <button class="btn btn-outline-light btn-sm" id="themeToggle" title="Alternar Tema">
+                    <i class="fa fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
 
-            #userTable thead {
-                background: #4F4F4F;
-            }
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                
+                <div class="card border-danger shadow text-center">
+                    <div class="card-header bg-danger text-white py-3">
+                        <h4 class="mb-0 fw-bold"><i class="fa fa-trash-alt me-2"></i> Confirmar Exclusão</h4>
+                    </div>
+                    
+                    <div class="card-body p-5">
+                        <div class="mb-4 text-danger pulse-icon">
+                            <i class="fa fa-exclamation-triangle fa-5x"></i>
+                        </div>
+                        
+                        <h5 class="card-title mb-3">Tem certeza que deseja apagar?</h5>
+                        <p class="card-text text-muted mb-4">
+                            Você está prestes a excluir uma Secretaria. <br>
+                            <small class="text-danger fw-bold">Atenção: Se houver contatos vinculados a esta secretaria, eles podem perder a referência.</small>
+                        </p>
 
-            .headcontainer {
-                width: auto;
-                height: auto;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-            }
-
-            body {
-                margin: 0px;
-            }
-
-            .h2 {
-                text-align: center;
-            }
-        </style>
-    </head>
-
-    <body>
-        <div class="wrapper">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-md-12">
-                        <h2 class="mt-5 mb-3">Apagar registro</h2>
                         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-                            <div class="alert alert-danger">
-                                <input type="hidden" name="id_secretaria"
-                                    value="<?php echo trim($_GET["id_secretaria"]); ?>" />
-                                <p>Tem certeza que deseja apagar este registro da lista?</p>
-                                <p>
-                                    <input type="submit" value="Sim" class="btn btn-danger">
-                                    <a href="index.php" class="btn btn-secondary">Não</a>
-                                </p>
+                            <input type="hidden" name="id_secretaria" value="<?php echo trim($_GET["id_secretaria"]); ?>" />
+                            
+                            <div class="d-grid gap-2">
+                                <input type="submit" value="Sim, Apagar Secretaria" class="btn btn-danger btn-lg">
+                                <a href="index.php" class="btn btn-outline-secondary">Cancelar</a>
                             </div>
                         </form>
                     </div>
                 </div>
+
             </div>
         </div>
-    </body>
+    </div>
 
-    </html>
-<?php } else {
-    header("Location: /lista/index.php");
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Script de Dark Mode (Persistente)
+        const themeToggle = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement;
+        const icon = themeToggle.querySelector('i');
+
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        htmlElement.setAttribute('data-bs-theme', savedTheme);
+        updateIcon(savedTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = htmlElement.getAttribute('data-bs-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            htmlElement.setAttribute('data-bs-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateIcon(newTheme);
+        });
+
+        function updateIcon(theme) {
+            if (theme === 'dark') {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            } else {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            }
+        }
+    </script>
+</body>
+</html>
+<?php 
+} else {
+    header("Location: ../index.php");
     exit;
 }
 ?>

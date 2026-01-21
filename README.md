@@ -1,218 +1,134 @@
-## Aplicação de Lista Telefônica
+# Aplicação de Lista Telefônica
 
-Bem-vindo ao repositório da aplicação de lista telefônica desenvolvida para um órgão público.
-Esta aplicação foi construída utilizando PHP, HTML, CSS, JavaScript e MariaDB.
-O objetivo desta aplicação é fornecer uma interface intuitiva para gerenciar contatos
-telefônicos do órgão.
+Bem-vindo ao repositório da aplicação de lista telefônica desenvolvida para órgãos públicos. Esta ferramenta fornece uma interface intuitiva, responsiva e segura para gerenciar contatos e ramais internos.
+
+**Destaque da Versão 0.13+:** Interface modernizada com Bootstrap 5, suporte nativo a Temas (Claro/Escuro) e verificação automática de atualizações.
 
 ## Índice
 
-- [Requisitos de Software](#requisitos-de-software)
-- [Instalação](#instalação)
-- [Configuração](#configuração)
-- [Uso](#uso)
-- [Contribuição](#contribuição)
+* [Requisitos de Software](https://www.google.com/search?q=%23requisitos-de-software)
+* [Instalação](https://www.google.com/search?q=%23instala%C3%A7%C3%A3o)
+* [Configuração](https://www.google.com/search?q=%23configura%C3%A7%C3%A3o)
+* [Uso](https://www.google.com/search?q=%23uso)
+* [Interface e Temas](https://www.google.com/search?q=%23interface-e-temas)
+* [Contribuição](https://www.google.com/search?q=%23contribui%C3%A7%C3%A3o)
 
 ## Requisitos de Software
 
-Para executar esta aplicação, é necessário ter os seguintes softwares instalados:
+Para executar esta aplicação, é necessário:
 
-- PHP 8.2
-- MariaDB 10.6 (ou MySQL)
-- Apache 2.4 (ou equivalente)
+* **PHP 8.2+** (com extensões `php-mysqli` e `php-curl` habilitadas)
+* **MariaDB 10.6+** ou MySQL 8.0+
+* **Apache 2.4+** (com módulo `mod_env` e `mod_rewrite` habilitados)
 
 ## Instalação
 
-Siga os passos abaixo para instalar a aplicação:
+1. Clone o repositório:
+```bash
+git clone https://github.com/adrianolerner/lista-telefonica.git
 
-1. Clone o repositório para o seu ambiente local:
-    ```bash
-    git clone https://github.com/adrianolerner/lista-telefonica.git
-    ```
+```
 
-2. Navegue até o diretório do projeto:
-    ```bash
-    cd lista-telefonica
-    ```
 
-3. Certifique-se de ter os requisitos de software instalados e configurados.
+2. Navegue até o diretório:
+```bash
+cd lista-telefonica
+
+```
+
+
 
 ## Configuração
 
-Para configurar a aplicação, siga os passos abaixo:
+### 1. Banco de Dados
 
-1. **Criação de usuário e senha do banco de dados:**
-    - Acesse o MariaDB (ou MySQL) e crie um novo usuário e senha:
-        ```sql
-        CREATE USER 'usuario'@'localhost' IDENTIFIED BY 'senha';
-        ```
+Acesse seu gerenciador de banco de dados e execute:
 
-2. **Criação da base de dados:**
-    - Crie uma base de dados chamada `agenda`:
-        ```sql
-        CREATE DATABASE agenda;
-        ```
+```sql
+CREATE DATABASE agenda;
+CREATE USER 'usuario'@'localhost' IDENTIFIED BY 'sua_senha_forte';
+GRANT ALL PRIVILEGES ON agenda.* TO 'usuario'@'localhost';
+FLUSH PRIVILEGES;
 
-3. **Importar o arquivo SQL:**
-    - Importe o arquivo SQL incluído na release (ou crie as tabelas conforme exigido nos
-arquivos):
-        ```bash
-        mysql -u usuario -p agenda < caminho/para/o/arquivo.sql
-        ```
-    - Edite o campo de senha do usuário "admin" na tabela de usuários (a senha padrão do arquivo é admin)
+```
 
-4. **Configuração dos arquivos PHP:**
-    - Nos arquivos `acesso.php`, `verifica_login.php` e `index.php`, altere as
-seguintes linhas conforme necessário para validar pelo IP a exibição do botão de login:
-        ```php
-        $ip = $_SERVER['HTTP_X_REAL_IP'];
-        //$ipaddress = "172.16.0.10";
-        $ipaddress = strstr($ip, ',', true);
-        ```
-         - No arquivo `index.php` alterar a variável abaixo com o nome do seu órgão ou entidade:
-      	```php
-         $orgao = "DA PRAFEITURA DE XXXX";
-       	```
-         - Nos arquivos `acesso.php` e `index.php`, altere o IP  das
-seguintes linhas conforme necessário para validar pelo IP.
-        ```php
-        if (!fnmatch("172.16.0.\*", $ipaddress))
-        ```
-    - Caso não queira validar pelo IP, descomente a linha:
-        ```php
-        //$ipaddress = "172.16.0.10";
-        ```
-      e comente as linhas:
-        ```php
-        $ip = $_SERVER['HTTP_X_REAL_IP'];
-        $ipaddress = strstr($ip, ',', true);
-        ```
-    - Caso queira usar o recaptcha para validação de login, mude para "false" o valor da variável $recaptcha_verified na linha 12. Caso não queira utilizar, basta manter como "true".
-      ```php
-      $recaptcha_verified = true;
-      ```
-    - Criar no google recaptcha v3 um novo site conforme seu dominio e copiar as chaves privada e pública. (Caso queira usar)
-    - Aterar codigo recaptcha nas referidas linhas nos arquivos login.php e acesso.php, sendo a
-chave privada em login.php e a publica em acesso.php.
-    - Caso a variavel acima esteja como "false" e não seja indicado o código recaptcha nas paginas indicadas, a tela de login não funcionará.
-    - Alterar as linhas 32, 53, 54 e 164 do arquivo gerapdf.php conforme necessário, com as informações e nomes usados pelo órgão (apenas altere as informações destas linhas presentes dentro das '')
+### 2. Importação das Tabelas
 
-5. **Inclusão de usuário e senha do banco de dados (mudança da versão 0.8 - passos obrigatórios para atualização)**
-Para configurar variáveis de ambiente no Ubuntu Server com Apache 2 e usá-las no seu código PHP, você pode seguir estas etapas:
+Importe o arquivo `agenda.sql` localizado na raiz do projeto:
 
-    1. **Criar as Variáveis de Ambiente no Sistema**
-    As variáveis de ambiente podem ser definidas no sistema operacional e acessadas pelo Apache e PHP.
+```bash
+mysql -u usuario -p agenda < agenda.sql
 
-    2. **Editar o Arquivo de Configuração do Apache**:
-       - Abra o arquivo de configuração do Apache para o site em questão. Geralmente, o arquivo está localizado em `/etc/apache2/sites-available/000-default.conf` (ou em outro arquivo de configuração se estiver usando hosts virtuais específicos).
-       - Adicione as variáveis de ambiente usando a diretiva `SetEnv` dentro do bloco `<VirtualHost>`.
+```
 
-       ```bash
-       sudo nano /etc/apache2/sites-available/000-default.conf
-       ```
+### 3. Variáveis de Ambiente (Segurança)
 
-       **Exemplo de configuração:**
+Para proteger suas credenciais, a aplicação utiliza variáveis de ambiente. No Ubuntu/Debian com Apache, edite seu VirtualHost:
 
-       ```apache
-       <VirtualHost *:80>
-       ServerAdmin webmaster@localhost
-       DocumentRoot /var/www/html
+```bash
+sudo nano /etc/apache2/sites-available/000-default.conf
 
-       # Definir variáveis de ambiente
-       SetEnv DB_SERVER localhost
-       SetEnv DB_USERNAME USUARIO-DB
-       SetEnv DB_PASSWORD SENHA-DB
-       SetEnv DB_NAME agenda
+```
 
-       ErrorLog ${APACHE_LOG_DIR}/error.log
-       CustomLog ${APACHE_LOG_DIR}/access.log combined
-       </VirtualHost>
-       ```
+Adicione dentro de `<VirtualHost *:80>`:
 
-    3. **Recarregar o Apache**:
-       - Após editar o arquivo de configuração, recarregue o Apache para aplicar as mudanças.
+```apache
+SetEnv DB_SERVER localhost
+SetEnv DB_USERNAME usuario
+SetEnv DB_PASSWORD sua_senha_forte
+SetEnv DB_NAME agenda
 
-       ```bash
-       sudo systemctl reload apache2
-       ```
+```
 
-	**Alternativa: Usar `.htaccess` para Definir Variáveis de Ambiente**
+Reinicie o serviço: `sudo systemctl reload apache2`
 
-	Se preferir, as variáveis de ambiente também podem ser definidas em um arquivo `.htaccess` na raiz do seu projeto.
+### 4. Validação por IP e Órgão
 
-    1. **Criar ou Editar o Arquivo `.htaccess`**:
-       - Se o arquivo `.htaccess` não existir, crie um na raiz do diretório do seu projeto web (`/var/www/html` ou o diretório correspondente).
+No arquivo `index.php`, ajuste o nome da sua entidade:
 
-       ```bash
-       sudo nano /var/www/html/.htaccess
-       ```
+```php
+$orgao = "PREFEITURA DE SUA CIDADE";
 
-    2. **Adicionar as Variáveis de Ambiente**:
-       - Insira as diretivas `SetEnv` no arquivo `.htaccess`.
+```
 
-       **Exemplo:**
+A aplicação possui um filtro de segurança para exibir o botão de Login apenas em redes internas. No `index.php` e `acesso.php`, configure a faixa de IP permitida:
 
-       ```apache
-       SetEnv DB_SERVER localhost
-       SetEnv DB_USERNAME USUARIO-DB
-       SetEnv DB_PASSWORD SENHA-DB
-       SetEnv DB_NAME agenda
-       ```
+```php
+if (!fnmatch("172.16.0.*", $ipaddress))
 
-    3. **Reiniciar o Apache**:
-       - Certifique-se de que o módulo `mod_env` do Apache está habilitado e reinicie o Apache para aplicar as mudanças.
+```
 
-       ```bash
-       sudo a2enmod env
-       sudo systemctl restart apache2
-       ```
-
-    4. **Segurança Adicional**
-
-	Para aumentar a segurança, especialmente ao definir variáveis de ambiente com credenciais sensíveis, considere:
-
-    - **Restringir o acesso ao arquivo `.htaccess`**: Apenas o proprietário e o servidor web devem ter permissões de leitura.
-  
-  	```bash
-	sudo chmod 640 /var/www/html/.htaccess
- 	 ```
-
-    - **Habilitar HTTPS**: Isso garante que as credenciais transmitidas entre o cliente e o servidor estejam criptografadas.
-
-6. **Alterar imagens/Titulos:**
-    - Altere os logos.
-    - Os logos ficam na pasta "img" e podem ser trocados somente substituindo por seus logos e mantendo o nome. Cada arquivo represente o Logo em um local.
-    - O logo.png, é o brasão exibido no cabeçalho da lista em PDF.
-    - O logo2.png, é o logo/brasão do órgão a ser exibido na pagina principal.
-
-7. **Caso seja necessário a atualização de versão anterior, por conta das mudaças no código e banco de dados, recomendamos que seja feito backup dos arquivos do projeto e do banco de dados, e seja criado novo banco, importando do exemplo disponibilizado, e importados os registros no sistema já atualizado, para evitar conflitos.**
-
-8. **Para Verificar novas versões desta ferramenta, acesse a página sobre da aplicação (a partir da versão 0.12). Em caso de nova versão, será exibido alerta com link para download.**
+*Dica: Para desativar a trava de IP e permitir acesso externo, descomente a linha fixa de IP no topo desses arquivos conforme as instruções nos comentários do código.*
 
 ## Uso
 
-Depois de configurar a aplicação, você pode acessar a aplicação de lista telefônica através do
-seu navegador apontando para o servidor onde a aplicação está hospedada.
-O usuário pré-cadastrado é "admin" e senha "admin".
-Em caso de necessidade, é possível gerar o hash de senha para inserção diretamente no banco de dos, editando o arquivo trocahash.php, inserindo a senha desejada no campo `INSIRA_A_SENHA_AQUI` e depois executando-o no terminal em sua pasta com o PHP com o comando `php trocahash.php`.
+* **Acesso Inicial:** O usuário padrão é `admin` com a senha `admin`. **Altere-a imediatamente após o primeiro login.**
+* **Manutenção de Senhas:** Caso perca o acesso, utilize o arquivo auxiliar `trocahash.php`. Insira a nova senha no campo indicado e execute via terminal: `php trocahash.php`. O script gerará o hash seguro para inserção manual no banco de dados.
+* **Relatórios:** O sistema gera listas em PDF formatadas através da biblioteca FPDF. As variáveis de cabeçalho do PDF podem ser alteradas diretamente no topo do arquivo `gerapdf.php`.
 
-Por gentileza mantenha os créditos do criador.
+## Interface e Temas
+
+A aplicação utiliza o **Bootstrap 5.3** e oferece suporte a Temas:
+
+* **Dark Mode / Light Mode:** O usuário pode alternar o tema através do botão na barra de navegação. A preferência é salva automaticamente no navegador.
+* **Responsividade:** A tabela de contatos utiliza o plugin *Responsive* do DataTables, adaptando-se a celulares, tablets e desktops.
 
 ## Contribuição
 
-Se você deseja contribuir com este projeto, siga as diretrizes abaixo:
+1. Faça um **Fork** do projeto.
+2. Crie uma **Branch** para sua modificação (`git checkout -b feature/nova-funcao`).
+3. Faça o **Commit** (`git commit -am 'Adiciona nova função'`).
+4. **Push** para a branch (`git push origin feature/nova-funcao`).
+5. Abra um **Pull Request**.
 
-1. Fork este repositório.
-2. Crie uma branch para a sua feature ou correção de bug (`git checkout -b minha-feature`).
-3. Commit suas alterações (`git commit -am 'Adicionar nova feature'`).
-4. Push para a branch (`git push origin minha-feature`).
-5. Crie um novo Pull Request.
+## Referências
 
-## Referências Usadas
+* [FPDF.org](http://fpdf.org) - Geração de PDFs
+* [DataTables.net](https://datatables.net) - Gestão de tabelas dinâmicas
+* [FontAwesome](https://fontawesome.com) - Ícones da interface
 
-- [fpdf.org](http://fpdf.org)
-- [getbootstrap.com](https://getbootstrap.com)
-- [datatables.net](https://datatables.net)
-- [jquery.org](https://jquery.org)
-- [fontawesome.com](https://fontawesome.com)
-- [bulma.io](https://bulma.io)
+---
+
+*Mantenha os créditos do autor original: Adriano Lerner Biesek.*
+
+---

@@ -1,423 +1,194 @@
 <?php
-    // Versão atual do seu aplicativo
-    function getCurrentVersion()
-    {
-        return '0.13';
-    }
+// Versão atual do seu aplicativo
+function getCurrentVersion() {
+    return '0.13';
+}
+
+// Função para obter a última versão do GitHub
+function getLatestVersion() {
+    $url = 'https://api.github.com/repos/adrianolerner/lista-telefonica/releases/latest';
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_USERAGENT, 'ListaTelefonica-App');
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 2); // Timeout curto para não travar a página
+    $response = curl_exec($ch);
+    curl_close($ch);
+    $data = json_decode($response, true);
+    return isset($data['tag_name']) ? $data['tag_name'] : '0.0.0';
+}
+
+// Função para verificar se há atualização disponível
+function isUpdateAvailable() {
+    $current = ltrim(getCurrentVersion(), 'v');
+    $latest = ltrim(getLatestVersion(), 'v');
+    return version_compare($latest, $current, '>');
+}
 ?>
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br" data-bs-theme="dark">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Créditos - Lista Telefônica</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Sobre - Lista Telefônica</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
     <style>
-        :root {
-            --primary: #4361ee;
-            --secondary: #3a0ca3;
-	    --back: #A9A9A9;
-            --accent: #f72585;
-            --light: #f8f9fa;
-            --dark: #212529;
-            --success: #4cc9f0;
-        }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: var(--dark);
-        }
-
-        .container {
-            background-color: white;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            width: 90%;
-            max-width: 800px;
-            padding: 40px;
-            margin: 40px 0;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 8px;
-            background: linear-gradient(90deg, var(--primary), var(--accent));
-        }
-
-        h1 {
-            color: var(--primary);
-            margin-top: 0;
-            font-weight: 600;
-            font-size: clamp(1.8rem, 5vw, 2.5rem);
-            line-height: 1.2;
-        }
-
-        .author {
-            display: flex;
-            align-items: center;
-            margin: 20px 0;
-            flex-wrap: wrap;
-        }
-
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bs-body-bg); }
         .author-avatar {
-            width: 80px;
-            height: 80px;
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
-            object-fit: cover;
-            margin-right: 20px;
-            border: 4px solid var(--primary);
+            border: 3px solid var(--bs-success);
+            padding: 3px;
         }
-
-        .author-info h2 {
-            margin: 0;
-            color: var(--secondary);
-            font-size: clamp(1.2rem, 4vw, 1.5rem);
-        }
-
-        .author-info p {
-            margin: 5px 0 0;
-            opacity: 0.8;
-            font-size: clamp(0.9rem, 3vw, 1rem);
-        }
-
-        .details {
-            margin: 30px 0;
-        }
-
-        .detail-item {
-            display: flex;
-            margin-bottom: 15px;
-            align-items: flex-start;
-        }
-
-        .detail-icon {
-            min-width: 40px;
-            height: 40px;
-            background-color: rgba(67, 97, 238, 0.1);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 15px;
-            color: var(--primary);
-            font-size: 1.2rem;
-            flex-shrink: 0;
-        }
-
-        .detail-item h3 {
-            margin: 0 0 8px 0;
-            font-size: clamp(1rem, 4vw, 1.2rem);
-        }
-
-        .detail-item p {
-            margin: 0;
-            font-size: clamp(0.9rem, 3vw, 1rem);
-            line-height: 1.5;
-        }
-
-        .version {
-            display: inline-block;
-            background-color: var(--primary);
+        .card { border: none; }
+        .update-banner {
+            background: linear-gradient(45deg, #198754, #146c43);
             color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: 600;
-            margin: 10px 0;
-            font-size: clamp(0.9rem, 3vw, 1rem);
-        }
-
-        .update-available {
-            background-color: var(--accent);
-            color: white;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 20px 0;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            animation: pulse 2s infinite;
-        }
-
-        .update-available-content {
-            flex: 1;
-        }
-
-        .update-available strong {
-            display: block;
-            margin-bottom: 5px;
-            font-size: clamp(1rem, 4vw, 1.2rem);
-        }
-
-        .update-available p {
-            margin: 0;
-            font-size: clamp(0.9rem, 3vw, 1rem);
-        }
-
-        .update-btn {
-            background-color: white;
-            color: var(--accent);
-            border: none;
-            padding: 10px 15px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            display: block;
-            text-align: center;
-            font-size: clamp(0.9rem, 3vw, 1rem);
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        .update-btn:hover {
-            background-color: rgba(255, 255, 255, 0.9);
-            transform: translateY(-2px);
-        }
-
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(247, 37, 133, 0.4);
-            }
-            70% {
-                box-shadow: 0 0 0 10px rgba(247, 37, 133, 0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(247, 37, 133, 0);
-            }
-        }
-
-        .btn {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            display: inline-block;
-            text-align: center;
-            font-size: clamp(0.9rem, 3vw, 1rem);
-            width: 90%;
-        }
-
-        .btn:hover {
-            background-color: var(--secondary);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .btn-ghost {
-            background-color: transparent;
-            border: 2px solid var(--primary);
-            color: var(--primary);
-	    width: 89%;
-        }
-
-	.btn-back {
-            background-color: transparent;
-	    border: 2px solid var(--back);
-            color: var(--back);
-            width: 89%;
-        }
-
-        .btn-ghost:hover {
-            background-color: var(--primary);
-            color: white;
-        }
-
-	.btn-back:hover {
-	   background-color: var(--back);
-	   color: white;
-	}
-
-        .links {
-            display: flex;
-            gap: 10px;
-            margin-top: 30px;
-            flex-wrap: wrap;
-        }
-
-        footer {
-            margin-top: 40px;
-            text-align: center;
-            opacity: 0.7;
-            font-size: clamp(0.8rem, 3vw, 0.9rem);
-            line-height: 1.5;
-        }
-
-        @media (min-width: 601px) {
-            .update-available {
-                flex-direction: row;
-                align-items: center;
-            }
-            
-            .update-btn {
-                width: auto;
-                min-width: 180px;
-                margin-left: 15px;
-            }
-
-            .btn {
-                width: auto;
-                min-width: 150px;
-            }
-        }
-
-        @media (max-width: 600px) {
-            .container {
-                padding: 25px 15px;
-                margin: 20px 0;
-            }
-
-            .author {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .author-avatar {
-                margin-right: 0;
-                margin-bottom: 15px;
-            }
-
-            .links {
-                flex-direction: column;
-            }
-
-            .detail-item {
-                flex-direction: row;
-                align-items: flex-start;
-            }
-        }
-
-        @media (max-width: 400px) {
-            .container {
-                width: 95%;
-                padding: 20px 10px;
-            }
-
-            .detail-item {
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-            }
-
-            .detail-icon {
-                margin-right: 0;
-                margin-bottom: 10px;
-            }
         }
     </style>
 </head>
 
 <body>
+    
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success shadow-sm mb-5">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="index.php">
+                <i class="fa fa-phone-square me-2"></i> LISTA TELEFÔNICA
+            </a>
+            <div class="d-flex align-items-center">
+                <button class="btn btn-outline-light btn-sm" id="themeToggle" title="Alternar Tema">
+                    <i class="fa fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
     <div class="container">
-        <h1>Sobre a aplicação Lista Telefônica</h1>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                
+                <div class="card shadow-lg mb-4">
+                    <div class="card-body p-4 p-md-5">
+                        
+                        <div class="text-center mb-4">
+                            <img src="https://avatars.githubusercontent.com/u/11412428?v=4" alt="Adriano Lerner Biesek" class="author-avatar mb-3">
+                            <h2 class="fw-bold mb-0">Adriano Lerner Biesek</h2>
+                            <p class="text-success fw-semibold">Autor e Desenvolvedor</p>
+                            
+                            <div class="d-flex justify-content-center gap-2 mt-2">
+                                <span class="badge bg-body-secondary text-body border px-3 py-2">
+                                    <i class="fa fa-code-branch me-1 text-success"></i> Versão <?php echo getCurrentVersion(); ?>
+                                </span>
+                                <?php if (!isUpdateAvailable()): ?>
+                                    <span class="badge bg-success-subtle text-success border border-success px-3 py-2">
+                                        <i class="fa fa-check-circle me-1"></i> Atualizado
+                                    </span>
+                                <?php endif; ?>
+                            </div>
+                        </div>
 
-        <div class="author">
-            <img src="https://avatars.githubusercontent.com/u/11412428?v=4" alt="Adriano Lerner Biesek" class="author-avatar">
-            <div class="author-info">
-                <h2>Adriano Lerner Biesek</h2>
-                <p>Autor e Desenvolvedor</p>
+                        <hr class="my-4 opacity-25">
+
+                        <?php if (isUpdateAvailable()): ?>
+                            <div class="card update-banner mb-4 shadow-sm">
+                                <div class="card-body d-flex align-items-center justify-content-between flex-wrap gap-3">
+                                    <div>
+                                        <h5 class="mb-1 fw-bold"><i class="fa fa-rocket me-2"></i> Nova versão disponível!</h5>
+                                        <p class="mb-0 small opacity-75">A versão <?php echo getLatestVersion(); ?> já está disponível no repositório.</p>
+                                    </div>
+                                    <a href="https://github.com/adrianolerner/lista-telefonica/releases/latest" target="_blank" class="btn btn-light btn-sm fw-bold px-4">Baixar Agora</a>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+
+                        <h4 class="fw-bold mb-4"><i class="fa fa-info-circle text-success me-2"></i> Sobre o Projeto</h4>
+                        
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="p-3 rounded bg-body-tertiary h-100">
+                                    <h6 class="fw-bold"><i class="fa fa-university me-2 text-success"></i> Propósito</h6>
+                                    <p class="small text-muted mb-0">Interface intuitiva para gestão de contatos e ramais em órgãos públicos, otimizando a comunicação interna e externa.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 rounded bg-body-tertiary h-100">
+                                    <h6 class="fw-bold"><i class="fa fa-layer-group me-2 text-success"></i> Stack Técnica</h6>
+                                    <p class="small text-muted mb-0">Desenvolvido com PHP 8, MariaDB, Bootstrap 5 e DataTables. Focado em performance e responsividade.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 rounded bg-body-tertiary h-100">
+                                    <h6 class="fw-bold"><i class="fa fa-balance-scale me-2 text-success"></i> Licença MIT</h6>
+                                    <p class="small text-muted mb-0">Software livre. Você pode usar, modificar e distribuir livremente, desde que mantidos os créditos originais.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 rounded bg-body-tertiary h-100">
+                                    <h6 class="fw-bold"><i class="fa-brands fa-github me-2 text-success"></i> Open Source</h6>
+                                    <p class="small text-muted mb-0">Código aberto disponível para a comunidade. Sinta-se à vontade para contribuir com melhorias.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-2 mt-5">
+                            <a href="index.php" class="btn btn-outline-secondary px-4">
+                                <i class="fa fa-arrow-left me-2"></i> Voltar
+                            </a>
+                            <a href="https://github.com/adrianolerner/lista-telefonica" target="_blank" class="btn btn-success px-4">
+                                <i class="fab fa-github me-2"></i> Ver no GitHub
+                            </a>
+                            <a href="https://github.com/adrianolerner/lista-telefonica/releases" target="_blank" class="btn btn-outline-success px-4">
+                                <i class="fa fa-history me-2"></i> Versões
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <footer class="text-center mb-5 opacity-50">
+                    <p class="small">
+                        © <?php echo date('Y'); ?> Adriano Lerner Biesek | Prefeitura Municipal de Castro (PR)<br>
+                        Feito com <i class="fa fa-heart text-danger"></i> para o serviço público.
+                    </p>
+                </footer>
+
             </div>
         </div>
-
-        <div class="version">Versão Atual: <?php echo getCurrentVersion(); ?></div>
-
-        <?php if (isUpdateAvailable()) { ?>
-            <div class="update-available">
-                <div class="update-available-content">
-                    <strong>Nova versão disponível!</strong>
-                    <p>Uma atualização para a versão <?php echo getLatestVersion(); ?> está disponível no GitHub.</p>
-                </div>
-                <a href="https://github.com/adrianolerner/lista-telefonica/releases/latest" class="update-btn" target="_blank">Baixar Última Versão</a>
-            </div>
-        <?php } else {
-		echo '<div class="version"><strong>Você tem a versão mais recente! </strong></div>' ;
-	 }; ?>
-
-        <div class="details">
-            <div class="detail-item">
-                <div class="detail-icon">📱</div>
-                <div>
-                    <h3>Aplicativo de Lista Telefônica para órgãos públicos</h3>
-                    <p>Bem-vindo à aplicação de lista telefônica desenvolvida para um órgão público. Esta aplicação foi construída utilizando PHP, HTML, CSS, JavaScript e MariaDB. O objetivo desta aplicação é fornecer uma interface intuitiva para gerenciar contatos telefônicos do órgão.</p>
-                </div>
-            </div>
-
-            <div class="detail-item">
-                <div class="detail-icon">🔗</div>
-                <div>
-                    <h3>Repositório no GitHub</h3>
-                    <p>Código-fonte aberto disponível para uso, colaboração e inspiração.</p>
-                </div>
-            </div>
-
-            <div class="detail-item">
-                <div class="detail-icon">📄</div>
-                <div>
-                    <h3>Licença MIT</h3>
-                    <p>Software livre para uso, modificação e distribuição, com reconhecimento do autor.</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="links">
-	    <a href="index.php" class="btn btn-back">← Voltar</a>
-            <a href="https://github.com/adrianolerner/lista-telefonica" class="btn" target="_blank">Visitar GitHub</a>
-            <a href="https://github.com/adrianolerner/lista-telefonica/releases" class="btn btn-ghost" target="_blank">Ver Todas Versões</a>
-        </div>
-        <footer>
-            © <?php echo date('Y'); ?> Adriano Lerner Biesek | Prefeitura Municipal de Castro (Paraná). Todos os direitos reservados.
-        </footer>
     </div>
 
-    <?php
-    // Função para obter a última versão do GitHub
-    function getLatestVersion()
-    {
-        $url = 'https://api.github.com/repos/adrianolerner/lista-telefonica/releases/latest';
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Script de Dark Mode (Persistente)
+        const themeToggle = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement;
+        const icon = themeToggle.querySelector('i');
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_USERAGENT, 'ListaTelefonica-App');
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        htmlElement.setAttribute('data-bs-theme', savedTheme);
+        updateIcon(savedTheme);
 
-        $response = curl_exec($ch);
-        curl_close($ch);
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = htmlElement.getAttribute('data-bs-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            htmlElement.setAttribute('data-bs-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateIcon(newTheme);
+        });
 
-        $data = json_decode($response, true);
-
-        return isset($data['tag_name']) ? $data['tag_name'] : '0.0.0';
-    }
-
-    // Função para verificar se há atualização disponível
-    function isUpdateAvailable()
-    {
-        $current = getCurrentVersion();
-        $latest = getLatestVersion();
-
-        // Remove o 'v' inicial se existir para comparação
-        $current = ltrim($current, 'v');
-        $latest = ltrim($latest, 'v');
-
-        return version_compare($latest, $current, '>');
-    }
-    ?>
+        function updateIcon(theme) {
+            if (theme === 'dark') {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            } else {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            }
+        }
+    </script>
 </body>
 </html>

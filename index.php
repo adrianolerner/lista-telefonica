@@ -1,7 +1,4 @@
 <?php
-// ---------------------------------------------------------
-// BLOCO PHP ORIGINAL (MANTIDO INTACTO)
-// ---------------------------------------------------------
 session_start();
 
 //Verificação de IP
@@ -37,9 +34,6 @@ if ($stmtBanner = mysqli_prepare($link, "SELECT banner FROM banner WHERE id_bann
 }
 
 $bannerarray = ['banner' => $banner];
-// ---------------------------------------------------------
-// FIM DO BLOCO PHP ORIGINAL
-// ---------------------------------------------------------
 ?>
 <!DOCTYPE html>
 <html lang="pt-br" data-bs-theme="dark">
@@ -81,16 +75,34 @@ $bannerarray = ['banner' => $banner];
             100% { transform: translate3d(-100%, 0, 0); }
         }
 
-        /* Ajustes da Tabela */
-        table.dataTable td, table.dataTable th { vertical-align: middle; }
+        /* --- AJUSTES DE ESTABILIDADE DA TABELA --- */
+        
         [data-bs-theme="dark"] .table thead th {
             background-color: #2b3035;
             color: #fff;
             border-bottom: 2px solid #495057;
         }
+        
+        /* Define uma altura fixa para as células para evitar pulos */
+        table.dataTable tbody td {
+            vertical-align: middle;
+            height: 60px; /* Altura suficiente para 2 linhas + padding */
+        }
+
+        /* CLASSE MÁGICA: Limita a 2 linhas e põe reticências (...) */
+        .text-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* Número máximo de linhas */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.3; /* Espaçamento entre linhas */
+            max-height: 2.6em; /* Garante o corte visual */
+        }
+
         td a { text-decoration: none; }
 
-        /* Customização dos botões +/- minimalistas */
+        /* Botões +/- */
         table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control:before, 
         table.dataTable.dtr-inline.collapsed > tbody > tr > th.dtr-control:before {
             content: "+";
@@ -118,27 +130,12 @@ $bannerarray = ['banner' => $banner];
             line-height: 14px;
         }
 
-        /* --- ESTILOS DA BARRA DE PESQUISA MODERNA --- */
-        .modern-search-wrapper {
-            transition: all 0.3s ease;
-        }
-        .modern-search-wrapper:focus-within {
-            transform: translateY(-2px);
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-        }
-        .search-icon-box {
-            background-color: var(--bs-body-bg); /* Se adapta ao dark mode */
-            border-color: var(--bs-border-color);
-        }
-        #customSearchBox {
-            background-color: var(--bs-body-bg);
-            border-color: var(--bs-border-color);
-            font-size: 1.1rem; /* Texto levemente maior */
-        }
-        #customSearchBox:focus {
-            box-shadow: none; /* Remove o glow padrão do bootstrap */
-            border-color: var(--bs-border-color);
-        }
+        /* Barra de pesquisa moderna */
+        .modern-search-wrapper { transition: all 0.3s ease; }
+        .modern-search-wrapper:focus-within { transform: translateY(-2px); box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important; }
+        .search-icon-box { background-color: var(--bs-body-bg); border-color: var(--bs-border-color); }
+        #customSearchBox { background-color: var(--bs-body-bg); border-color: var(--bs-border-color); font-size: 1.1rem; }
+        #customSearchBox:focus { box-shadow: none; border-color: var(--bs-border-color); }
     </style>
 </head>
 
@@ -235,26 +232,46 @@ $bannerarray = ['banner' => $banner];
                     if (mysqli_num_rows($result) > 0) {
                 ?>
                     <div class="p-3">
-                        <table id="userTable" class="table table-hover align-middle w-100 border-bottom nowrap">
+                        <table id="userTable" class="table table-hover align-middle w-100 border-bottom">
                             <thead>
                                 <tr>
-                                    <th data-priority="4">SECRETARIA</th>
-                                    <th data-priority="5">SETOR</th>
-                                    <th data-priority="1">NOME</th>
-                                    <th data-priority="2">RAMAL</th>
-                                    <th data-priority="6">E-MAIL</th>
-                                    <th data-priority="3" class="text-end">AÇÃO</th>
+                                    <th data-priority="4" style="width: 20%;">SECRETARIA</th>
+                                    <th data-priority="5" style="width: 20%;">SETOR</th>
+                                    <th data-priority="1" style="width: 25%;">NOME</th>
+                                    <th data-priority="2" class="text-nowrap" style="width: 10%;">RAMAL</th>
+                                    <th data-priority="6" style="width: 15%;">E-MAIL</th>
+                                    <th data-priority="3" class="text-end" style="width: 10%;">AÇÃO</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php
                                 while ($row = mysqli_fetch_array($result)) {
+                                    $secretaria = htmlspecialchars($row['secretaria']);
+                                    $setor = htmlspecialchars($row['setor']);
+                                    $nome = htmlspecialchars($row['nome']);
+                                    $email = htmlspecialchars($row['email']);
+
                                     echo "<tr>";
-                                    echo "<td class='fw-semibold small'>" . htmlspecialchars($row['secretaria']) . "</td>";
-                                    echo "<td><span class='badge bg-secondary bg-opacity-25 text-body border'>" . htmlspecialchars($row['setor']) . "</span></td>";
-                                    echo "<td class='fw-bold'>" . htmlspecialchars($row['nome']) . "</td>";
-                                    echo "<td class='text-primary fw-bold'>" . htmlspecialchars($row['ramal']) . "</td>";
-                                    echo "<td class='small text-muted'>" . htmlspecialchars($row['email']) . "</td>";
+                                    
+                                    echo "<td class='fw-semibold small'>";
+                                    echo "<div class='text-clamp-2' title='$secretaria'>$secretaria</div>";
+                                    echo "</td>";
+                                    
+                                    echo "<td>";
+                                    echo "<span class='badge bg-secondary bg-opacity-25 text-body border text-wrap text-start w-100'>";
+                                    echo "<div class='text-clamp-2' title='$setor'>$setor</div>";
+                                    echo "</span>";
+                                    echo "</td>";
+                                    
+                                    echo "<td class='fw-bold'>";
+                                    echo "<div class='text-clamp-2' title='$nome'>$nome</div>";
+                                    echo "</td>";
+                                    
+                                    echo "<td class='text-primary fw-bold text-nowrap'>" . htmlspecialchars($row['ramal']) . "</td>";
+                                    
+                                    echo "<td class='small text-muted'>";
+                                    echo "<div class='text-clamp-2' title='$email'>$email</div>";
+                                    echo "</td>";
                                     
                                     echo "<td class='text-end text-nowrap'>";
                                     echo "<a href='read.php?id_lista=" . urlencode($row['id_lista']) . "' class='btn btn-sm btn-info text-white me-1' title='Ver detalhes...'><i class='fa fa-eye'></i></a>";
@@ -295,6 +312,7 @@ $bannerarray = ['banner' => $banner];
                             <a href="https://castro.pr.gov.br/pontos/" target="_blank" class="btn btn-outline-secondary btn-sm"><i class="fa fa-map-marked-alt me-1"></i> Mapa</a>
                         <?php } ?>
                         <a href="https://castro.atende.net" target="_blank" class="btn btn-outline-primary btn-sm"><i class="fa fa-external-link-alt me-1"></i> Portal</a>
+                        <a href="sobre.php" class="btn btn-outline-secondary btn-sm"><i class="fa fa-info-circle me-1"></i> Sobre</a>
                     </div>
                 </div>
                 <div class="col-lg-6 col-md-12 mb-4 mb-md-0 text-center text-lg-end">
@@ -318,7 +336,6 @@ $bannerarray = ['banner' => $banner];
 
     <script>
         $(document).ready(function () {
-            // Inicializar a tabela
             var table = $('#userTable').DataTable({
                 responsive: true,
                 order: [[2, 'asc']],
@@ -338,21 +355,13 @@ $bannerarray = ['banner' => $banner];
                     "sLoadingRecords": "Carregando...",
                     "sProcessing":   "Processando...",
                     "sZeroRecords":  "Nenhum registro encontrado",
-                    // IMPORTANTE: Removemos os textos internos de busca padrão, pois usamos a busca externa
                     "oPaginate": { "sNext": "Próximo", "sPrevious": "Anterior", "sFirst": "Primeiro", "sLast": "Último" }
                 },
-                // ALTERAÇÃO DO DOM:
-                // Removemos o 'f' (filter) padrão da estrutura, mantendo o 'l' (length/quantidade) e a paginação 'p'
-                // l = length changing input control
-                // t = table
-                // i = table information summary
-                // p = pagination control
                 dom: "<'row'<'col-sm-12'l>>" +
                      "<'row'<'col-sm-12'tr>>" +
                      "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
             });
 
-            // VINCULAR O CAMPO DE PESQUISA EXTERNO AO DATATABLES
             $('#customSearchBox').on('keyup', function () {
                 table.search(this.value).draw();
             });
