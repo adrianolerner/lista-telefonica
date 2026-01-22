@@ -6,12 +6,12 @@ Bem-vindo ao repositório da aplicação de lista telefônica desenvolvida para 
 
 ## Índice
 
-* [Requisitos de Software](https://www.google.com/search?q=%23requisitos-de-software)
-* [Instalação](https://www.google.com/search?q=%23instala%C3%A7%C3%A3o)
-* [Configuração](https://www.google.com/search?q=%23configura%C3%A7%C3%A3o)
-* [Uso](https://www.google.com/search?q=%23uso)
-* [Interface e Temas](https://www.google.com/search?q=%23interface-e-temas)
-* [Contribuição](https://www.google.com/search?q=%23contribui%C3%A7%C3%A3o)
+* [Requisitos de Software](https://github.com/adrianolerner/lista-telefonica?tab=readme-ov-file#requisitos-de-software)
+* [Instalação](https://github.com/adrianolerner/lista-telefonica?tab=readme-ov-file#instala%C3%A7%C3%A3o)
+* [Configuração](https://github.com/adrianolerner/lista-telefonica?tab=readme-ov-file#configura%C3%A7%C3%A3o)
+* [Uso](https://github.com/adrianolerner/lista-telefonica?tab=readme-ov-file#uso)
+* [Interface e Temas](https://github.com/adrianolerner/lista-telefonica?tab=readme-ov-file#interface-e-temas)
+* [Contribuição](https://github.com/adrianolerner/lista-telefonica?tab=readme-ov-file#contribui%C3%A7%C3%A3o)
 
 ## Requisitos de Software
 
@@ -91,7 +91,7 @@ $orgao = "PREFEITURA DE SUA CIDADE";
 
 ```
 
-A aplicação possui um filtro de segurança para exibir o botão de Login apenas em redes internas. No `index.php` e `acesso.php`, configure a faixa de IP permitida:
+A aplicação possui um filtro de segurança para exibir o botão de Login apenas em redes internas. No `index.php`, `acesso.php` e `verifica_login.php`, configure a faixa de IP permitida:
 
 ```php
 if (!fnmatch("172.16.0.*", $ipaddress))
