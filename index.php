@@ -131,8 +131,8 @@ $bannerarray = ['banner' => $banner];
         table.dataTable.dtr-inline.collapsed > tbody > tr.parent > td.dtr-control:before, 
         table.dataTable.dtr-inline.collapsed > tbody > tr.parent > th.dtr-control:before {
             content: "-";
-            border-color: var(--bs-secondary);
-            color: var(--bs-secondary);
+            border-color: var(--bs-warning-subtle);
+            color: var(--bs-warning-subtle);
             line-height: 14px;
         }
 
@@ -261,7 +261,7 @@ $bannerarray = ['banner' => $banner];
                         <table id="userTable" class="table table-hover align-middle w-100 border-bottom">
                             <thead>
                                 <tr>
-                                    <th data-priority="1" class="text-center" style="width: 5%;"><i class="fa fa-star text-warning"></i></th>
+                                    <th data-priority="1" class="text-left" style="width: 5%;"><i class="fa fa-star text-warning"></i></th>
                                     
                                     <th data-priority="5" style="width: 20%;">SECRETARIA</th>
                                     <th data-priority="6" style="width: 20%;">SETOR</th>
@@ -284,7 +284,7 @@ $bannerarray = ['banner' => $banner];
                                     
                                     // NOVO: Célula da Estrela
                                     // data-order="0" é padrão (sem estrela). O JS vai mudar para "1" se for favorito.
-                                    echo "<td class='text-center' data-order='0'>"; 
+                                    echo "<td class='text-left' data-order='0'>"; 
                                     echo "<i class='fa fa-star star-btn' data-id='" . $id . "' title='Favoritar contato'></i>";
                                     echo "</td>";
                                     
