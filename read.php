@@ -161,14 +161,14 @@ if (isset($_GET["id_lista"]) && !empty(trim($_GET["id_lista"]))) {
                                     </div>
                                     <div>
                                         <div class="detail-label">Ramal</div>
-                                        <div class="detail-value text-primary fs-4"><i class="far fa-copy" style="cursor:pointer; margin-right:8px; font-size: 0.8em;" onclick="copyToClipboard('<?php echo htmlspecialchars(preg_replace('/\D/', '', $row['ramal'])) ?>')" title="Copiar ramal"></i><a href="tel:<?php echo htmlspecialchars(preg_replace('/\D/', '', $row['ramal'])) ?>"><?php echo htmlspecialchars($ramal); ?></a></div>
+                                        <div class="detail-value text-primary fs-4"><i class="far fa-copy" style="cursor:pointer; margin-right:8px;" onclick="copyToClipboard('<?php echo htmlspecialchars(preg_replace('/\D/', '', $row['ramal'])) ?>')" title="Copiar ramal"></i><a href="tel:<?php echo htmlspecialchars(preg_replace('/\D/', '', $row['ramal'])) ?>"><?php echo htmlspecialchars($ramal); ?></a></div>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="col-md-6">
                                 <div class="d-flex align-items-start">
-                                    <div class="icon-box bg-info text-white">
+                                    <div class="icon-box bg-primary">
                                         <i class="fa fa-envelope"></i>
                                     </div>
                                     <div class="overflow-hidden">
