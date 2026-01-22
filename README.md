@@ -60,6 +60,9 @@ Importe o arquivo `agenda.sql` localizado na raiz do projeto:
 mysql -u usuario -p agenda < agenda.sql
 
 ```
+** ATUALIZAÇÃO PARA A VERSÃO 0.14 **
+
+OBSERVAÇÃO: PARA ATUALIZAR PARA A VERSÃO 0.14 SERÁ NECESSÁRIO IMPORTAR O NOVO ARQUIVO DE BANCO QUE CONTEM A TABELA NOVA DE STATS E NOVAS COLUNAS PARA OS NOVOS DADOS, OU FAZER OS AJUSTES MANUAIS EM SEU BANCO COM BASE NO ARQUIVO SQL DE EXEMPLO.
 
 ### 3. Variáveis de Ambiente (Segurança)
 
