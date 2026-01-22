@@ -14,6 +14,7 @@ $nome_err = $ramal_err = $email_err = $setor_err = $secretaria_err = "";
 // Processamento de dados do formulário quando o formulário é enviado
 if (isset($_POST["id_lista"]) && !empty($_POST["id_lista"])) {
     $id_lista = $_POST["id_lista"];
+    
     // Valida nome
     $input_nome = trim($_POST["nome"]);
     if (empty($input_nome)) {
@@ -23,6 +24,7 @@ if (isset($_POST["id_lista"]) && !empty($_POST["id_lista"])) {
     } else {
         $nome = $input_nome;
     }
+    
     // Valida ramal
     $input_ramal = trim($_POST["ramal"]);
     if (empty($input_ramal)) {
@@ -32,6 +34,7 @@ if (isset($_POST["id_lista"]) && !empty($_POST["id_lista"])) {
     } else {
         $ramal = $input_ramal;
     }
+    
     // Valida e-mail
     $input_email = trim($_POST["email"]);
     if (empty($input_email)) {
@@ -41,6 +44,7 @@ if (isset($_POST["id_lista"]) && !empty($_POST["id_lista"])) {
     } else {
         $email = $input_email;
     }
+    
     // Valida setor
     $input_setor = trim($_POST["setor"]);
     if (empty($input_setor)) {
@@ -48,6 +52,7 @@ if (isset($_POST["id_lista"]) && !empty($_POST["id_lista"])) {
     } else {
         $setor = $input_setor;
     }
+    
     // Valida secretaria
     $input_secretaria = trim($_POST["secretaria"]);
     if (empty($input_secretaria)) {
@@ -55,10 +60,55 @@ if (isset($_POST["id_lista"]) && !empty($_POST["id_lista"])) {
     } else {
         $secretaria = $input_secretaria;
     }
+
     // Verifica os erros de entrada antes de inserir no banco de dados
     if (empty($nome_err) && empty($ramal_err) && empty($email_err) && empty($setor_err) && empty($secretaria_err)) {
+        
+        // ---------------------------------------------------------
+        // 1. BUSCA DADOS ANTIGOS PARA COMPARAR (AUDITORIA)
+        // ---------------------------------------------------------
+        $dados_antigos = [];
+        $sql_old = "SELECT * FROM lista WHERE id_lista = ?";
+        if($stmt_old = mysqli_prepare($link, $sql_old)){
+            mysqli_stmt_bind_param($stmt_old, "i", $id_lista);
+            mysqli_stmt_execute($stmt_old);
+            $res_old = mysqli_stmt_get_result($stmt_old);
+            $dados_antigos = mysqli_fetch_assoc($res_old);
+            mysqli_stmt_close($stmt_old);
+        }
+
+        // 2. MONTA A STRING DE DETALHES DA MUDANÇA
+        $mudancas = [];
+        
+        // Compara Nome
+        if ($dados_antigos['nome'] != $nome) {
+            $mudancas[] = "Registro Alterado: <br> Nome: <s>" . $dados_antigos['nome'] . "</s> &rarr; <strong class='text-success'>" . $nome . "</strong>";
+        }
+        // Compara Ramal
+        if ($dados_antigos['ramal'] != $ramal) {
+            $mudancas[] = "Registro Alterado: <br> Ramal: <s>" . $dados_antigos['ramal'] . "</s> &rarr; <strong class='text-success'>" . $ramal . "</strong>";
+        }
+        // Compara Email
+        if ($dados_antigos['email'] != $email) {
+            $mudancas[] = "Registro Alterado: <br> Email: <s>" . $dados_antigos['email'] . "</s> &rarr; <strong class='text-success'>" . $email . "</strong>";
+        }
+        // Compara Setor
+        if ($dados_antigos['setor'] != $setor) {
+            $mudancas[] = "Registro Alterado: <br> Setor: <s>" . $dados_antigos['setor'] . "</s> &rarr; <strong class='text-success'>" . $setor . "</strong>";
+        }
+        // Compara Secretaria (ID)
+        if ($dados_antigos['secretaria'] != $secretaria) {
+            // Nota: Compara o ID da secretaria. Para mostrar o nome seria necessário mais queries, 
+            // mas o ID já serve para auditoria técnica.
+            $mudancas[] = "Registro Alterado: <br> Secretaria (ID): <s>" . $dados_antigos['secretaria'] . "</s> &rarr; <strong class='text-success'>" . $secretaria . "</strong>";
+        }
+
+        $detalhes_log = implode("<br>", $mudancas);
+        // ---------------------------------------------------------
+
         $sql = "UPDATE lista SET nome=?, ramal=?, email=?, setor=?, secretaria=? WHERE id_lista=?";
-        // Prepara a instrução de inserção na tabela lista
+        
+        // Prepara a instrução de atualização
         if ($stmt = mysqli_prepare($link, $sql)) {
             mysqli_stmt_bind_param($stmt, "sssssi", $param_nome, $param_ramal, $param_email, $param_setor, $param_secretaria, $param_id);
 
@@ -71,13 +121,17 @@ if (isset($_POST["id_lista"]) && !empty($_POST["id_lista"])) {
 
             if (mysqli_stmt_execute($stmt)) {
 
-                // REGISTRA O LOG DE ALTERAÇÃO
+                // REGISTRA O LOG DE ALTERAÇÃO (COM DETALHES)
                 $acao = "Atualização";
                 $usuario = $_SESSION['usuario'];
                 $datahora = date('Y-m-d H:i:s');
-                $sql_log = "INSERT INTO log_alteracoes (acao, id_lista, ramal, usuario, ip, datahora) VALUES (?, ?, ?, ?, ?, ?)";
+                
+                // Query atualizada para incluir 'detalhes'
+                $sql_log = "INSERT INTO log_alteracoes (acao, id_lista, ramal, usuario, ip, datahora, detalhes) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                
                 if ($stmt_log = mysqli_prepare($link, $sql_log)) {
-                    mysqli_stmt_bind_param($stmt_log, "sissss", $acao, $id_lista, $ramal, $usuario, $ipaddress, $datahora);
+                    // Note o "sisssss" (mais um 's' no final para o texto de detalhes)
+                    mysqli_stmt_bind_param($stmt_log, "sisssss", $acao, $id_lista, $ramal, $usuario, $ipaddress, $datahora, $detalhes_log);
                     mysqli_stmt_execute($stmt_log);
                     mysqli_stmt_close($stmt_log);
                 }

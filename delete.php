@@ -11,21 +11,30 @@ $ipaddress = strstr($ip, ',', true);
 if (isset($_POST["id_lista"]) && !empty($_POST["id_lista"])) {
     // Inclui config file
     require_once "config.php";
-
-    // Primeiro buscamos o ramal para registrar no log antes de apagar
+    
     $id_lista = trim($_POST["id_lista"]);
-    $ramal = "";
-    $sql_ramal = "SELECT ramal FROM lista WHERE id_lista = ?";
-    if ($stmt_ramal = mysqli_prepare($link, $sql_ramal)) {
-        mysqli_stmt_bind_param($stmt_ramal, "i", $id_lista);
-        if (mysqli_stmt_execute($stmt_ramal)) {
-            $result = mysqli_stmt_get_result($stmt_ramal);
+
+    // ---------------------------------------------------------
+    // 1. BUSCA DADOS COMPLETOS ANTES DE APAGAR (BACKUP PARA LOG)
+    // ---------------------------------------------------------
+    $nome = $ramal = $email = $setor = $secretaria = "";
+    
+    $sql_backup = "SELECT nome, ramal, email, setor, secretaria FROM lista WHERE id_lista = ?";
+    if ($stmt_backup = mysqli_prepare($link, $sql_backup)) {
+        mysqli_stmt_bind_param($stmt_backup, "i", $id_lista);
+        if (mysqli_stmt_execute($stmt_backup)) {
+            $result = mysqli_stmt_get_result($stmt_backup);
             if ($row = mysqli_fetch_assoc($result)) {
+                $nome = $row['nome'];
                 $ramal = $row['ramal'];
+                $email = $row['email'];
+                $setor = $row['setor'];
+                $secretaria = $row['secretaria']; // ID da secretaria
             }
         }
-        mysqli_stmt_close($stmt_ramal);
+        mysqli_stmt_close($stmt_backup);
     }
+    // ---------------------------------------------------------
 
     // Prepara o statement de delete
     $sql = "DELETE FROM lista WHERE id_lista = ?";
@@ -35,16 +44,30 @@ if (isset($_POST["id_lista"]) && !empty($_POST["id_lista"])) {
         // Tenta executar os parametros configurados
         if (mysqli_stmt_execute($stmt)) {
 
-            // REGISTRA O LOG DE EXCLUSÃO
+            // ---------------------------------------------------------
+            // REGISTRA O LOG DE EXCLUSÃO (COM DETALHES)
+            // ---------------------------------------------------------
             $acao = "Exclusão";
             $usuario = $_SESSION['usuario'];
             $datahora = date('Y-m-d H:i:s');
-            $sql_log = "INSERT INTO log_alteracoes (acao, id_lista, ramal, usuario, ip, datahora) VALUES (?, ?, ?, ?, ?, ?)";
+            
+            // Monta string com dados riscados para indicar remoção
+            $detalhes_log = "Registro Apagado:<br>" .
+                            "Nome: <s>$nome</s><br>" .
+                            "Ramal: <s>$ramal</s><br>" .
+                            "Setor: <s>$setor</s><br>" .
+                            "Email: <s>$email</s>";
+
+            // Query atualizada com coluna 'detalhes'
+            $sql_log = "INSERT INTO log_alteracoes (acao, id_lista, ramal, usuario, ip, datahora, detalhes) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            
             if ($stmt_log = mysqli_prepare($link, $sql_log)) {
-                mysqli_stmt_bind_param($stmt_log, "sissss", $acao, $id_lista, $ramal, $usuario, $ipaddress, $datahora);
+                // Bind atualizado para "sisssss"
+                mysqli_stmt_bind_param($stmt_log, "sisssss", $acao, $id_lista, $ramal, $usuario, $ipaddress, $datahora, $detalhes_log);
                 mysqli_stmt_execute($stmt_log);
                 mysqli_stmt_close($stmt_log);
             }
+            // ---------------------------------------------------------
 
             // Redireciona para o index após exclusão
             header("location: index.php");

@@ -28,6 +28,16 @@ if ($admin === "s") {
         $ip = $_SERVER['HTTP_X_REAL_IP'] ?? $_SERVER['REMOTE_ADDR'];
         $ipaddress = strstr($ip, ',', true) ?: $ip; // Se não houver vírgula, usa o IP inteiro
 
+        // ---------------------------------------------------------
+        // 1. CONTA REGISTROS ANTES DE APAGAR (PARA LOG)
+        // ---------------------------------------------------------
+        $total_registros = 0;
+        $sqlCount = "SELECT COUNT(*) FROM lista";
+        if ($resCount = mysqli_query($link, $sqlCount)) {
+            $total_registros = mysqli_fetch_row($resCount)[0];
+        }
+        // ---------------------------------------------------------
+
         // Executa exclusão total e reseta o AUTO_INCREMENT
         $sqlDelete = "DELETE FROM lista";
         $sqlResetAI = "ALTER TABLE lista AUTO_INCREMENT = 1";
@@ -35,19 +45,28 @@ if ($admin === "s") {
         if (mysqli_query($link, $sqlDelete)) {
             mysqli_query($link, $sqlResetAI);
 
-            // REGISTRA O LOG DE EXCLUSÃO
-            $acao = "LIMPEZA TOTAL (RESET)"; // Ação destacada no log
+            // ---------------------------------------------------------
+            // REGISTRA O LOG DE LIMPEZA TOTAL
+            // ---------------------------------------------------------
+            $acao = "Limpeza Total"; // Ação destacada no log
             $ramal = "TODOS";
             $id_lista = 0;
             $usuario = $_SESSION['usuario'];
             $datahora = date('Y-m-d H:i:s');
             
-            $sql_log = "INSERT INTO log_alteracoes (acao, id_lista, ramal, usuario, ip, datahora) VALUES (?, ?, ?, ?, ?, ?)";
+            // Monta detalhes com a quantidade apagada
+            $detalhes_log = "<strong class='text-danger'>OPERAÇÃO CRÍTICA:</strong><br>" .
+                            "Tabela de contatos resetada.<br>" .
+                            "Total de registros removidos: <strong>$total_registros</strong>";
+
+            $sql_log = "INSERT INTO log_alteracoes (acao, id_lista, ramal, usuario, ip, datahora, detalhes) VALUES (?, ?, ?, ?, ?, ?, ?)";
             if ($stmt_log = mysqli_prepare($link, $sql_log)) {
-                mysqli_stmt_bind_param($stmt_log, "sissss", $acao, $id_lista, $ramal, $usuario, $ipaddress, $datahora);
+                // Bind atualizado para "sisssss"
+                mysqli_stmt_bind_param($stmt_log, "sisssss", $acao, $id_lista, $ramal, $usuario, $ipaddress, $datahora, $detalhes_log);
                 mysqli_stmt_execute($stmt_log);
                 mysqli_stmt_close($stmt_log);
             }
+            // ---------------------------------------------------------
 
             header("Location: index.php");
             exit;

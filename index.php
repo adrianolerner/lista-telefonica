@@ -12,6 +12,12 @@ $orgao = "PREFEITURA DE CASTRO";
 // Checagens de usuário
 include('config.php');
 
+// Registro de acessos
+$data_hoje = date('Y-m-d');
+$sql_stats = "INSERT INTO stats_diario (data, acessos) VALUES ('$data_hoje', 1) 
+              ON DUPLICATE KEY UPDATE acessos = acessos + 1";
+mysqli_query($link, $sql_stats);
+
 $useradmin = @$_SESSION['usuario'];
 
 if ($stmt = mysqli_prepare($link, "SELECT admin FROM usuarios WHERE usuario = ?")) {
@@ -136,6 +142,22 @@ $bannerarray = ['banner' => $banner];
         .search-icon-box { background-color: var(--bs-body-bg); border-color: var(--bs-border-color); }
         #customSearchBox { background-color: var(--bs-body-bg); border-color: var(--bs-border-color); font-size: 1.1rem; }
         #customSearchBox:focus { box-shadow: none; border-color: var(--bs-border-color); }
+
+        /* --- NOVO: ESTILO DOS FAVORITOS (ESTRELAS) --- */
+        .star-btn {
+            cursor: pointer;
+            color: #6c757d; /* Cinza desativado */
+            font-size: 1.2rem;
+            transition: all 0.2s ease;
+        }
+        .star-btn:hover {
+            color: #ffc107; /* Amarelo ao passar o mouse */
+            transform: scale(1.2);
+        }
+        .star-btn.active {
+            color: #ffc107; /* Amarelo ativado */
+            text-shadow: 0 0 5px rgba(255, 193, 7, 0.5);
+        }
     </style>
 </head>
 
@@ -186,7 +208,10 @@ $bannerarray = ['banner' => $banner];
                     <div class="d-flex flex-wrap gap-2 justify-content-center justify-content-md-start align-items-center">
                         <span class="badge bg-primary me-2 p-2"><i class="fa fa-cogs"></i> Painel</span>
                         <a href="create.php" class="btn btn-success btn-sm" title="Adicionar novo ramal à lista"><i class="fa fa-plus me-1"></i> Novo Ramal</a>
+                        
                         <?php if ($adminarray['admin'] == "s") { ?>
+                            <a href="dashboard.php" class="btn btn-info btn-sm text-white" title="Visualizar Dashboard e Estatísticas"><i class="fa fa-chart-line me-1"></i> Dashboard</a>
+
                             <div class="btn-group btn-group-sm" role="group">
                                 <a href="usuarios/index.php" class="btn btn-outline-primary" title="Gerenciar usuários do sistema"><i class="fa fa-users"></i> Usuários</a>
                                 <a href="secretarias/index.php" class="btn btn-outline-primary" title="Gerenciar secretarias cadastradas"><i class="fa fa-building"></i> Secretarias</a>
@@ -199,6 +224,7 @@ $bannerarray = ['banner' => $banner];
                             </div>
                             <a href="delete_all.php" class="btn btn-danger btn-sm" onclick="return confirm('Apagar TUDO?');" title="Apagar todos os registros da lista (Cuidado!)"><i class="fa fa-trash-alt"></i></a>
                         <?php } ?>
+                        
                         <div class="ms-auto border-start ps-2">
                             <a href="senha.php?user=<?php echo htmlspecialchars($useradmin); ?>" class="btn btn-warning btn-sm text-dark" title="Alterar senha do usuário"><i class="fa fa-key"></i></a>
                             <a href="logout.php" class="btn btn-secondary btn-sm" title="Sair do sistema"><i class="fa fa-sign-out-alt"></i> Sair</a>
@@ -235,12 +261,14 @@ $bannerarray = ['banner' => $banner];
                         <table id="userTable" class="table table-hover align-middle w-100 border-bottom">
                             <thead>
                                 <tr>
-                                    <th data-priority="4" style="width: 20%;">SECRETARIA</th>
-                                    <th data-priority="5" style="width: 20%;">SETOR</th>
-                                    <th data-priority="1" style="width: 25%;">NOME</th>
-                                    <th data-priority="2" class="text-nowrap" style="width: 10%;">RAMAL</th>
-                                    <th data-priority="6" style="width: 15%;">E-MAIL</th>
-                                    <th data-priority="3" class="text-end" style="width: 10%;">AÇÃO</th>
+                                    <th data-priority="1" class="text-center" style="width: 5%;"><i class="fa fa-star text-warning"></i></th>
+                                    
+                                    <th data-priority="5" style="width: 20%;">SECRETARIA</th>
+                                    <th data-priority="6" style="width: 20%;">SETOR</th>
+                                    <th data-priority="2" style="width: 25%;">NOME</th>
+                                    <th data-priority="3" class="text-nowrap" style="width: 10%;">RAMAL</th>
+                                    <th data-priority="7" style="width: 15%;">E-MAIL</th>
+                                    <th data-priority="4" class="text-end" style="width: 10%;">AÇÃO</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -250,8 +278,15 @@ $bannerarray = ['banner' => $banner];
                                     $setor = htmlspecialchars($row['setor']);
                                     $nome = htmlspecialchars($row['nome']);
                                     $email = htmlspecialchars($row['email']);
+                                    $id = $row['id_lista'];
 
                                     echo "<tr>";
+                                    
+                                    // NOVO: Célula da Estrela
+                                    // data-order="0" é padrão (sem estrela). O JS vai mudar para "1" se for favorito.
+                                    echo "<td class='text-center' data-order='0'>"; 
+                                    echo "<i class='fa fa-star star-btn' data-id='" . $id . "' title='Favoritar contato'></i>";
+                                    echo "</td>";
                                     
                                     echo "<td class='fw-semibold small'>";
                                     echo "<div class='text-clamp-2' title='$secretaria'>$secretaria</div>";
@@ -336,13 +371,42 @@ $bannerarray = ['banner' => $banner];
 
     <script>
         $(document).ready(function () {
+            // --- LÓGICA DE FAVORITOS (LOCALSTORAGE) ---
+            
+            // 1. Carrega favoritos salvos ou cria array vazio
+            let favorites = JSON.parse(localStorage.getItem('lista_favoritos') || '[]');
+
+            // 2. Função para aplicar visual e ordenação (data-order)
+            function applyFavorites() {
+                $('.star-btn').each(function() {
+                    let id = $(this).data('id').toString();
+                    let parentTd = $(this).parent();
+
+                    if (favorites.includes(id)) {
+                        $(this).addClass('active');
+                        // Define valor alto para ordenação
+                        parentTd.attr('data-order', '1'); 
+                    } else {
+                        $(this).removeClass('active');
+                        // Define valor baixo para ordenação
+                        parentTd.attr('data-order', '0'); 
+                    }
+                });
+            }
+
+            // Aplica visualmente antes de iniciar o DataTable
+            applyFavorites();
+
+            // 3. Inicializa DataTable
             var table = $('#userTable').DataTable({
                 responsive: true,
-                order: [[2, 'asc']],
+                // Ordena primeiro pela coluna 0 (Estrelas) DESCendente, depois pelo Nome (Coluna 3) ASCendente
+                order: [[0, 'desc'], [3, 'asc']], 
                 columnDefs: [
-                    { responsivePriority: 1, targets: 2 },
-                    { responsivePriority: 2, targets: 3 },
-                    { responsivePriority: 3, targets: -1 }
+                    { responsivePriority: 1, targets: 3 }, // Nome
+                    { responsivePriority: 2, targets: 4 }, // Ramal
+                    { responsivePriority: 3, targets: 0 }, // Estrela
+                    { responsivePriority: 4, targets: -1 } // Ação
                 ],
                 language: {
                     "sEmptyTable":   "Nenhum registro encontrado",
@@ -361,15 +425,38 @@ $bannerarray = ['banner' => $banner];
                      "<'row'<'col-sm-12'tr>>" +
                      "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
             });
-            // Evento disparado ao trocar de página
-            table.on('page.dt', function () {
-                // Verifica se a quantidade de registros por página é maior que 10
-                var pageLength = table.page.len();
+
+            // 4. Evento de Clique na Estrela
+            $('#userTable').on('click', '.star-btn', function() {
+                let id = $(this).data('id').toString();
+                let index = favorites.indexOf(id);
+
+                if (index === -1) {
+                    favorites.push(id); // Adiciona
+                } else {
+                    favorites.splice(index, 1); // Remove
+                }
                 
+                // Salva no navegador
+                localStorage.setItem('lista_favoritos', JSON.stringify(favorites));
+
+                // Atualiza visual
+                applyFavorites();
+
+                // Avisa o DataTables que os dados mudaram e pede para reordenar/redesenhar
+                // O 'false' evita que a paginação resete para a página 1
+                table.rows().invalidate().draw(false);
+            });
+
+            // --- FIM LÓGICA FAVORITOS ---
+
+            // Evento disparado ao trocar de página (Ajuste de scroll)
+            table.on('page.dt', function () {
+                var pageLength = table.page.len();
                 if (pageLength > 10) {
                     $('html, body').animate({
                         scrollTop: $(".card").offset().top - 20
-                    }, 'fast'); // 'fast' para uma subida suave, ou 0 para instantâneo
+                    }, 'fast');
                 }
             });
             $('#customSearchBox').on('keyup', function () {
@@ -403,7 +490,7 @@ $bannerarray = ['banner' => $banner];
                 icon.classList.add('fa-moon');
             }
         }
-		function copyToClipboard(text) {
+        function copyToClipboard(text) {
             navigator.clipboard.writeText(text).then(() => {
                 alert("Copiado para a área de transferência: " + text);
             }).catch(err => {

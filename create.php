@@ -77,18 +77,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 // Obtém o ID recém-inserido
                 $id_lista = mysqli_insert_id($link);
 
-                // Registro de log na tabela log_alteracoes
+                // ---------------------------------------------------------
+                // REGISTRA O LOG DE ALTERAÇÃO (COM DETALHES)
+                // ---------------------------------------------------------
                 $usuario = $_SESSION['usuario'];
                 $acao = 'Inclusão';
                 $ramal_log = $ramal;
                 $datahora = date('Y-m-d H:i:s');
 
-                $sql_log = "INSERT INTO log_alteracoes (acao, id_lista, ramal, usuario, ip, datahora) VALUES (?, ?, ?, ?, ?, ?)";
+                // Monta a string de detalhes com os dados inseridos
+                $detalhes_log = "Registro Criado:<br>" .
+                                "Nome: <strong class='text-success'>$nome</strong><br>" .
+                                "Ramal: <strong class='text-success'>$ramal</strong><br>" .
+                                "Email: <strong class='text-success'>$email</strong><br>" .
+                                "Setor: <strong class='text-success'>$setor</strong><br>" .
+                                "Secretaria ID: <strong class='text-success'>$secretaria</strong>";
+
+                // Atualizei a query para incluir a coluna 'detalhes'
+                $sql_log = "INSERT INTO log_alteracoes (acao, id_lista, ramal, usuario, ip, datahora, detalhes) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                
                 if ($stmt_log = mysqli_prepare($link, $sql_log)) {
-                    mysqli_stmt_bind_param($stmt_log, "sissss", $acao, $id_lista, $ramal, $usuario, $ipaddress, $datahora);
+                    // Atualizei o bind para "sisssss" (7 parâmetros)
+                    mysqli_stmt_bind_param($stmt_log, "sisssss", $acao, $id_lista, $ramal, $usuario, $ipaddress, $datahora, $detalhes_log);
                     mysqli_stmt_execute($stmt_log);
                     mysqli_stmt_close($stmt_log);
                 }
+                // ---------------------------------------------------------
 
                 // Redireciona após inserção
                 header("location: index.php");
@@ -216,7 +230,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         if ($result_sec->num_rows > 0) {
                                             $first = true;
                                             while ($row = $result_sec->fetch_assoc()) {
-                                                // Lógica original mantida para seleção (caso ocorra erro e a página recarregue)
+                                                // Lógica original para seleção
                                                 if (!empty($secretaria)) {
                                                     $selected = ($row["id_secretaria"] == $secretaria) ? 'selected' : '';
                                                 } else {
