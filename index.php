@@ -56,9 +56,16 @@ $bannerarray = ['banner' => $banner];
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bs-body-bg); }
-        .navbar-brand img { height: 40px; margin-right: 10px; }
-        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bs-body-bg);
+        }
+
+        .navbar-brand img {
+            height: 40px;
+            margin-right: 10px;
+        }
+
         /* Banner Rolante */
         .news-ticker-container {
             background: var(--bs-tertiary-bg);
@@ -69,6 +76,7 @@ $bannerarray = ['banner' => $banner];
             display: flex;
             align-items: center;
         }
+
         .news-ticker-text {
             display: inline-block;
             padding-left: 100%;
@@ -76,41 +84,53 @@ $bannerarray = ['banner' => $banner];
             font-weight: 500;
             color: var(--bs-emphasis-color);
         }
+
         @keyframes ticker {
-            0% { transform: translate3d(0, 0, 0); }
-            100% { transform: translate3d(-100%, 0, 0); }
+            0% {
+                transform: translate3d(0, 0, 0);
+            }
+
+            100% {
+                transform: translate3d(-100%, 0, 0);
+            }
         }
 
         /* --- AJUSTES DE ESTABILIDADE DA TABELA --- */
-        
+
         [data-bs-theme="dark"] .table thead th {
             background-color: #2b3035;
             color: #fff;
             border-bottom: 2px solid #495057;
         }
-        
+
         /* Define uma altura fixa para as células para evitar pulos */
         table.dataTable tbody td {
             vertical-align: middle;
-            height: 60px; /* Altura suficiente para 2 linhas + padding */
+            height: 60px;
+            /* Altura suficiente para 2 linhas + padding */
         }
 
         /* CLASSE MÁGICA: Limita a 2 linhas e põe reticências (...) */
         .text-clamp-2 {
             display: -webkit-box;
-            -webkit-line-clamp: 2; /* Número máximo de linhas */
+            -webkit-line-clamp: 2;
+            /* Número máximo de linhas */
             -webkit-box-orient: vertical;
             overflow: hidden;
             text-overflow: ellipsis;
-            line-height: 1.3; /* Espaçamento entre linhas */
-            max-height: 2.6em; /* Garante o corte visual */
+            line-height: 1.3;
+            /* Espaçamento entre linhas */
+            max-height: 2.6em;
+            /* Garante o corte visual */
         }
 
-        td a { text-decoration: none; }
+        td a {
+            text-decoration: none;
+        }
 
         /* Botões +/- */
-        table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control:before, 
-        table.dataTable.dtr-inline.collapsed > tbody > tr > th.dtr-control:before {
+        table.dataTable.dtr-inline.collapsed>tbody>tr>td.dtr-control:before,
+        table.dataTable.dtr-inline.collapsed>tbody>tr>th.dtr-control:before {
             content: "+";
             font-family: "Courier New", Courier, monospace;
             font-weight: 900;
@@ -128,8 +148,9 @@ $bannerarray = ['banner' => $banner];
             transform: translateY(-50%);
             margin-right: 10px;
         }
-        table.dataTable.dtr-inline.collapsed > tbody > tr.parent > td.dtr-control:before, 
-        table.dataTable.dtr-inline.collapsed > tbody > tr.parent > th.dtr-control:before {
+
+        table.dataTable.dtr-inline.collapsed>tbody>tr.parent>td.dtr-control:before,
+        table.dataTable.dtr-inline.collapsed>tbody>tr.parent>th.dtr-control:before {
             content: "-";
             border-color: var(--bs-warning-subtle);
             color: var(--bs-warning-subtle);
@@ -137,25 +158,49 @@ $bannerarray = ['banner' => $banner];
         }
 
         /* Barra de pesquisa moderna */
-        .modern-search-wrapper { transition: all 0.3s ease; }
-        .modern-search-wrapper:focus-within { transform: translateY(-2px); box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important; }
-        .search-icon-box { background-color: var(--bs-body-bg); border-color: var(--bs-border-color); }
-        #customSearchBox { background-color: var(--bs-body-bg); border-color: var(--bs-border-color); font-size: 1.1rem; }
-        #customSearchBox:focus { box-shadow: none; border-color: var(--bs-border-color); }
+        .modern-search-wrapper {
+            transition: all 0.3s ease;
+        }
+
+        .modern-search-wrapper:focus-within {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        }
+
+        .search-icon-box {
+            background-color: var(--bs-body-bg);
+            border-color: var(--bs-border-color);
+        }
+
+        #customSearchBox {
+            background-color: var(--bs-body-bg);
+            border-color: var(--bs-border-color);
+            font-size: 1.1rem;
+        }
+
+        #customSearchBox:focus {
+            box-shadow: none;
+            border-color: var(--bs-border-color);
+        }
 
         /* --- NOVO: ESTILO DOS FAVORITOS (ESTRELAS) --- */
         .star-btn {
             cursor: pointer;
-            color: #6c757d; /* Cinza desativado */
+            color: #6c757d;
+            /* Cinza desativado */
             font-size: 1.2rem;
             transition: all 0.2s ease;
         }
+
         .star-btn:hover {
-            color: #ffc107; /* Amarelo ao passar o mouse */
+            color: #ffc107;
+            /* Amarelo ao passar o mouse */
             transform: scale(1.2);
         }
+
         .star-btn.active {
-            color: #ffc107; /* Amarelo ativado */
+            color: #ffc107;
+            /* Amarelo ativado */
             text-shadow: 0 0 5px rgba(255, 193, 7, 0.5);
         }
     </style>
@@ -176,28 +221,30 @@ $bannerarray = ['banner' => $banner];
         </div>
     </nav>
 
-    <?php if(!empty($bannerarray["banner"])): ?>
-    <div class="news-ticker-container">
-        <div class="container-fluid">
-            <div class="news-ticker-text">
-                <i class="fa fa-bullhorn me-2 text-warning"></i> <?php echo htmlspecialchars($bannerarray["banner"]); ?>
+    <?php if (!empty($bannerarray["banner"])): ?>
+        <div class="news-ticker-container">
+            <div class="container-fluid">
+                <div class="news-ticker-text">
+                    <i class="fa fa-bullhorn me-2 text-warning"></i> <?php echo htmlspecialchars($bannerarray["banner"]); ?>
+                </div>
             </div>
         </div>
-    </div>
     <?php endif; ?>
 
     <div class="container my-4">
-        
+
         <div class="row mb-4 align-items-center">
             <div class="col-md-8">
                 <h2 class="fw-light text-uppercase mb-0 fs-4"><?php echo $orgao; ?></h2>
                 <p class="text-muted mb-0 small">
-                    Olá, <strong><?php echo !empty($useradmin) ? htmlspecialchars($useradmin) : "Visitante"; ?></strong>.
+                    Olá,
+                    <strong><?php echo !empty($useradmin) ? htmlspecialchars($useradmin) : "Visitante"; ?></strong>.
                 </p>
             </div>
             <div class="col-md-4 text-md-end mt-2 mt-md-0">
                 <?php if (fnmatch("172.16.0.*", $ipaddress) && empty($useradmin)) { ?>
-                    <a href="login.php" class="btn btn-primary btn-sm" title="Acesso para ajustes na lista"><i class="fa fa-sign-in-alt me-1"></i> Login Administrativo</a>
+                    <a href="login.php" class="btn btn-primary btn-sm" title="Acesso para ajustes na lista"><i
+                            class="fa fa-sign-in-alt me-1"></i> Login Administrativo</a>
                 <?php } ?>
             </div>
         </div>
@@ -207,27 +254,39 @@ $bannerarray = ['banner' => $banner];
                 <div class="card-body py-3">
                     <div class="d-flex flex-wrap gap-2 justify-content-center justify-content-md-start align-items-center">
                         <span class="badge bg-primary me-2 p-2"><i class="fa fa-cogs"></i> Painel</span>
-                        <a href="create.php" class="btn btn-success btn-sm" title="Adicionar novo ramal à lista"><i class="fa fa-plus me-1"></i> Novo Ramal</a>
-                        
+                        <a href="create.php" class="btn btn-success btn-sm" title="Adicionar novo ramal à lista"><i
+                                class="fa fa-plus me-1"></i> Novo Ramal</a>
+
                         <?php if ($adminarray['admin'] == "s") { ?>
-                            <a href="dashboard.php" class="btn btn-info btn-sm text-white" title="Visualizar Dashboard e Estatísticas"><i class="fa fa-chart-line me-1"></i> Dashboard</a>
+                            <a href="dashboard.php" class="btn btn-info btn-sm text-white"
+                                title="Visualizar Dashboard e Estatísticas"><i class="fa fa-chart-line me-1"></i> Dashboard</a>
 
                             <div class="btn-group btn-group-sm" role="group">
-                                <a href="usuarios/index.php" class="btn btn-outline-primary" title="Gerenciar usuários do sistema"><i class="fa fa-users"></i> Usuários</a>
-                                <a href="secretarias/index.php" class="btn btn-outline-primary" title="Gerenciar secretarias cadastradas"><i class="fa fa-building"></i> Secretarias</a>
-                                <a href="update_banner.php?id_banner=1" class="btn btn-outline-primary" title="Gerenciar banner cadastrado"><i class="fa fa-bullhorn"></i> Banner</a>
+                                <a href="usuarios/index.php" class="btn btn-outline-primary"
+                                    title="Gerenciar usuários do sistema"><i class="fa fa-users"></i> Usuários</a>
+                                <a href="secretarias/index.php" class="btn btn-outline-primary"
+                                    title="Gerenciar secretarias cadastradas"><i class="fa fa-building"></i> Secretarias</a>
+                                <a href="update_banner.php?id_banner=1" class="btn btn-outline-primary"
+                                    title="Gerenciar banner cadastrado"><i class="fa fa-bullhorn"></i> Banner</a>
                             </div>
                             <div class="btn-group btn-group-sm" role="group">
-                                <a href="importar.php" class="btn btn-outline-secondary" title="Importar lista de ramais em CSV"><i class="fa fa-file-upload"></i></a>
-                                <a href="exportar_csv.php" class="btn btn-outline-secondary" title="Exportar lista de ramais para CSV"><i class="fa fa-file-download"></i></a>
-                                <a href="historico_alteracoes.php" class="btn btn-outline-secondary" title="Exibir histórico de alterações em ramais"><i class="fa fa-history"></i></a>
+                                <a href="importar.php" class="btn btn-outline-secondary"
+                                    title="Importar lista de ramais em CSV"><i class="fa fa-file-upload"></i></a>
+                                <a href="exportar_csv.php" class="btn btn-outline-secondary"
+                                    title="Exportar lista de ramais para CSV"><i class="fa fa-file-download"></i></a>
+                                <a href="historico_alteracoes.php" class="btn btn-outline-secondary"
+                                    title="Exibir histórico de alterações em ramais"><i class="fa fa-history"></i></a>
                             </div>
-                            <a href="delete_all.php" class="btn btn-danger btn-sm" onclick="return confirm('Apagar TUDO?');" title="Apagar todos os registros da lista (Cuidado!)"><i class="fa fa-trash-alt"></i></a>
+                            <a href="delete_all.php" class="btn btn-danger btn-sm" onclick="return confirm('Apagar TUDO?');"
+                                title="Apagar todos os registros da lista (Cuidado!)"><i class="fa fa-trash-alt"></i></a>
                         <?php } ?>
-                        
+
                         <div class="ms-auto border-start ps-2">
-                            <a href="senha.php?user=<?php echo htmlspecialchars($useradmin); ?>" class="btn btn-warning btn-sm text-dark" title="Alterar senha do usuário"><i class="fa fa-key"></i></a>
-                            <a href="logout.php" class="btn btn-secondary btn-sm" title="Sair do sistema"><i class="fa fa-sign-out-alt"></i> Sair</a>
+                            <a href="senha.php?user=<?php echo htmlspecialchars($useradmin); ?>"
+                                class="btn btn-warning btn-sm text-dark" title="Alterar senha do usuário"><i
+                                    class="fa fa-key"></i></a>
+                            <a href="logout.php" class="btn btn-secondary btn-sm" title="Sair do sistema"><i
+                                    class="fa fa-sign-out-alt"></i> Sair</a>
                         </div>
                     </div>
                 </div>
@@ -236,12 +295,14 @@ $bannerarray = ['banner' => $banner];
 
         <div class="row justify-content-center mb-4 mt-2">
             <div class="col-md-8 col-lg-7">
-                <div class="input-group input-group-lg shadow-sm rounded-pill overflow-hidden modern-search-wrapper border">
+                <div
+                    class="input-group input-group-lg shadow-sm rounded-pill overflow-hidden modern-search-wrapper border">
                     <span class="input-group-text border-0 ps-4 search-icon-box">
                         <i class="fa fa-search text-secondary"></i>
                     </span>
-                    <input type="text" id="customSearchBox" class="form-control border-0 py-3" 
-                           placeholder="Pesquise por nome, setor ou ramal..." aria-label="Pesquisar" title="Pesquisar informações da lista">
+                    <input type="text" id="customSearchBox" class="form-control border-0 py-3"
+                        placeholder="Pesquise por nome, setor ou ramal..." aria-label="Pesquisar"
+                        title="Pesquisar informações da lista">
                     <span class="input-group-text border-0 pe-4 search-icon-box">
                         <i class="fa fa-filter text-muted opacity-50" style="font-size: 0.8em;"></i>
                     </span>
@@ -253,77 +314,78 @@ $bannerarray = ['banner' => $banner];
             <div class="card-body p-0">
                 <?php
                 $sql = "SELECT l.id_lista, l.nome, l.ramal, l.email, l.setor, s.secretaria FROM lista l JOIN secretarias s ON l.secretaria = s.id_secretaria";
-                
+
                 if ($result = mysqli_query($link, $sql)) {
                     if (mysqli_num_rows($result) > 0) {
-                ?>
-                    <div class="p-3">
-                        <table id="userTable" class="table table-hover align-middle w-100 border-bottom">
-                            <thead>
-                                <tr>
-                                    <th data-priority="1" class="text-left" style="width: 5%;"><i class="fa fa-star text-warning"></i></th>
-                                    
-                                    <th data-priority="5" style="width: 20%;">SECRETARIA</th>
-                                    <th data-priority="6" style="width: 20%;">SETOR</th>
-                                    <th data-priority="2" style="width: 25%;">NOME</th>
-                                    <th data-priority="3" class="text-nowrap" style="width: 10%;">RAMAL</th>
-                                    <th data-priority="7" style="width: 15%;">E-MAIL</th>
-                                    <th data-priority="4" class="text-end" style="width: 10%;">AÇÃO</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php
-                                while ($row = mysqli_fetch_array($result)) {
-                                    $secretaria = htmlspecialchars($row['secretaria']);
-                                    $setor = htmlspecialchars($row['setor']);
-                                    $nome = htmlspecialchars($row['nome']);
-                                    $email = htmlspecialchars($row['email']);
-                                    $id = $row['id_lista'];
+                        ?>
+                        <div class="p-3">
+                            <table id="userTable" class="table table-hover align-middle w-100 border-bottom">
+                                <thead>
+                                    <tr>
+                                        <th data-priority="1" class="text-left" style="width: 5%;"><i
+                                                class="fa fa-star text-warning"></i></th>
 
-                                    echo "<tr>";
-                                    
-                                    // NOVO: Célula da Estrela
-                                    // data-order="0" é padrão (sem estrela). O JS vai mudar para "1" se for favorito.
-                                    echo "<td class='text-left' data-order='0'>"; 
-                                    echo "<i class='fa fa-star star-btn' data-id='" . $id . "' title='Favoritar contato'></i>";
-                                    echo "</td>";
-                                    
-                                    echo "<td class='fw-semibold small'>";
-                                    echo "<div class='text-clamp-2' title='$secretaria'>$secretaria</div>";
-                                    echo "</td>";
-                                    
-                                    echo "<td>";
-                                    echo "<span class='badge bg-secondary bg-opacity-25 text-body border text-wrap text-start w-100'>";
-                                    echo "<div class='text-clamp-2' title='$setor'>$setor</div>";
-                                    echo "</span>";
-                                    echo "</td>";
-                                    
-                                    echo "<td class='fw-bold'>";
-                                    echo "<div class='text-clamp-2' title='$nome'>$nome</div>";
-                                    echo "</td>";
-                                    
-                                    echo "<td class='text-primary fw-bold text-nowrap'><i class='far fa-copy' style='cursor:pointer; margin-right:5px;' onclick='copyToClipboard(\"" . htmlspecialchars(preg_replace('/\D/', '', $row['ramal'])) . "\")' title='Copiar número'></i> <a href='tel:" . htmlspecialchars(preg_replace('/\D/', '', $row['ramal'])) . "'>" . htmlspecialchars($row['ramal']) . "</a> </td>";
-                                    
-                                    echo "<td class='text-primary fw-bold'>";
-                                    echo "<div class='text-clamp-2' title='" . htmlspecialchars($email) . "'><i class='far fa-copy' style='cursor:pointer; margin-right:5px;' onclick='copyToClipboard(\"" . htmlspecialchars($email) . "\")' title='Copiar e-mail'></i><a href='mailto:" . htmlspecialchars($email) . "'>" . htmlspecialchars($email) . "</a></div>";
-                                    echo "</td>";
-                                    
-                                    echo "<td class='text-end text-nowrap'>";
-                                    echo "<a href='read.php?id_lista=" . urlencode($row['id_lista']) . "' class='btn btn-sm btn-info text-white me-1' title='Ver detalhes deste ramal'><i class='fa fa-eye'></i> Ver</a>";
-                                    
-                                    if (!empty($useradmin)) {
-                                        echo "<a href='update.php?id_lista=" . urlencode($row['id_lista']) . "' class='btn btn-sm btn-warning text-dark me-1' title='Atualizar informações deste ramal'><i class='fa fa-pen'></i> Editar</a>";
-                                        echo "<a href='delete.php?id_lista=" . urlencode($row['id_lista']) . "' class='btn btn-sm btn-danger' title='Apagar este ramal'><i class='fa fa-trash'></i> Apagar</a>";
+                                        <th data-priority="5" style="width: 20%;">SECRETARIA</th>
+                                        <th data-priority="6" style="width: 20%;">SETOR</th>
+                                        <th data-priority="2" style="width: 25%;">NOME</th>
+                                        <th data-priority="3" class="text-nowrap" style="width: 10%;">RAMAL</th>
+                                        <th data-priority="7" style="width: 15%;">E-MAIL</th>
+                                        <th data-priority="4" class="text-end" style="width: 10%;">AÇÃO</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    while ($row = mysqli_fetch_array($result)) {
+                                        $secretaria = htmlspecialchars($row['secretaria']);
+                                        $setor = htmlspecialchars($row['setor']);
+                                        $nome = htmlspecialchars($row['nome']);
+                                        $email = htmlspecialchars($row['email']);
+                                        $id = $row['id_lista'];
+
+                                        echo "<tr>";
+
+                                        // NOVO: Célula da Estrela
+                                        // data-order="0" é padrão (sem estrela). O JS vai mudar para "1" se for favorito.
+                                        echo "<td class='text-left' data-order='0'>";
+                                        echo "<i class='fa fa-star star-btn' data-id='" . $id . "' title='Favoritar contato'></i>";
+                                        echo "</td>";
+
+                                        echo "<td class='fw-semibold small'>";
+                                        echo "<div class='text-clamp-2' title='$secretaria'>$secretaria</div>";
+                                        echo "</td>";
+
+                                        echo "<td>";
+                                        echo "<span class='badge bg-secondary bg-opacity-25 text-body border text-wrap text-start w-100'>";
+                                        echo "<div class='text-clamp-2' title='$setor'>$setor</div>";
+                                        echo "</span>";
+                                        echo "</td>";
+
+                                        echo "<td class='fw-bold'>";
+                                        echo "<div class='text-clamp-2' title='$nome'>$nome</div>";
+                                        echo "</td>";
+
+                                        echo "<td class='text-primary fw-bold text-nowrap'><i class='far fa-copy' style='cursor:pointer; margin-right:5px;' onclick='copyToClipboard(\"" . htmlspecialchars(preg_replace('/\D/', '', $row['ramal'])) . "\")' title='Copiar número'></i> <a href='tel:" . htmlspecialchars(preg_replace('/\D/', '', $row['ramal'])) . "'>" . htmlspecialchars($row['ramal']) . "</a> </td>";
+
+                                        echo "<td class='text-primary fw-bold'>";
+                                        echo "<div class='text-clamp-2' title='" . htmlspecialchars($email) . "'><i class='far fa-copy' style='cursor:pointer; margin-right:5px;' onclick='copyToClipboard(\"" . htmlspecialchars($email) . "\")' title='Copiar e-mail'></i><a href='mailto:" . htmlspecialchars($email) . "'>" . htmlspecialchars($email) . "</a></div>";
+                                        echo "</td>";
+
+                                        echo "<td class='text-end text-nowrap'>";
+                                        echo "<a href='read.php?id_lista=" . urlencode($row['id_lista']) . "' class='btn btn-sm btn-info text-white me-1' title='Ver detalhes deste ramal'><i class='fa fa-eye'></i> Ver</a>";
+
+                                        if (!empty($useradmin)) {
+                                            echo "<a href='update.php?id_lista=" . urlencode($row['id_lista']) . "' class='btn btn-sm btn-warning text-dark me-1' title='Atualizar informações deste ramal'><i class='fa fa-pen'></i> Editar</a>";
+                                            echo "<a href='delete.php?id_lista=" . urlencode($row['id_lista']) . "' class='btn btn-sm btn-danger' title='Apagar este ramal'><i class='fa fa-trash'></i> Apagar</a>";
+                                        }
+                                        echo "</td>";
+                                        echo "</tr>";
                                     }
-                                    echo "</td>";
-                                    echo "</tr>";
-                                }
-                                ?>
-                            </tbody>
-                        </table>
-                    </div>
-                <?php
-                    mysqli_free_result($result);
+                                    ?>
+                                </tbody>
+                            </table>
+                        </div>
+                        <?php
+                        mysqli_free_result($result);
                     } else {
                         echo '<div class="alert alert-info m-3">Nenhum registro encontrado.</div>';
                     }
@@ -343,20 +405,28 @@ $bannerarray = ['banner' => $banner];
                     <h6 class="text-uppercase fw-bold mb-2">Links Úteis</h6>
                     <div class="d-flex gap-2 flex-wrap justify-content-center justify-content-lg-start">
                         <?php if (empty($useradmin)) { ?>
-                            <a href="gerapdf.php" class="btn btn-outline-secondary btn-sm"><i class="fa fa-file-pdf me-1"></i> Gerar PDF</a>
-                            <a href="https://castro.pr.gov.br/pontos/" target="_blank" class="btn btn-outline-secondary btn-sm"><i class="fa fa-map-marked-alt me-1"></i> Mapa</a>
+                            <a href="gerapdf.php" class="btn btn-outline-secondary btn-sm"><i
+                                    class="fa fa-file-pdf me-1"></i> Gerar PDF</a>
+                            <a href="https://castro.pr.gov.br/pontos/" target="_blank"
+                                class="btn btn-outline-secondary btn-sm"><i class="fa fa-map-marked-alt me-1"></i> Mapa</a>
                         <?php } ?>
-                        <a href="https://castro.atende.net" target="_blank" class="btn btn-outline-primary btn-sm"><i class="fa fa-external-link-alt me-1"></i> Portal</a>
-                        <a href="sobre.php" class="btn btn-outline-secondary btn-sm"><i class="fa fa-info-circle me-1"></i> Sobre</a>
+                        <a href="https://castro.atende.net" target="_blank" class="btn btn-outline-primary btn-sm"><i
+                                class="fa fa-external-link-alt me-1"></i> Portal</a>
+                        <a href="sobre.php" class="btn btn-outline-secondary btn-sm"><i
+                                class="fa fa-info-circle me-1"></i> Sobre</a>
                     </div>
                 </div>
                 <div class="col-lg-6 col-md-12 mb-4 mb-md-0 text-center text-lg-end">
                     <img src="img/logo2.png" alt="Logo Prefeitura" style="max-height: 50px; opacity: 0.8;">
-                    <p class="small text-muted mt-2 mb-0">
-                        &copy; <?php echo date("Y"); ?> Prefeitura Municipal de Castro<br>
-                        <span class="text-opacity-50">SMCTI - Adriano Lerner Biesek</span>
-                    </p>
-                    <small class="text-muted" style="font-size: 0.7em;">IP: <?php echo htmlspecialchars($ipaddress); ?></small>
+                    <div class="col-lg-6 col-md-12 mb-4 mb-md-0 text-center text-lg-end">
+                        <img src="img/logo2.png" alt="Logo Prefeitura" style="max-height: 50px; opacity: 0.8;">
+                        <br />
+                        <small>© <?php echo date('Y'); ?> Adriano Lerner Biesek | Prefeitura Municipal de Castro (PR)<b>
+                                class="fa fa-heart text-danger"></i> para o serviço público.</small>
+                        <br />
+                        <small class="text-muted" style="font-size: 0.7em;">IP:
+                            <?php echo htmlspecialchars($ipaddress); ?>>
+                    </div>
                 </div>
             </div>
         </div>
@@ -372,24 +442,24 @@ $bannerarray = ['banner' => $banner];
     <script>
         $(document).ready(function () {
             // --- LÓGICA DE FAVORITOS (LOCALSTORAGE) ---
-            
+
             // 1. Carrega favoritos salvos ou cria array vazio
             let favorites = JSON.parse(localStorage.getItem('lista_favoritos') || '[]');
 
             // 2. Função para aplicar visual e ordenação (data-order)
             function applyFavorites() {
-                $('.star-btn').each(function() {
+                $('.star-btn').each(function () {
                     let id = $(this).data('id').toString();
                     let parentTd = $(this).parent();
 
                     if (favorites.includes(id)) {
                         $(this).addClass('active');
                         // Define valor alto para ordenação
-                        parentTd.attr('data-order', '1'); 
+                        parentTd.attr('data-order', '1');
                     } else {
                         $(this).removeClass('active');
                         // Define valor baixo para ordenação
-                        parentTd.attr('data-order', '0'); 
+                        parentTd.attr('data-order', '0');
                     }
                 });
             }
@@ -401,7 +471,7 @@ $bannerarray = ['banner' => $banner];
             var table = $('#userTable').DataTable({
                 responsive: true,
                 // Ordena primeiro pela coluna 0 (Estrelas) DESCendente, depois pelo Nome (Coluna 3) ASCendente
-                order: [[0, 'desc'], [3, 'asc']], 
+                order: [[0, 'desc'], [3, 'asc']],
                 columnDefs: [
                     { responsivePriority: 1, targets: 3 }, // Nome
                     { responsivePriority: 2, targets: 4 }, // Ramal
@@ -409,25 +479,25 @@ $bannerarray = ['banner' => $banner];
                     { responsivePriority: 4, targets: -1 } // Ação
                 ],
                 language: {
-                    "sEmptyTable":   "Nenhum registro encontrado",
-                    "sInfo":         "Mostrando de _START_ até _END_ de _TOTAL_ registros",
-                    "sInfoEmpty":    "Mostrando 0 até 0 de 0 registros",
+                    "sEmptyTable": "Nenhum registro encontrado",
+                    "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                    "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
                     "sInfoFiltered": "(Filtrados de _MAX_ registros)",
-                    "sInfoPostFix":  "",
+                    "sInfoPostFix": "",
                     "sInfoThousands": ".",
-                    "sLengthMenu":   "_MENU_ resultados por página",
+                    "sLengthMenu": "_MENU_ resultados por página",
                     "sLoadingRecords": "Carregando...",
-                    "sProcessing":   "Processando...",
-                    "sZeroRecords":  "Nenhum registro encontrado",
+                    "sProcessing": "Processando...",
+                    "sZeroRecords": "Nenhum registro encontrado",
                     "oPaginate": { "sNext": "Próximo", "sPrevious": "Anterior", "sFirst": "Primeiro", "sLast": "Último" }
                 },
                 dom: "<'row'<'col-sm-12'l>>" +
-                     "<'row'<'col-sm-12'tr>>" +
-                     "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+                    "<'row'<'col-sm-12'tr>>" +
+                    "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
             });
 
             // 4. Evento de Clique na Estrela
-            $('#userTable').on('click', '.star-btn', function() {
+            $('#userTable').on('click', '.star-btn', function () {
                 let id = $(this).data('id').toString();
                 let index = favorites.indexOf(id);
 
@@ -436,7 +506,7 @@ $bannerarray = ['banner' => $banner];
                 } else {
                     favorites.splice(index, 1); // Remove
                 }
-                
+
                 // Salva no navegador
                 localStorage.setItem('lista_favoritos', JSON.stringify(favorites));
 
@@ -499,4 +569,5 @@ $bannerarray = ['banner' => $banner];
         }
     </script>
 </body>
+
 </html>
