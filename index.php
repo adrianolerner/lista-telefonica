@@ -309,11 +309,11 @@ $bannerarray = ['banner' => $banner];
                                     echo "</td>";
                                     
                                     echo "<td class='text-end text-nowrap'>";
-                                    echo "<a href='read.php?id_lista=" . urlencode($row['id_lista']) . "' class='btn btn-sm btn-info text-white me-1' title='Ver detalhes deste ramal'><i class='fa fa-eye'></i></a>";
+                                    echo "<a href='read.php?id_lista=" . urlencode($row['id_lista']) . "' class='btn btn-sm btn-info text-white me-1' title='Ver detalhes deste ramal'><i class='fa fa-eye'></i> Ver</a>";
                                     
                                     if (!empty($useradmin)) {
-                                        echo "<a href='update.php?id_lista=" . urlencode($row['id_lista']) . "' class='btn btn-sm btn-warning text-dark me-1' title='Atualizar informações deste ramal'><i class='fa fa-pen'></i></a>";
-                                        echo "<a href='delete.php?id_lista=" . urlencode($row['id_lista']) . "' class='btn btn-sm btn-danger' title='Apagar este ramal'><i class='fa fa-trash'></i></a>";
+                                        echo "<a href='update.php?id_lista=" . urlencode($row['id_lista']) . "' class='btn btn-sm btn-warning text-dark me-1' title='Atualizar informações deste ramal'><i class='fa fa-pen'></i> Editar</a>";
+                                        echo "<a href='delete.php?id_lista=" . urlencode($row['id_lista']) . "' class='btn btn-sm btn-danger' title='Apagar este ramal'><i class='fa fa-trash'></i> Apagar</a>";
                                     }
                                     echo "</td>";
                                     echo "</tr>";
