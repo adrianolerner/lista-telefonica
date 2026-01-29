@@ -3,6 +3,7 @@
 Bem-vindo ao repositório da aplicação de lista telefônica desenvolvida para órgãos públicos. Esta ferramenta fornece uma interface intuitiva, responsiva e segura para gerenciar contatos e ramais internos.
 
 **Destaque da Versão 0.13+:** Interface modernizada com Bootstrap 5, suporte nativo a Temas (Claro/Escuro) e verificação automática de atualizações.
+**Destaque da Versão 0.15+:** Alterado captcha do Google recaptcha para o Cloudflare Turnstile, Implementado rate limite no login para segurança adicional, Implementado importação automática do banco de dados.
 
 ## Índice
 
@@ -54,10 +55,12 @@ FLUSH PRIVILEGES;
 
 ### 2. Importação das Tabelas
 
-Importe o arquivo `agenda.sql` localizado na raiz do projeto:
+Na versão 0.15, o sistema importa as tabelas automaticamente, desde que o usuário tenha os privilégios corretos, caso contrário importe manualamente conforme a seguir.
+
+Importe o arquivo `setup.sql` localizado na raiz do projeto:
 
 ```bash
-mysql -u usuario -p agenda < agenda.sql
+mysql -u usuario -p agenda < setup.sql
 
 ```
 ** ATUALIZAÇÃO PARA A VERSÃO 0.14 **
