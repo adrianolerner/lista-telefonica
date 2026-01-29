@@ -404,12 +404,10 @@ $bannerarray = ['banner' => $banner];
                 <div class="col-lg-6 col-md-12 mb-4 mb-md-0 text-center text-lg-start">
                     <h6 class="text-uppercase fw-bold mb-2">Links Úteis</h6>
                     <div class="d-flex gap-2 flex-wrap justify-content-center justify-content-lg-start">
-                        <?php if (empty($useradmin)) { ?>
-                            <a href="gerapdf.php" class="btn btn-outline-secondary btn-sm"><i
-                                    class="fa fa-file-pdf me-1"></i> Gerar PDF</a>
-                            <a href="https://castro.pr.gov.br/pontos/" target="_blank"
-                                class="btn btn-outline-secondary btn-sm"><i class="fa fa-map-marked-alt me-1"></i> Mapa</a>
-                        <?php } ?>
+                        <a href="gerapdf.php" class="btn btn-outline-secondary btn-sm"><i
+                                class="fa fa-file-pdf me-1"></i> Gerar PDF</a>
+                        <a href="https://castro.pr.gov.br/pontos/" target="_blank"
+                            class="btn btn-outline-secondary btn-sm"><i class="fa fa-map-marked-alt me-1"></i> Mapa</a>
                         <a href="https://castro.atende.net" target="_blank" class="btn btn-outline-primary btn-sm"><i
                                 class="fa fa-external-link-alt me-1"></i> Portal</a>
                         <a href="sobre.php" class="btn btn-outline-secondary btn-sm"><i
@@ -418,15 +416,11 @@ $bannerarray = ['banner' => $banner];
                 </div>
                 <div class="col-lg-6 col-md-12 mb-4 mb-md-0 text-center text-lg-end">
                     <img src="img/logo2.png" alt="Logo Prefeitura" style="max-height: 50px; opacity: 0.8;">
-                    <div class="col-lg-6 col-md-12 mb-4 mb-md-0 text-center text-lg-end">
-                        <img src="img/logo2.png" alt="Logo Prefeitura" style="max-height: 50px; opacity: 0.8;">
-                        <br />
-                        <small>© <?php echo date('Y'); ?> Adriano Lerner Biesek | Prefeitura Municipal de Castro (PR)<b>
-                                class="fa fa-heart text-danger"></i> para o serviço público.</small>
-                        <br />
-                        <small class="text-muted" style="font-size: 0.7em;">IP:
-                            <?php echo htmlspecialchars($ipaddress); ?>>
-                    </div>
+                    <br />
+                    <small>© 2026 Adriano Lerner Biesek | Prefeitura Municipal de Castro (PR)<br>Feito com <i
+                            class="fa fa-heart text-danger"></i> para o serviço público.</small>
+                    <br />
+                    <small class="text-muted" style="font-size: 0.7em;">IP: 172.16.0.10</small>
                 </div>
             </div>
         </div>

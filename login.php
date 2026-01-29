@@ -2,6 +2,10 @@
 session_start();
 include('config.php');
 
+// Captura IP real
+$ip = $_SERVER['HTTP_X_REAL_IP'] ?? $_SERVER['REMOTE_ADDR'];
+$ipaddress = strstr($ip, ',', true) ?: $ip;
+
 // Verifica se os campos foram enviados
 if (empty($_POST['usuario']) || empty($_POST['senha'])) {
     header('Location: acesso.php');
@@ -9,63 +13,84 @@ if (empty($_POST['usuario']) || empty($_POST['senha'])) {
 }
 
 // ---------------------------------------------------------
-// LÓGICA DO RECAPTCHA ENTERPRISE
+// 1. RATE LIMIT (Proteção contra Brute Force)
 // ---------------------------------------------------------
-$recaptcha_verified = true; // Em produção, mude para false
+// Configuração: Máximo 5 tentativas em 15 minutos
+$max_tentativas = 5;
+$janela_tempo = 15; // minutos
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['recaptcha_response'])) {
-    
-    if (!empty($_POST['recaptcha_response'])) {
-        $token = $_POST['recaptcha_response'];
-        
-        // CONFIGURAÇÕES ENTERPRISE
-        $api_key = "SUA_CHAVE_API_GOOGLE_CLOUD"; // Diferente da Chave do Site!
-        $project_id = "ID_DO_SEU_PROJETO_GOOGLE_CLOUD";
-        $site_key = "SUA_CHAVE_DO_SITE_ENTERPRISE";
+// Conta quantas tentativas falhas este IP teve no intervalo de tempo
+$sql_check = "SELECT COUNT(*) FROM login_tentativas WHERE ip = ? AND datahora > (NOW() - INTERVAL ? MINUTE)";
+if ($stmt = $link->prepare($sql_check)) {
+    $stmt->bind_param("si", $ipaddress, $janela_tempo);
+    $stmt->execute();
+    $stmt->bind_result($tentativas_recentes);
+    $stmt->fetch();
+    $stmt->close();
 
-        // URL da API Enterprise
-        $url = "https://recaptchaenterprise.googleapis.com/v1/projects/{$project_id}/assessments?key={$api_key}";
-
-        // Dados para a verificação
-        $data = [
-            'event' => [
-                'token' => $token,
-                'siteKey' => $site_key,
-                'expectedAction' => 'login' // Deve ser igual ao que colocamos no acesso.php
-            ]
-        ];
-
-        // Chamada via cURL
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $response = curl_exec($ch);
-        curl_close($ch);
-
-        $result = json_decode($response);
-
-        // Verificação Enterprise
-        // O Enterprise retorna um objeto "tokenProperties" e uma pontuação "riskAnalysis"
-        if (isset($result->tokenProperties->valid) && $result->tokenProperties->valid === true) {
-            // Pontuação de risco (0.1 a 1.0). 1.0 é humano, 0.1 é robô.
-            if ($result->riskAnalysis->score >= 0.5) {
-                $recaptcha_verified = true;
-            } else {
-                $recaptcha_verified = false;
-            }
-        } else {
-            $recaptcha_verified = false;
-        }
+    if ($tentativas_recentes >= $max_tentativas) {
+        // Bloqueia o acesso
+        $link->close();
+        $_SESSION['bloqueado'] = true;
+        header('Location: acesso.php');
+        exit();
     }
 }
 
 // ---------------------------------------------------------
-// AUTENTICAÇÃO NO BANCO
+// 2. LÓGICA DO CLOUDFLARE TURNSTILE (COM BYPASS DE DEV)
+// ---------------------------------------------------------
+$captcha_verified = false; // Começa como falso por segurança
+
+// Lista de IPs que podem pular o Captcha (Dev / Localhost / Seu IP)
+$ips_liberados = ['127.0.0.1', '::1'];
+
+if (in_array($ipaddress, $ips_liberados)) {
+    // MODO DESENVOLVIMENTO: Pula a checagem
+    $captcha_verified = true;
+} else {
+    // MODO PRODUÇÃO: Valida com Cloudflare
+    if (isset($_POST['cf-turnstile-response']) && !empty($_POST['cf-turnstile-response'])) {
+        
+        $secret_key = "SUA_SECRET_KEY_CLOUDFLARE"; //  Coloque sua Secret Key aqui
+        $token = $_POST['cf-turnstile-response'];
+        $remote_ip = $ipaddress;
+
+        $url = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
+        
+        $data = [
+            'secret' => $secret_key,
+            'response' => $token,
+            'remoteip' => $remote_ip
+        ];
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        $response_data = json_decode($response);
+
+        if ($response_data->success) {
+            $captcha_verified = true;
+        }
+    } else {
+        // Se não for IP liberado e não enviou token (tentativa de burlar via Postman/Curl)
+        $link->close();
+        $_SESSION['nao_autenticado'] = true;
+        header('Location: acesso.php');
+        exit();
+    }
+}
+
+// ---------------------------------------------------------
+// 3. AUTENTICAÇÃO NO BANCO
 // ---------------------------------------------------------
 
-if ($recaptcha_verified) {
+if ($captcha_verified) {
     $usuario = trim($_POST['usuario']);
     $senha = $_POST['senha'];
 
@@ -79,6 +104,17 @@ if ($recaptcha_verified) {
             $stmt->fetch();
 
             if (password_verify($senha, $senha_hash)) {
+                // SUCESSO!
+                
+                // A. Limpa tentativas de erro deste IP (zera o contador)
+                $sql_clean = "DELETE FROM login_tentativas WHERE ip = ?";
+                if($stmt_clean = $link->prepare($sql_clean)) {
+                    $stmt_clean->bind_param("s", $ipaddress);
+                    $stmt_clean->execute();
+                    $stmt_clean->close();
+                }
+
+                // B. Cria a sessão
                 session_regenerate_id(true);
                 $_SESSION['usuario'] = $usuario;
                 
@@ -93,7 +129,18 @@ if ($recaptcha_verified) {
     }
 }
 
-// FALHA NO LOGIN
+// ---------------------------------------------------------
+// 4. FALHA NO LOGIN (Registrar tentativa)
+// ---------------------------------------------------------
+
+// Insere a tentativa falha no banco
+$sql_log = "INSERT INTO login_tentativas (ip, datahora) VALUES (?, NOW())";
+if($stmt_log = $link->prepare($sql_log)) {
+    $stmt_log->bind_param("s", $ipaddress);
+    $stmt_log->execute();
+    $stmt_log->close();
+}
+
 $link->close();
 $_SESSION['nao_autenticado'] = true;
 header('Location: acesso.php');

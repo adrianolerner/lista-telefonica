@@ -1,18 +1,9 @@
 ﻿<?php
 session_start();
 
-//Verificação de IP (Mantida a lógica original para testes)
-//$ip = $_SERVER['HTTP_X_REAL_IP'];
-$ipaddress = "172.16.0.10";
-//$ipaddress = strstr($ip, ',', true);
-
-// Se quiser bloquear acesso externo via PHP, descomente a lógica abaixo
-/*
-if (!fnmatch("172.16.0.*", $ipaddress)) {
-    header('Location: index.php');
-    exit();
-}
-*/
+// Verificação de IP 
+$ip = $_SERVER['HTTP_X_REAL_IP'] ?? $_SERVER['REMOTE_ADDR'];
+$ipaddress = strstr($ip, ',', true) ?: $ip;
 ?>
 
 <!DOCTYPE html>
@@ -26,18 +17,8 @@ if (!fnmatch("172.16.0.*", $ipaddress)) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
-    <script src="https://www.google.com/recaptcha/enterprise.js?render=SUA_CHAVE_SITE_ENTERPRISE"></script>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     
-    <script>
-        // 2. O comando agora utiliza grecaptcha.enterprise
-        grecaptcha.enterprise.ready(function () {
-            grecaptcha.enterprise.execute('SUA_CHAVE_SITE_ENTERPRISE', { action: 'login' }).then(function (token) {
-                var recaptchaResponse = document.getElementById('recaptchaResponse');
-                recaptchaResponse.value = token;
-            });
-        });
-    </script>
-
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -90,7 +71,14 @@ if (!fnmatch("172.16.0.*", $ipaddress)) {
 
                     <div class="card-body p-4">
                         
-                        <?php if (isset($_SESSION['nao_autenticado'])): ?>
+                        <?php if (isset($_SESSION['bloqueado'])): ?>
+                            <div class="alert alert-warning d-flex align-items-center mb-4 border-0 shadow-sm" role="alert">
+                                <i class="fa fa-hand-paper me-2"></i>
+                                <div>Muitas tentativas falhas. Aguarde 15 minutos.</div>
+                            </div>
+                            <?php unset($_SESSION['bloqueado']); ?>
+                        
+                        <?php elseif (isset($_SESSION['nao_autenticado'])): ?>
                             <div class="alert alert-danger d-flex align-items-center mb-4 border-0 shadow-sm" role="alert">
                                 <i class="fa fa-exclamation-circle me-2"></i>
                                 <div>Usuário ou senha inválidos.</div>
@@ -118,7 +106,9 @@ if (!fnmatch("172.16.0.*", $ipaddress)) {
                                 </div>
                             </div>
 
-                            <input type="hidden" name="recaptcha_response" id="recaptchaResponse">
+                            <div class="mb-4 d-flex justify-content-center">
+                                <div class="cf-turnstile" data-sitekey="SEU_SITE_KEY_CLOUDFLARE" data-theme="light"></div>
+                            </div>
 
                             <div class="d-grid gap-2 mb-3">
                                 <button type="submit" class="btn btn-success btn-lg fw-bold shadow-sm py-2">
@@ -139,9 +129,7 @@ if (!fnmatch("172.16.0.*", $ipaddress)) {
                             IP: <span class="fw-bold"><?php echo htmlspecialchars($ipaddress); ?></span>
                         </div>
                         <div class="text-muted opacity-50" style="font-size: 0.65rem; line-height: 1.2;">
-                            Este site é protegido pelo reCAPTCHA Enterprise e a<br>
-                            <a href="https://policies.google.com/privacy" target="_blank" class="text-reset">Política de Privacidade</a> e
-                            <a href="https://policies.google.com/terms" target="_blank" class="text-reset">Termos de Serviço</a> do Google se aplicam.
+                            Protegido por Cloudflare Turnstile
                         </div>
                     </div>
                 </div>

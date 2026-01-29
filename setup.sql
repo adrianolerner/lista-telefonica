@@ -1,12 +1,3 @@
--- phpMyAdmin SQL Dump
--- version 5.2.1
--- https://www.phpmyadmin.net/
---
--- Host: 127.0.0.1
--- Tempo de geração: 22/01/2026 às 16:39
--- Versão do servidor: 10.4.32-MariaDB
--- Versão do PHP: 8.2.12
-
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
@@ -53,6 +44,18 @@ CREATE TABLE `lista` (
   `setor` varchar(100) DEFAULT NULL,
   `secretaria` int(11) DEFAULT NULL,
   `acessos` int(11) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `login_tentativas`
+--
+
+CREATE TABLE `login_tentativas` (
+  `id` int(99) NOT NULL,
+  `ip` varchar(45) NOT NULL,
+  `datahora` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -109,6 +112,13 @@ CREATE TABLE `stats_diario` (
   `acessos` int(11) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Despejando dados para a tabela `stats_diario`
+--
+
+INSERT INTO `stats_diario` (`data`, `acessos`) VALUES
+('2026-01-29', 3);
+
 -- --------------------------------------------------------
 
 --
@@ -146,6 +156,12 @@ ALTER TABLE `banner`
 ALTER TABLE `lista`
   ADD PRIMARY KEY (`id_lista`),
   ADD KEY `fk_secretaria` (`secretaria`);
+
+--
+-- Índices de tabela `login_tentativas`
+--
+ALTER TABLE `login_tentativas`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Índices de tabela `log_alteracoes`
@@ -192,7 +208,13 @@ ALTER TABLE `banner`
 -- AUTO_INCREMENT de tabela `lista`
 --
 ALTER TABLE `lista`
-  MODIFY `id_lista` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_lista` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT de tabela `login_tentativas`
+--
+ALTER TABLE `login_tentativas`
+  MODIFY `id` int(99) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de tabela `log_alteracoes`
@@ -210,7 +232,7 @@ ALTER TABLE `log_importacoes`
 -- AUTO_INCREMENT de tabela `secretarias`
 --
 ALTER TABLE `secretarias`
-  MODIFY `id_secretaria` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=107;
+  MODIFY `id_secretaria` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=108;
 
 --
 -- AUTO_INCREMENT de tabela `usuarios`
