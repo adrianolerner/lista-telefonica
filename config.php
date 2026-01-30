@@ -6,7 +6,7 @@
 define('RESTRITO_POR_IP', false);
 define('FAIXA_IP_PERMITIDA', '127.0.0.*');
 //Nome do órgão (alterar com seu orgão)
-$orgao = 'NOME DA PREFEITURA';
+$orgao = getenv('NOME_ORGAO') ?: 'NOME DA PREFEITURA';
 
 $raw_ip = $_SERVER['HTTP_X_REAL_IP'] ?? $_SERVER['REMOTE_ADDR'];
 $user_ip = trim(explode(',', $raw_ip)[0]);
@@ -25,7 +25,7 @@ if (RESTRITO_POR_IP === false) {
 // ATENÇÃO: No Docker Compose, o host geralmente é o nome do serviço (ex: db_agenda)
 $DB_SERVER   = getenv('DB_SERVER') ?: '127.0.0.1';
 $DB_USERNAME = getenv('DB_USERNAME') ?: 'admin';
-$DB_PASSWORD = getenv('DB_PASSWORD') ?: 'admin';
+$DB_PASSWORD = getenv('DB_PASSWORD') ?: '';
 $DB_NAME     = getenv('DB_NAME') ?: 'agenda';
 
 // Arquivo de instalação

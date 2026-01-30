@@ -97,6 +97,15 @@ $cf_site_key   = 'SUA_CHAVE_SITE_CLOUDFLARE';
 $cf_secret_key = 'SUA_CHAVE_SECRETA_CLOUDFLARE';
 
 ```
+### Nome do órgão
+
+Para alterar o nome do órgão que aparece na página principal, defina o valor da variável de ambiente NOME_ORGAO ou diretamente no valor da variável (NOME DA PREFEITURA) no arquivo `config.php` como abaixo:
+
+```php
+// No config.php:
+$orgao = getenv('NOME_ORGAO') ?: 'NOME DA PREFEITURA';
+
+```
 
 * **Ativação Automática:** Se as chaves estiverem preenchidas, o Captcha aparece.
 * **Desativação Automática:** Se as variáveis estiverem vazias (`''`), o Captcha é desabilitado automaticamente.
