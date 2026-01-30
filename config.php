@@ -3,8 +3,8 @@
 // 1. CONTROLE DE ACESSO E REDE (CENTRALIZADO)
 // ====================================================================
 
-define('RESTRITO_POR_IP', false);
-define('FAIXA_IP_PERMITIDA', '127.0.0.*');
+define('RESTRITO_POR_IP', getenv('RESTRITO_POR_IP') ?: false);
+define('FAIXA_IP_PERMITIDA', getenv('FAIXA_IP_PERMITIDA') ?: '127.0.0.*');
 //Nome do órgão (alterar com seu orgão)
 $orgao = getenv('NOME_ORGAO') ?: 'NOME DA PREFEITURA';
 
