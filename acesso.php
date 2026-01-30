@@ -1,9 +1,15 @@
 ﻿<?php
 session_start();
+include('config.php');
 
-// Verificação de IP 
-$ip = $_SERVER['HTTP_X_REAL_IP'] ?? $_SERVER['REMOTE_ADDR'];
-$ipaddress = strstr($ip, ',', true) ?: $ip;
+// Alias para manter compatibilidade
+$ipaddress = $user_ip;
+
+// 1. BLOQUEIO DE REDE (Redirecionamento)
+if (!$acesso_rede_permitido) {
+    header('Location: index.php');
+    exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -17,41 +23,16 @@ $ipaddress = strstr($ip, ',', true) ?: $ip;
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
+    <?php if ($captcha_ativo): ?>
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <?php endif; ?>
     
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bs-body-bg);
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0;
-        }
-        .login-card {
-            width: 100%;
-            max-width: 400px;
-            border: none;
-            box-shadow: 0 1rem 3rem rgba(0,0,0,.175);
-            border-radius: 1rem;
-            overflow: hidden;
-        }
-        .login-header {
-            background-color: var(--bs-success);
-            color: white;
-            text-align: center;
-            padding: 2.5rem 1rem;
-        }
-        .logo-img {
-            max-width: 130px;
-            margin-bottom: 15px;
-            filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.3));
-        }
-        .form-control:focus {
-            border-color: #198754;
-            box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
-        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bs-body-bg); height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; }
+        .login-card { width: 100%; max-width: 400px; border: none; box-shadow: 0 1rem 3rem rgba(0,0,0,.175); border-radius: 1rem; overflow: hidden; }
+        .login-header { background-color: var(--bs-success); color: white; text-align: center; padding: 2.5rem 1rem; }
+        .logo-img { max-width: 130px; margin-bottom: 15px; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.3)); }
+        .form-control:focus { border-color: #198754; box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25); }
         .hover-link:hover { color: var(--bs-success) !important; }
     </style>
 </head>
@@ -106,10 +87,30 @@ $ipaddress = strstr($ip, ',', true) ?: $ip;
                                 </div>
                             </div>
 
-                            <div class="mb-4 d-flex justify-content-center">
-                                <div class="cf-turnstile" data-sitekey="SEU_SITE_KEY_CLOUDFLARE" data-theme="light"></div>
-                            </div>
+                            <?php if ($captcha_ativo): ?>
+                                
+                                <?php 
+                                    // 1. CAPTCHA ATIVO NO CONFIG
+                                    // Verifica se é IP de dev (bypass visual)
+                                    $ips_liberados = ['127.0.0.1', '::1'];
+                                    
+                                    if (!in_array($ipaddress, $ips_liberados)): 
+                                ?>
+                                    <div class="mb-4 d-flex justify-content-center">
+                                        <div class="cf-turnstile" data-sitekey="<?php echo $cf_site_key; ?>" data-theme="light"></div>
+                                    </div>
 
+                                <?php else: ?>
+                                    <div class="alert alert-info py-1 small text-center mb-3 border-0 bg-info bg-opacity-10 text-info">
+                                        <i class="fa fa-code me-1"></i> Modo Dev: Captcha ignorado
+                                    </div>
+                                <?php endif; ?>
+
+                            <?php else: ?>
+                                <div class="alert alert-secondary py-1 small text-center mb-3 border-0 bg-secondary bg-opacity-10 text-secondary">
+                                    <i class="fa fa-shield-alt me-1"></i> Captcha Desativado (Config)
+                                </div>
+                            <?php endif; ?>
                             <div class="d-grid gap-2 mb-3">
                                 <button type="submit" class="btn btn-success btn-lg fw-bold shadow-sm py-2">
                                     ENTRAR <i class="fa fa-sign-in-alt ms-2"></i>
@@ -128,9 +129,12 @@ $ipaddress = strstr($ip, ',', true) ?: $ip;
                         <div class="small text-muted mb-2">
                             IP: <span class="fw-bold"><?php echo htmlspecialchars($ipaddress); ?></span>
                         </div>
-                        <div class="text-muted opacity-50" style="font-size: 0.65rem; line-height: 1.2;">
-                            Protegido por Cloudflare Turnstile
-                        </div>
+                        
+                        <?php if ($captcha_ativo): ?>
+                            <div class="text-muted opacity-50" style="font-size: 0.65rem; line-height: 1.2;">
+                                Protegido por Cloudflare Turnstile
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
 

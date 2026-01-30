@@ -1,16 +1,14 @@
 <?php
 session_start();
 
-//Verificação de IP
-//$ip = $_SERVER['HTTP_X_REAL_IP'];
-$ipaddress = "172.16.0.10";
-//$ipaddress = strstr($ip, ',', true);
+// 1. Incluir config PRIMEIRO para carregar conexão, $user_ip e $acesso_rede_permitido
+include('config.php');
+
+// Alias para manter compatibilidade com o nome de variável usado no template HTML
+$ipaddress = $user_ip;
 
 //Nome do órgão (alterar com seu orgão)
 $orgao = "PREFEITURA DE CASTRO";
-
-// Checagens de usuário
-include('config.php');
 
 // Registro de acessos
 $data_hoje = date('Y-m-d');
@@ -18,7 +16,9 @@ $sql_stats = "INSERT INTO stats_diario (data, acessos) VALUES ('$data_hoje', 1)
               ON DUPLICATE KEY UPDATE acessos = acessos + 1";
 mysqli_query($link, $sql_stats);
 
+// Checagem de usuário Admin
 $useradmin = @$_SESSION['usuario'];
+$admin = '';
 
 if ($stmt = mysqli_prepare($link, "SELECT admin FROM usuarios WHERE usuario = ?")) {
     mysqli_stmt_bind_param($stmt, "s", $useradmin);
@@ -30,6 +30,8 @@ if ($stmt = mysqli_prepare($link, "SELECT admin FROM usuarios WHERE usuario = ?"
 
 $adminarray = ['admin' => $admin];
 
+// Checagem de Banner
+$banner = '';
 if ($stmtBanner = mysqli_prepare($link, "SELECT banner FROM banner WHERE id_banner = ?")) {
     $id_banner = 1;
     mysqli_stmt_bind_param($stmtBanner, "i", $id_banner);
@@ -107,21 +109,17 @@ $bannerarray = ['banner' => $banner];
         table.dataTable tbody td {
             vertical-align: middle;
             height: 60px;
-            /* Altura suficiente para 2 linhas + padding */
         }
 
         /* CLASSE MÁGICA: Limita a 2 linhas e põe reticências (...) */
         .text-clamp-2 {
             display: -webkit-box;
             -webkit-line-clamp: 2;
-            /* Número máximo de linhas */
             -webkit-box-orient: vertical;
             overflow: hidden;
             text-overflow: ellipsis;
             line-height: 1.3;
-            /* Espaçamento entre linhas */
             max-height: 2.6em;
-            /* Garante o corte visual */
         }
 
         td a {
@@ -187,20 +185,17 @@ $bannerarray = ['banner' => $banner];
         .star-btn {
             cursor: pointer;
             color: #6c757d;
-            /* Cinza desativado */
             font-size: 1.2rem;
             transition: all 0.2s ease;
         }
 
         .star-btn:hover {
             color: #ffc107;
-            /* Amarelo ao passar o mouse */
             transform: scale(1.2);
         }
 
         .star-btn.active {
             color: #ffc107;
-            /* Amarelo ativado */
             text-shadow: 0 0 5px rgba(255, 193, 7, 0.5);
         }
     </style>
@@ -242,14 +237,14 @@ $bannerarray = ['banner' => $banner];
                 </p>
             </div>
             <div class="col-md-4 text-md-end mt-2 mt-md-0">
-                <?php if (fnmatch("172.16.0.*", $ipaddress) && empty($useradmin)) { ?>
+                <?php if ($acesso_rede_permitido && empty($useradmin)) { ?>
                     <a href="login.php" class="btn btn-primary btn-sm" title="Acesso para ajustes na lista"><i
                             class="fa fa-sign-in-alt me-1"></i> Login Administrativo</a>
                 <?php } ?>
             </div>
         </div>
 
-        <?php if (fnmatch("172.16.0.*", $ipaddress) && !empty($useradmin)) { ?>
+        <?php if ($acesso_rede_permitido && !empty($useradmin)) { ?>
             <div class="card mb-4 border-primary border-opacity-25 bg-primary bg-opacity-10">
                 <div class="card-body py-3">
                     <div class="d-flex flex-wrap gap-2 justify-content-center justify-content-md-start align-items-center">

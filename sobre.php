@@ -1,7 +1,7 @@
 <?php
 // Versão atual do seu aplicativo
 function getCurrentVersion() {
-    return '0.15';
+    return '0.16';
 }
 
 // Função para obter a última versão do GitHub
