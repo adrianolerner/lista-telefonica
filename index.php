@@ -7,9 +7,6 @@ include('config.php');
 // Alias para manter compatibilidade com o nome de variável usado no template HTML
 $ipaddress = $user_ip;
 
-//Nome do órgão (alterar com seu orgão)
-$orgao = "PREFEITURA DE CASTRO";
-
 // Registro de acessos
 $data_hoje = date('Y-m-d');
 $sql_stats = "INSERT INTO stats_diario (data, acessos) VALUES ('$data_hoje', 1) 
