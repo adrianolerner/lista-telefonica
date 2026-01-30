@@ -29,7 +29,11 @@ Para executar esta aplicação, é necessário:
 * Permissão de escrita na pasta raiz (para o processo de auto-instalação apagar o arquivo SQL temporário).
 * Permissão correta do usuário do banco de dados para criação do banco e tabelas.
 
-## Instalação
+## Instalação utilizando docker, disponível em:
+
+https://github.com/adrianolerner/lista-telefonica-docker/
+
+## Instalação Padrão
 
 A versão 0.16 introduziu o conceito de **Auto-Instalação**. Não é mais necessário importar SQL manualmente.
 
