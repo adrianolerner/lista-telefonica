@@ -1,4 +1,9 @@
 <?php
+// Inicia sessão se ainda não existir
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 // O config já define a variável $acesso_rede_permitido e $user_ip
 // Se este arquivo for chamado diretamente sem o config, incluímos ele.
 if (!isset($link)) {
