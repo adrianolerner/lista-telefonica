@@ -1,9 +1,5 @@
 <?php
-// Versão atual do seu aplicativo
-function getCurrentVersion() {
-    return '0.16';
-}
-
+include ('versao.php');
 // Função para obter a última versão do GitHub
 function getLatestVersion() {
     $url = 'https://api.github.com/repos/adrianolerner/lista-telefonica/releases/latest';
