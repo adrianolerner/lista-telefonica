@@ -1,5 +1,5 @@
 <?php
-include ('versao.php');
+include('versao.php');
 // Função para obter a última versão do GitHub
 function getLatestVersion() {
     $url = 'https://api.github.com/repos/adrianolerner/lista-telefonica/releases/latest';
