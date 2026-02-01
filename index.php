@@ -412,7 +412,8 @@ $bannerarray = ['banner' => $banner];
                     <small>© 2026 Adriano Lerner Biesek | Prefeitura Municipal de Castro (PR)<br>Feito com <i
                             class="fa fa-heart text-danger"></i> para o serviço público.</small>
                     <br />
-                    <small class="text-muted" style="font-size: 0.7em;">IP: 172.16.0.10</small>
+                    <?php include('versao.php'); ?>
+                    <small class="text-muted" style="font-size: 0.7em;">Versão <?php echo getCurrentVersion(); ?></small>
                 </div>
             </div>
         </div>
